@@ -1,0 +1,1 @@
+export {CombinedWishListScreen} from './combinedWishList.component';

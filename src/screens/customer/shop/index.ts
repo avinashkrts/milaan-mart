@@ -1,0 +1,1 @@
+export {ShopListScreen} from './shopList.screen'

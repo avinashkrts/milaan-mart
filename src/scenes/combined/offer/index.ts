@@ -1,0 +1,1 @@
+export {CombinedOffersScreen} from './CombinedOffers.component';
