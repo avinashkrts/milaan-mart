@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, Alert, FlatList, Keyboard, RefreshControl, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Keyboard, Pressable, RefreshControl, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import { Avatar, Divider, List, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
 import { Toolbar } from '../../../components/toolbar.component';
 import {
   SafeAreaLayout,
   SaveAreaInset
 } from '../../../components/safe-area-layout.component';
-import { CancelIcon, MenuIcon, RupeeIcon, SearchIcon, WishIcon } from '../../../assets/icons';
+import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RupeeIcon, SearchIcon, WishIcon } from '../../../assets/icons';
 import { ProductListScreenProps } from '../../../navigation/customer-navigator/product-list.navigator';
 import { connect, ConnectedProps } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -134,7 +134,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
   addToCart(productId) {
     const { shopId, logedIn, userData } = this.state
     if (null != logedIn && logedIn) {
-      // Alert.alert(''+ userData.userId + productId + logedIn + shopId)
+      // Alert.alert('' + userData.userId + productId + logedIn + shopId)
       axios({
         method: 'POST',
         url: AppConstants.API_BASE_URL + '/api/cart/create',
@@ -146,6 +146,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
         }
       }).then((response) => {
         if (null != response.data) {
+          console.log("Data", response.data)
           if (response.data.status === 'true') {
             Alert.alert("Product added to cart.")
             const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
@@ -155,6 +156,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
           }
         }
       }, (error) => {
+        // console.log(error)
         // Alert.alert("Server error.")
       });
     } else {
@@ -574,7 +576,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
                     <View style={[Styles.product_2nd_wish_view]}>
                       <TouchableOpacity onPress={() => { this.handleWishList(item.id) }}>
                         <Text
-                          style={this.state.logedIn && this.props.userData.wishList.includes(item.id) ?
+                          style={this.state.logedIn && this.props.userData.wishList != null && this.props.userData.wishList.includes(item.id) ?
                             Styles.selected_wish_icon :
                             Styles.wish_icon
                           }
@@ -646,98 +648,115 @@ class ProductList extends Component<Props, ProductPageState & any> {
       </ListItem> : <></>
   )
 
-  renderVariant = ({ item }: any): ListItemElement => (
-    <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
-      {item != null ?
-        <View style={Styles.variant_main_view}>
-          <View style={Styles.variant_view_1}>
-            <View style={Styles.variant_price_view}>
-              <View style={{ width: '55%', flexDirection: "column" }}>
-                {this.props.allMeasurement.length > 0 ? this.props.allMeasurement.map((brand, index) => {
-                  if (brand.id == item.measurement) {
-                    return (
-                      <View>
-                        <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.quantity} {brand.name}</Text>
-                      </View>
-                    );
-                  }
-                }) : null}
-                <View>
-                  <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.sellingPrice.toFixed(2)}</Text>
-                </View>
-
-                {item.sellingPrice != item.mrp ?
+  renderVariant = ({ item }: any): ListItemElement => {
+    var count = 0;
+    return (
+      <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+        {item != null ?
+          <View style={Styles.variant_main_view}>
+            <View style={Styles.variant_view_1}>
+              <View style={Styles.variant_price_view}>
+                <View style={{ width: '55%', flexDirection: "column" }}>
+                  {this.props.allMeasurement.length > 0 ? this.props.allMeasurement.map((brand, index) => {
+                    if (brand.id == item.measurement) {
+                      return (
+                        <View>
+                          <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.quantity} {brand.name}</Text>
+                        </View>
+                      );
+                    }
+                  }) : null}
                   <View>
-                    <Text style={Styles.offer_price_text}>
-                      {item.mrp.toFixed(2)}
-                    </Text>
+                    <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.sellingPrice.toFixed(2)}</Text>
                   </View>
-                  : null
-                }
-              </View>
-              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <View style={Styles.cart_quantity_view}>
-                  {item.stock ? item.stock > 0 ?
-                    this.state.logedIn ?
-                      this.props.allCart[0].productList.length ?
-                        this.props.allCart[0].productList.map((data, index) => {
-                          if (data.productId == item.id) {
-                            return (
-                              <>
-                                <TouchableOpacity style={Styles.cart_button}>
-                                  <Text onPress={() => { this.handleDecrease(item.id, data.cartId, data.productQuantity) }} style={Styles.cart_button_text}><MinusIcon /></Text>
-                                </TouchableOpacity>
 
-                                <View style={Styles.cart_quantity_text_view}>
-                                  <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
-                                </View>
+                  {item.sellingPrice != item.mrp ?
+                    <View>
+                      <Text style={Styles.offer_price_text}>
+                        {item.mrp.toFixed(2)}
+                      </Text>
+                    </View>
+                    : null
+                  }
+                </View>
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={Styles.cart_quantity_view}>
+                    {item.stock ? item.stock > 0 ?
+                      this.state.logedIn ?
+                        this.props.allCart != null && this.props.allCart.length ?
+                          this.props.allCart[0].productList.length > 0 ?
+                            this.props.allCart[0].productList.map((data, index) => {
 
-                                <TouchableOpacity style={Styles.cart_button}>
-                                  <Text style={Styles.cart_button_text} onPress={() => { this.handleIncrease(item.id, data.cartId) }}><AddIcon /></Text>
-                                </TouchableOpacity>
-                              </>
-                            )
-                          } else {
-                            return (
-                              <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ color: 'white', padding: scale(5) }} onPress={() => { this.addToCart(item.id) }} >Add To Cart</Text>
-                              </View>
-                            )
-                          }
-                        }) :
-                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                          <Text style={{ color: 'white' }}>Out of Stock</Text>
-                        </View> :
+                              if (data.productId == item.id) {
+                                if (count == 0) {
+                                  count++
+                                  return (
+                                    <>
+                                      <Pressable onPress={() => { this.handleDecrease(item.id, data.cartId, data.productQuantity) }} style={Styles.cart_button}>
+                                        <Text style={Styles.cart_button_text}><MinusIcon /></Text>
+                                      </Pressable>
+
+                                      <View style={Styles.cart_quantity_text_view}>
+                                        <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
+                                      </View>
+
+                                      <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId) }}>
+                                        <Text style={Styles.cart_button_text} ><AddIcon /></Text>
+                                      </Pressable>
+                                    </>
+                                  )
+                                }
+                              } else if (count < 1 && index == this.props.allCart[0].productList.length - 1) {
+                                return (
+                                  <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                      <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                    </View>
+                                  </Pressable>
+                                )
+                              }
+                            }) :
+                            <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                              <Text style={{ color: 'white' }}>Out of Stock</Text>
+                            </View> :
+                          <Pressable onPress={() => { this.addToCart(item.id) }}>
+                            <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                              <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                            </View>
+                          </Pressable> :
+                        <Pressable onPress={() => { this.addToCart(item.id) }}>
+                          <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                          </View>
+                        </Pressable> :
                       <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ color: 'white' }}>Out of Stock</Text>
                       </View> :
-                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                      <Text style={{ color: 'white' }}>Out of Stock</Text>
-                    </View> :
-                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                      <Text style={{ color: 'white' }}>Out of Stock</Text>
-                    </View>
-                  }
+                      <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ color: 'white' }}>Out of Stock</Text>
+                      </View>
+                    }
+                  </View>
                 </View>
               </View>
+              {item.offersAvailable ?
+                <View>
+                  <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
+                </View> : null
+              }
             </View>
             {item.offersAvailable ?
               <View>
-                <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
+                <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
               </View> : null
             }
           </View>
-          {item.offersAvailable ?
-            <View>
-              <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
-            </View> : null
-          }
-        </View>
-        :
-        <ActivityIndicator size='large' color='green' />}
+          :
+          <ActivityIndicator size='large' color='green' />}
 
-    </ListItem>
-  )
+      </ListItem>
+    )
+  }
   render() {
     // const productList = this.props.productData
     const productList = null
@@ -900,7 +919,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
           <Divider />
           {/* <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}> */}
 
-          <View style={{backgroundColor: '#ffffff', height: 50, marginTop: 0, flex: 1, flexDirection: 'column' }}>
+          <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0, flex: 1, flexDirection: 'column' }}>
             <View style={{ marginTop: 10 }}>
               <FlatList
                 style={{}}
@@ -938,7 +957,6 @@ class ProductList extends Component<Props, ProductPageState & any> {
             </ScrollView>
           </> :
           <>
-
             {null != productVariant ?
               <List data={productVariant}
                 refreshControl={
@@ -949,6 +967,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
                 renderItem={this.renderProduct}
                 onEndReached={() => this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: productVariant.length, to: productVariant.length + 10 })}
               /> : null}
+
             {/* {
               <View>
                 <ActivityIndicator />

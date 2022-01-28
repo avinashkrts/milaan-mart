@@ -11,6 +11,7 @@ export enum AppRoute {
     CUSTOMER_CATEGORY_LIST = "CUSTOMER_CATEGORY_LIST",
     CUSTOMER_CART = "CUSTOMER_CART",
     CART = "CART",
+    PAYMENT = "PAYMENT",
 
     /*----------------------------- Auth Navigator Constants -----------------------------*/
     AUTH = "Auth",

@@ -205,21 +205,11 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                             <List data={allCategory}
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
-                                refreshControl={
-                                    <RefreshControl
-                                        refreshing={refreshing}
-                                        onRefresh={this._onRefresh.bind(this)}
-                                    />}
                                 renderItem={this.renderCategory1}
                             />
                             <List data={allCategory}
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
-                                refreshControl={
-                                    <RefreshControl
-                                        refreshing={refreshing}
-                                        onRefresh={this._onRefresh.bind(this)}
-                                    />}
                                 renderItem={this.renderCategory}
                             />
                         </> : null}
@@ -231,11 +221,6 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                         <List data={allCategory}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={refreshing}
-                                    onRefresh={this._onRefresh.bind(this)}
-                                />}
                             renderItem={this.renderCategory}
                         /> : null}
                 </View>

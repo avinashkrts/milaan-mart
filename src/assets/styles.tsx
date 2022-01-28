@@ -209,6 +209,25 @@ export const Styles = ScaledSheet.create({
     color: Color.BUTTON_NAME_COLOR
   },
 
+  /*---------------------------------------------This Style is for All Category Page--------------------------------------------------------- */
+  category_card : {
+    width: '220@s',
+    height: '120@s',
+    borderColor: Color.SILVER,
+    borderWidth: 1,
+    borderRadius: 10
+  },
+
+  cat_card_img : {
+    borderRadius: 5,
+  },
+
+  cat_card_avatar : {
+    height: '118@s',
+    width: '218@s',
+    borderRadius: 5
+  },
+
   /*---------------------------------------------This Style is for All Item Page--------------------------------------------------------- */
   all_Item_Main_View: {
     width: '100%',

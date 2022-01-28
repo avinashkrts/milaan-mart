@@ -85,7 +85,8 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
             outOfStock: false,
             isModalVisible: false,
             selectedCartId: '',
-            insideShop: false
+            insideShop: false,
+            content: {}
         }
         this._onRefresh = this._onRefresh.bind(this);
         this.navigationProductDetail = this.navigationProductDetail.bind(this);
@@ -411,7 +412,10 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
                     </View>
                 </Modal> */}
 
-                <ScrollView style={Styles.cart_content} showsVerticalScrollIndicator={false}
+                <ScrollView
+                    nestedScrollEnabled={true}
+                    style={Styles.cart_content}
+                    showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -440,7 +444,9 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
                         </View>
                     </View> */}
                     <>
-                        <List data={productList ? productList.slice(0).reverse() : null}
+                        <List
+                            nestedScrollEnabled={true}
+                            data={productList ? productList.slice(0).reverse() : null}
                             renderItem={this.renderCart}
                         />
 
