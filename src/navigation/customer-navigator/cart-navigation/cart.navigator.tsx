@@ -4,9 +4,9 @@ import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack';
-import { AppRoute } from '../app-routes';
-import { CartScreen, PaymentScreen } from '../../screens/customer/cart';
-import { RootNavigatorParams } from '../root.navigator';
+import { AppRoute } from '../../app-routes';
+import { CartScreen, PaymentScreen } from '../../../screens/customer/cart';
+import { RootNavigatorParams } from '../../root.navigator';
 
 type CartNavigatorParams = RootNavigatorParams & {
   [AppRoute.CUSTOMER_CART]: undefined;

@@ -4,7 +4,7 @@ import { AuthNavigator } from './auth-navigation/auth.navigator';
 import { AppRoute } from './app-routes';
 import { CustomerNavigator } from './customer-navigator/customer.navigator';
 import { UserDecideNavigator } from './user-decide/userDecide.navigator';
-import { CartNavigator } from './cart-navigation/cart.navigator';
+import { CartNavigator } from './customer-navigator/cart-navigation/cart.navigator';
 
 type StackNavigatorProps = React.ComponentProps<typeof Stack.Navigator>;
 

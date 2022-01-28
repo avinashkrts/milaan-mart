@@ -20,23 +20,22 @@ import { Separator, Container, Content, View, Footer, FooterTab, Form, Picker, I
 import Axios from 'axios';
 import { LabelConstants } from '../../constants/LabelConstants';
 import { AsyncStorage } from 'react-native';
-import { AppNavigator } from '../../navigation/app.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { SignInScreen } from '.'
-import { LogoutScreenProps } from '../../navigation/auth.navigator';
+import { LogOutScreenProp } from '../../navigation/customer-navigator/customer.navigator';
 import { StackActions } from '@react-navigation/core';
 import DeviceInfo from 'react-native-device-info';
 
 type Mystate = {
 
 }
-// const prop = (props: AboutScreenProps):
-export class LogoutScreen extends Component<LogoutScreenProps & SafeAreaLayoutElement & any, Mystate & any> {
-  constructor(props) {
+
+type Props = LogOutScreenProp & SafeAreaLayoutElement 
+
+export class LogoutScreen extends Component<Props, Mystate & any> {
+  constructor(props: Props) {
     super(props)
     this.state = {}
-
-
   }
 
   async componentDidMount() {

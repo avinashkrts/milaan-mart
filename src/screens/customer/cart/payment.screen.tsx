@@ -37,7 +37,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import moment from 'moment';
 import { scale } from 'react-native-size-matters';
 import { StackActions } from '@react-navigation/routers';
-import { PaymentScreenProps } from '../../../navigation/cart-navigation/cart.navigator';
+import { PaymentScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
 
 type MyState = {
     displayName: String,

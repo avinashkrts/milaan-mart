@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, RefreshControl, Alert, AsyncStorage, ActivityIndicator, PermissionsAndroid } from "react-native";
 import { Avatar, Divider, ThemedComponentProps } from "react-native-ui-kitten";
-import { AddCustomerImageScreenProps } from "../../../navigation/customer-navigator/customerProfile.Navigator";
 import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
 import { Toolbar } from "../../../components/toolbar.component";
 import { BackIcon, CancelIcon, MenuIcon } from "../../../assets/icons";

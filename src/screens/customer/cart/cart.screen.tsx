@@ -54,7 +54,7 @@ import { fetchBrandByShopId } from '../../../redux/action/brandAction';
 import { connect, ConnectedProps } from 'react-redux';
 import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
 // import { CartNavigatorProp } from '../../../navigation/customer-navigator/customer.navigator';
-import { CartScreenProps } from '../../../navigation/cart-navigation/cart.navigator';
+import { CartScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
 
 interface CartPageProps {
 }
