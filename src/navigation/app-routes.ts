@@ -22,6 +22,8 @@ export enum AppRoute {
     CUSTOMER_WALLET = "CUSTOMER_WALLET",
     CUSTOMER_CONTACT = "CUSTOMER_CONTACT",
     ADD_CUSTOMER_IMAGE = "ADD_CUSTOMER_IMAGE",
+    CUSTOMER_ORDER = "CUSTOMER_ORDER",
+    CUSTOMER_ORDER_DETAIL = "CUSTOMER_ORDER_DETAIL",
     
     /*----------------------------- Auth Navigator Constants -----------------------------*/
     AUTH = "Auth",

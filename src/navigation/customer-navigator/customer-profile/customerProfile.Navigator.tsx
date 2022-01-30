@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/stack';
 import { RootNavigatorParams } from '../../root.navigator';
 import { AppRoute } from '../../app-routes';
-import { CustomerProfileScreen } from '../../../screens/customer/drawer';
+import { AddCustomerImageScreen, CustomerProfileScreen } from '../../../screens/customer/drawer';
 
 type CustomerProfileDrawerNavigatorParams = RootNavigatorParams & {
     [AppRoute.CUSTOMER_PROFILE]: undefined;

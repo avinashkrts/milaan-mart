@@ -1,4 +1,4 @@
-import React, { FC, Fragment } from "react";
+import React, { FC, Fragment, useEffect } from "react";
 // import { LogBox } from "react-native";
 import { light, mapping } from "@eva-design/eva";
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,6 +14,11 @@ import store, { persistor } from "./redux/store";
 interface Props { }
 
 const App: FC<Props> = () => {
+  // useEffect(() => {
+  //   OneSignal.setAppId("43e3395b-0019-492b-b999-4321444f25ad");
+  //   SplashScreen.hide();
+  // });
+  
   return (
     <Fragment>
       <Provider store={store}>

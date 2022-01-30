@@ -12,7 +12,6 @@ import {
   DrawerNavigationProp,
 } from '@react-navigation/drawer';
 import { AddressIcon, HelpIcon, HomeIcon, InfoIcon, LayoutIcon, LogoutIcon, MyOrderIcon, ProfileIcon, WalletIcon, WishIcon } from '../../assets/icons';
-import { AuthNavigator } from '../auth-navigation/auth.navigator';
 import { CustomerTabBar } from '../navigator-components/customer-tab-bar';
 import { CustomerDrawer } from '../navigator-components/customer-home-drawer';
 import { ProductListNavigator } from './product-list.navigator';
@@ -23,6 +22,9 @@ import { OffersListNavigator } from './offer-list.navigator';
 import { BillBookNavigator } from './bill-book.navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LogoutScreen } from '../../screens/auth/logout.component';
+import { CustomerProfileDrawerNavigator } from './customer-profile/customerProfile.Navigator';
+import { CustomerAddressScreen, CustomerContactScreen, CustomerNotificationScreen, CustomerWalletScreen } from '../../screens/customer/drawer';
+import { CustomerOrderNavigator } from './order-navigation/order.navigator';
 
 type CustomerDrawerNavigatorParams = {
   [AppRoute.HOME]: undefined;
@@ -174,25 +176,25 @@ export const CustomerNavigator = (): React.ReactElement => (
 
     <Drawer.Screen
       name={AppRoute.CUSTOMER_PROFILE}
-      component={CartNavigator}
+      component={CustomerProfileDrawerNavigator}
       options={{ title: 'Profile', drawerIcon: ProfileIcon }}
     />
 
     <Drawer.Screen
       name={AppRoute.CUSTOMER_ADDRESS}
-      component={CartNavigator}
+      component={CustomerAddressScreen}
       options={{ title: 'Address', drawerIcon: AddressIcon }}
     />
 
     <Drawer.Screen
       name={AppRoute.CUSTOMER_NOTIFICATION}
-      component={CartNavigator}
+      component={CustomerNotificationScreen}
       options={{ title: 'Notification', drawerIcon: AddressIcon }}
     />
 
     <Drawer.Screen
       name={AppRoute.CUSTOMER_ORDER_NAV}
-      component={CartNavigator}
+      component={CustomerOrderNavigator}
       options={{ title: 'My Order', drawerIcon: MyOrderIcon }}
     />
 
@@ -204,13 +206,13 @@ export const CustomerNavigator = (): React.ReactElement => (
 
     <Drawer.Screen
       name={AppRoute.CUSTOMER_WALLET}
-      component={CartNavigator}
+      component={CustomerWalletScreen}
       options={{ title: 'Wallet', drawerIcon: WalletIcon }}
     />
 
     <Drawer.Screen
       name={AppRoute.CUSTOMER_CONTACT}
-      component={CartNavigator}
+      component={CustomerContactScreen}
       options={{ title: 'About Us', drawerIcon: HelpIcon }}
     />
 

@@ -18,7 +18,7 @@ import {
 import { ScrollableTab, Tab, Item, Container, Content, Tabs, Header, TabHeading, Thumbnail, Input, Label, Footer, FooterTab, Col } from 'native-base';
 import { AppRoute } from '../../../navigation/app-routes';
 import { ProgressBar } from '../../../components/progress-bar.component';
-import { SearchIcon, MinusIcon, RupeeIcon, PlusCircle, BackIcon, CancelIcon, PlusIcon, AddIcon, RightArrowIcon } from '../../../assets/icons';
+import { SearchIcon, MinusIcon, RupeeIcon, PlusCircle, BackIcon, CancelIcon, AddIcon, RightArrowIcon } from '../../../assets/icons';
 import { AppConstants } from '../../../constants/AppConstants';
 import { Toolbar } from '../../../components/toolbar.component';
 import {
@@ -143,7 +143,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                 method: 'GET',
                 url: AppConstants.API_BASE_URL + '/api/product/getproduct/wishlist/' + AppConstants.SHOP_ID + '/' + userData.userId,
             }).then((response) => {
-                // console.log(data.variable, response.data)
+                // console.log( response.data, 'ooo')
                 this.setState({ allProduct: response.data })
             }, (error) => {
                 this.setState({ allProduct: null })
@@ -256,7 +256,8 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
     renderProduct = ({ item }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
-            {item != null ?
+            <Text>hjhjh</Text>
+            {/* {item != null ?
                 <View>
                     <View style={Styles.cart_main_view}>
                         <View style={Styles.cart_view_1}>
@@ -286,7 +287,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
                                         <View style={Styles.cart_quantity_text_view}>
                                             <Text style={Styles.cart_quantity_text}>3</Text>
-                                        </View> */}
+                                        </View> 
 
                                         <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleAddTocart(item.productId, item.shopId) }}>
                                             <Text style={Styles.cart_button_text}>Add to cart</Text>
@@ -302,13 +303,13 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                         </View>
 
                         <View>
-                            {item.offerPercent ? item.offerPercent > 0 && item.offerActiveInd?
+                            {item.offerPercent ? item.offerPercent > 0 && item.offerActiveInd ?
                                 <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}> offers available</Text> : null : null}
                         </View>
                     </View>
 
                 </View> :
-                <ActivityIndicator size='large' color='green' />}
+                <ActivityIndicator size='large' color='green' />} */}
 
         </ListItem>
     )
@@ -320,25 +321,20 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP}>
                 <Toolbar
-                    title= 'Wish List'
+                    title='Wish List'
                     backIcon={MenuIcon}
                     onBackPress={this.props.navigation.openDrawer}
-                    onRightPress={() => { this.continiueShopping() }}
-                    menuIcon={PlusCircle}
+                    // onRightPress={() => { this.continiueShopping() }}
+                    // menuIcon={PlusCircle}
                     style={{ marginTop: -5, marginLeft: -5 }}
                 />
                 <Divider />
 
-                <Content style={Styles.cart_content} showsVerticalScrollIndicator={false}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.refreshing}
-                            onRefresh={this._onRefresh.bind(this)}
-                        />
-                    }
-                >
-                    {/* <Header style={styles.header}> */}
-                    {/* <View style={Styles.searchBox}>
+                {/* <Content style={Styles.cart_content} showsVerticalScrollIndicator={false}
+                   
+                > */}
+                {/* <Header style={styles.header}> */}
+                {/* <View style={Styles.searchBox}>
                         <Text style={Styles.searchIcon}><SearchIcon /></Text>
                         <TextInput
                             placeholder="Search"
@@ -346,7 +342,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                         />
                     </View> */}
 
-                    {/* <View style={{ backgroundColor: '#fff', borderColor: Color.BORDER, borderWidth: 0.5, padding: 20, marginBottom: 10 }}>
+                {/* <View style={{ backgroundColor: '#fff', borderColor: Color.BORDER, borderWidth: 0.5, padding: 20, marginBottom: 10 }}>
                         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Address</Text>
 
                         <Text style={{ marginVertical: 5 }}>101, InOrbit Complex, Near B.M.P. 16, Phulwari Khagaul Road, Patna, 801505</Text>
@@ -357,12 +353,19 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                             </TouchableOpacity>
                         </View>
                     </View> */}
-                    {null != allProduct ?
-                        <List data={allProduct}
-                            renderItem={this.renderProduct}
-                        /> : null}
-                    <View style={{ height: 10, width: '100%' }} />
-                </Content>
+                {null != allProduct ?
+                    <List
+                        data={allProduct}
+                        renderItem={this.renderProduct}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.refreshing}
+                                onRefresh={this._onRefresh.bind(this)}
+                            />
+                        }
+                    /> : null}
+                <View style={{ height: 10, width: '100%' }} />
+                {/* </Content> */}
 
                 {/* <View style={Styles.cart_bottom_box_view}>
                     <View>

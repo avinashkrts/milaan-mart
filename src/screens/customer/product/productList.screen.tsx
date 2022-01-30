@@ -844,7 +844,6 @@ class ProductList extends Component<Props, ProductPageState & any> {
                     }
                   >
                   </Marker>
-
                 </MapView>
               </> : null}
           </View>
@@ -852,7 +851,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
 
 
         <Toolbar
-          title='Sone Biryani'
+          title='Product List'
           backIcon={MenuIcon}
           onBackPress={this.props.navigation.openDrawer}
           // onRightPress={() => { this.navigateToCart() }}
