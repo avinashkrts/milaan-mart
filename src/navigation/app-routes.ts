@@ -5,7 +5,7 @@ export enum AppRoute {
     LOG_OUT = "Log_Out",
     SHOP_LIST = "Shop_List",
     CATEGORY_LIST = "CATEGORY_LIST",
-    PRODUCT_LIST = "Product_List",
+    PRODUCT_LIST = "PRODUCT_LIST",
     CUSTOMER_PRODUCT_LIST = "Customer_Product_List",
     CUSTOMER_SHOP_LIST = "Customer_Shop_List",
     CUSTOMER_CATEGORY_LIST = "CUSTOMER_CATEGORY_LIST",

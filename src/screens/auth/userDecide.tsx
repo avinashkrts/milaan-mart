@@ -6,7 +6,7 @@ import axios from 'axios';
 import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { Styles } from '../../assets/styles';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import RazorpayCheckout from 'react-native-razorpay';
 import OneSignal from 'react-native-onesignal';
@@ -23,7 +23,7 @@ interface State {
     token: string | undefined;
 }
 
-type Props = UserDecideProps & ThemedComponentProps & any; 
+type Props = UserDecideProps & ThemedComponentProps & any;
 
 export class UserDecide extends Component<Props, State & any> {
     constructor(props: Props) {
@@ -44,6 +44,7 @@ export class UserDecide extends Component<Props, State & any> {
         const { data, playerId } = this.state;
         OneSignal.setLogLevel(6, 0);
         OneSignal.setAppId("43e3395b-0019-492b-b999-4321444f25ad");
+        AsyncStorage.setItem('categoryId', '')
 
         VersionCheck.getLatestVersion({
             provider: 'playStore'

@@ -134,13 +134,13 @@ const CustomerBottomNavigator = (): React.ReactElement => (
     <BottomTab.Screen
       name={AppRoute.PRODUCT_LIST}
       component={ProductListNavigator}
-      options={{ title: 'Home', tabBarIcon: LayoutIcon }}
+      options={{ title: 'Products', tabBarIcon: LayoutIcon }}
     />
 
     <BottomTab.Screen
       name={AppRoute.WISH_LIST}
       component={WishListNavigator}
-      options={{ title: 'Product', tabBarIcon: WishIcon }}
+      options={{ title: 'Wish List', tabBarIcon: WishIcon }}
     />
 
     <BottomTab.Screen

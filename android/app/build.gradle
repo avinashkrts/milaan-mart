@@ -134,9 +134,15 @@ android {
         applicationId "com.milaan.mart"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         versionCode 2
         versionName "2.0"
     }
+
+    dexOptions {
+       javaMaxHeapSize "4g"
+    }
+    
     splits {
         abi {
             reset()

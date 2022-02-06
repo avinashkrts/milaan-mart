@@ -21,7 +21,7 @@ export function* setProductVariantAsync(action) {
     let response1 = yield VARIENT_SERVICE.VARIENT_BY_SHOP_ID(action.payload.shopId);
     if (response.data && response.data != null && response1.data && response1.data != null) {
         var data = []
-        for (var i = 0; i < action.payload.to; i++) {
+        for (var i = 0; i < response.data.length; i++) {
             var data1 = []
             var data2 = []
             data1.push(response.data[i])
@@ -40,6 +40,35 @@ export function* setProductVariantAsync(action) {
     }
 }
 
+export function* setProductVariantByCatAsync(action) {
+    let response = yield PRODUCT_SERVICE.PRODUCT_BY_CATEGORY_ID(action.payload.categoryId);
+    let response1 = yield VARIENT_SERVICE.VARIENT_BY_SHOP_ID(action.payload.shopId);
+    if (response.data && response.data != null && response1.data && response1.data != null) {
+        var data = []
+        for (var i = 0; i < response.data.length; i++) {
+            var data1 = []
+            var data2 = []
+            data1.push(response.data[i])
+            for (var j = 0; j < response1.data.length; j++) {
+                if (response.data[i].id == response1.data[j].productId) {
+                    data2.push(response1.data[j])
+                }
+            }
+            data1[0].itemList = data2
+            data.push(data1[0])
+        }
+        yield put({
+            type: ProductActions.SET_PRODUCT_VARIANT_BY_CAT_ASYNC,
+            payload: data
+        });
+    } else {
+         yield put({
+            type: ProductActions.SET_PRODUCT_VARIANT_BY_CAT_ASYNC,
+            payload: []
+        });
+    }
+}
+
 export function* fetchProductByShopId() {
     yield takeEvery(ProductActions.GET_BY_SHOP_ID, fetchProductByShopIdAsync);
 }
@@ -48,9 +77,14 @@ export function* setProductVariant() {
     yield takeEvery(ProductActions.SET_PRODUCT_VARIANT, setProductVariantAsync);
 }
 
+export function* setProductVariantByCat() {
+    yield takeEvery(ProductActions.SET_PRODUCT_VARIANT_BY_CAT, setProductVariantByCatAsync);
+}
+
 export default function* rootSaga() {
     yield all([
         fork(fetchProductByShopId),
-        fork(setProductVariant)
+        fork(setProductVariant),
+        fork(setProductVariantByCat)
     ])
 }

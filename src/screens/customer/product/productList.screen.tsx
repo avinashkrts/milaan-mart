@@ -21,7 +21,7 @@ import { Varient } from '../../../redux/modules/varient.modules';
 import { Measurement } from '../../../redux/modules/measurement.modules';
 import { Category } from '../../../redux/modules/category.modules';
 import { Styles } from '../../../assets/styles';
-import { changeProductData, setProductVariant } from '../../../redux/action/productActions';
+import { changeProductData, setProductVariant, setProductVariantByCat } from '../../../redux/action/productActions';
 import { fetchUserById } from '../../../redux/action/userAction';
 import { fetchCartByShopIdUserId } from '../../../redux/action/cartAction';
 import { Product } from '../../../redux/modules/product';
@@ -98,6 +98,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
   async componentDidMount() {
     const { allData } = this.state;
     let userDetail = await AsyncStorage.getItem('userDetail');
+    let categoryId = await AsyncStorage.getItem('categoryId');
     let userData = JSON.parse(userDetail);
 
     const logedIn = await AsyncStorage.getItem('logedIn');
@@ -118,11 +119,19 @@ class ProductList extends Component<Props, ProductPageState & any> {
       })
     }
 
-    this.props.changeProductData(AppConstants.SHOP_ID)
-    this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-    this.props.fetchVarientByShopId(AppConstants.SHOP_ID)
-    this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-    this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
+    console.log("Cate ID...", categoryId)
+
+    if (categoryId != null && categoryId !== '') {
+      this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
+      this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
+      this.props.setProductVariantByCat({ shopId: AppConstants.SHOP_ID, categoryId: categoryId, from: 0, to: 10 })
+    } else {
+      // this.props.changeProductData(AppConstants.SHOP_ID)
+      this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
+      // this.props.fetchVarientByShopId(AppConstants.SHOP_ID)
+      this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
+      this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
+    }
 
     this.setState({
       allBrand: this.props.allBrand,
@@ -763,7 +772,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
     const { allVarient, productVariant, allBrand, allMeasurement, productData, allCart } = this.props
     const { allProduct, user, temp_variant, productName, searchVisible1, variantVisible, searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing, shopId, search, allCategory, wishList, selectedBrand, selectedCategory } = this.state;
     const filteredProduct = productList ? productList.length > 0 ? productList.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
-    // console.log('User Data', productVariant)
+    console.log('User Data', productVariant, "ppop")
     return (
       <SafeAreaLayout
         style={Styles.safeArea}
@@ -1004,6 +1013,7 @@ interface LinkDispatchToProp {
   fetchUserById: (id: Number) => void;
   fetchCartByShopIdUserId: (data: any) => void;
   setProductVariant: (data: any) => void;
+  setProductVariantByCat: (data: any) => void;
 }
 
 const mapStateToProps = (
@@ -1029,7 +1039,8 @@ const mapDispatchToProps = (
   fetchMeasurementByShopId: bindActionCreators(fetchMeasurementByShopId, dispatch),
   fetchCartByShopIdUserId: bindActionCreators(fetchCartByShopIdUserId, dispatch),
   setProductVariant: bindActionCreators(setProductVariant, dispatch),
-  fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch)
+  fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch),
+  setProductVariantByCat: bindActionCreators(setProductVariantByCat, dispatch)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);

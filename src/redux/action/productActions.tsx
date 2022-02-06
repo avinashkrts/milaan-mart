@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { AppActions } from "../interfaces";
 import { AppState } from "../store";
-import {ProductActions} from "./constants";
+import { ProductActions } from "./constants";
 
 export const changeProductData = (data) => {
     return dispatch => {
@@ -15,10 +15,21 @@ export const changeProductData = (data) => {
 export const setVariant = (data: any): AppActions => ({
     type: ProductActions.SET_PRODUCT_VARIANT,
     payload: data
-  });
+});
 
 export const setProductVariant = (data: any) => {
     return (dispatch: Dispatch<AppActions>, getState: () => AppState) => {
         dispatch(setVariant(data));
-    };  
+    };
+}
+
+export const setVariantByCat = (data: any): AppActions => ({
+    type: ProductActions.SET_PRODUCT_VARIANT_BY_CAT,
+    payload: data
+});
+
+export const setProductVariantByCat = (data: any) => {
+    return (dispatch: Dispatch<AppActions>, getState: () => AppState) => {
+        dispatch(setVariantByCat(data));
+    };
 }

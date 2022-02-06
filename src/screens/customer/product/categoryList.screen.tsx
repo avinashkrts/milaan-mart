@@ -27,6 +27,7 @@ import { fetchMeasurementByShopId } from '../../../redux/action/measurementActio
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Category } from '../../../redux/modules/category.modules';
 import { fetchCategoryByShopId } from '../../../redux/action/categoryAction';
+import { CommonActions, StackActions } from '@react-navigation/core';
 
 interface ShopPageProps {
     CategoryListScreenProps: CategoryListScreenProps
@@ -149,19 +150,31 @@ class CategoryList extends Component<Props, ShopPageState & any> {
     //     </ListItem>
     // )}
 
+    navigateProductDetail(id, shopId) {
+        // console.log("Check", id, shopId)
+        AsyncStorage.setItem("categoryId", String(id))
+        const resetAction = CommonActions.reset({
+            index: 0,
+            routes: [
+              { name: AppRoute.PRODUCT_LIST }
+            ],
+          });
+          this.props.navigation.dispatch(resetAction)
+    }
+
     renderCategory = ({ item }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
             <View style={Styles.category_card}>
-                <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
+                <Pressable onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
                     <View style={[Styles.cat_card_img, Styles.center]}>
                         <Image
                             resizeMethod='auto'
                             resizeMode='stretch'
-                            source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + 1 + "_" + item.shopId + '_category.png' }}
+                            source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + item.id + "_" + item.shopId + '_category.png' }}
                             style={Styles.cat_card_avatar}
                         />
                     </View>
-                </TouchableOpacity>
+                </Pressable>
                 <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
                     {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
                 </View>
@@ -171,16 +184,9 @@ class CategoryList extends Component<Props, ShopPageState & any> {
 
     renderCategory1 = ({ item }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
-            {/* <View style={Styles.category_card}> */}
-            {/* <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
-                    <View style={[Styles.cat_card_img, Styles.center]}>
-                        <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + 2 + "_" + item.shopId + '_category.png' }} style={Styles.cat_card_avatar} />
-                    </View>
-                </TouchableOpacity> */}
-            {/* <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}> */}
-            <Text style={{ fontSize: scale(13), fontWeight: '400', borderWidth: 1, borderColor: Color.SILVER, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, color: '#000' }}>{item.name}</Text>
-            {/* </View> */}
-            {/* </View> */}
+            <Pressable onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
+                <Text style={{ fontSize: scale(13), fontWeight: '400', borderWidth: 1, borderColor: Color.SILVER, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, color: '#000' }}>{item.name}</Text>
+            </Pressable>
         </ListItem>
     )
 
@@ -215,7 +221,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                         </> : null}
                 </View>
 
-                <View style={{ marginTop: scale(10) }}>
+                {/* <View style={{ marginTop: scale(10) }}>
                     <Text style={{ fontSize: scale(15), color: '#000', fontWeight: 'bold' }}>All Offers</Text>
                     {null != allCategory ?
                         <List data={allCategory}
@@ -223,7 +229,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                             showsHorizontalScrollIndicator={false}
                             renderItem={this.renderCategory}
                         /> : null}
-                </View>
+                </View> */}
                 {/* </ScrollView> */}
             </SafeAreaLayout>
         );
