@@ -1,5 +1,17 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, Alert, FlatList, Keyboard, Pressable, RefreshControl, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Keyboard,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { Avatar, Divider, List, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
 import { Toolbar } from '../../../components/toolbar.component';
 import {
@@ -38,6 +50,10 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { AppRoute } from '../../../navigation/app-routes';
 import { CartNavigatorProp } from '../../../navigation/customer-navigator/customer.navigator';
 import { StackActions } from '@react-navigation/native';
+import { createFilter } from 'react-native-search-filter';
+import { Header } from 'native-base';
+import { OfferData } from './offerdata';
+const KEYS_TO_FILTERS = ['name'];
 
 interface ProductPageProps {
   ProductListScreenProps: ProductListScreenProps
@@ -49,15 +65,16 @@ interface ProductPageState {
   refreshing: Boolean
 }
 
-type Props = ProductListScreenProps & CartNavigatorProp & ThemedComponentProps & ProductPageProps & ProductListProps
+type Props = ProductListScreenProps & CartNavigatorProp & ThemedComponentProps & ProductPageProps
 
-class ProductList extends Component<Props, ProductPageState & any> {
+export class ProductListScreen extends Component<Props, ProductPageState & any> {
   constructor(props: Props) {
     super(props)
     this.state = {
       searchTerm: '',
       searchVisible1: '',
       allProduct: [],
+      allCart: [],
       allCategory: [],
       allBrand: [],
       selectedCategory: '',
@@ -79,6 +96,8 @@ class ProductList extends Component<Props, ProductPageState & any> {
       variantVisible: false,
       temp_variant: [],
       productName: '',
+      productWithVariant: [],
+      subCategory: [],
       allData: [
         {
           url: '/api/lookup/getallmeasurementtype',
@@ -93,12 +112,16 @@ class ProductList extends Component<Props, ProductPageState & any> {
     this._onRefresh = this._onRefresh.bind(this);
     this.handleAddToCart = this.handleAddToCart.bind(this);
     this.navigateToCart = this.navigateToCart.bind(this);
+    this.getSubCategory = this.getSubCategory.bind(this);
+    this.getAllSubCategory = this.getAllSubCategory.bind(this);
+    this.getMeasurement = this.getMeasurement.bind(this);
   }
 
   async componentDidMount() {
     const { allData } = this.state;
     let userDetail = await AsyncStorage.getItem('userDetail');
     let categoryId = await AsyncStorage.getItem('categoryId');
+    let offerId = await AsyncStorage.getItem('offerId');
     let userData = JSON.parse(userDetail);
 
     const logedIn = await AsyncStorage.getItem('logedIn');
@@ -108,36 +131,287 @@ class ProductList extends Component<Props, ProductPageState & any> {
       userData: userData,
     })
 
+    this.getMeasurement();
+
     if (null != logedIn && logedIn === 'true') {
-      this.props.fetchUserById(Number(userData.userId))
-      const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
-      this.props.fetchCartByShopIdUserId(data)
-
-      this.setState({
-        user: this.props.userData,
-        logedIn: Boolean(logedIn)
-      })
+      this.getCart(userData.userId)
+      this.getUser(userData.userId)
     }
-
-    console.log("Cate ID...", categoryId)
 
     if (categoryId != null && categoryId !== '') {
-      this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-      this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-      this.props.setProductVariantByCat({ shopId: AppConstants.SHOP_ID, categoryId: categoryId, from: 0, to: 10 })
+      // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
+      // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
+      // this.props.setProductVariantByCat({ shopId: AppConstants.SHOP_ID, categoryId: categoryId, from: 0, to: 10 })
+      this.getSubCategory(categoryId)
+      this.getBrandByCategory(categoryId)
+      axios({
+        method: 'GET',
+        url: AppConstants.API_BASE_URL + '/api/item/get/onlinecategory/' + categoryId + '/true',
+      }).then((response) => {
+        if (null != response.data) {
+          axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+          }).then((response1) => {
+            if (null != response1.data) {
+              // console.log("Variant", response1.data)
+              if (response.data && response.data != null && response1.data && response1.data != null) {
+                var data = []
+                for (var i = 0; i < response.data.length; i++) {
+                  var data1 = []
+                  var data2 = []
+                  data1.push(response.data[i])
+                  for (var j = 0; j < response1.data.length; j++) {
+                    if (response.data[i].id == response1.data[j].productId) {
+                      data2.push(response1.data[j])
+                    }
+                  }
+                  data1[0].itemList = data2
+                  data.push(data1[0])
+                }
+                this.setState({
+                  productWithVariant: data
+                })
+              }
+            }
+          }, (error) => {
+            Alert.alert("Server error!.")
+          });
+        }
+      }, (error) => {
+        Alert.alert("Server error!.")
+      });
+
+    } else if (offerId != null && offerId !== '') {
+      var productUrl = ''
+      var variantUrl = ''
+      OfferData.map((offer, index) => {
+        if (offer.id == offerId) {
+          switch (offer.name) {
+            case "HOT_SELL":
+              productUrl = '/api/item/get/hotSell/1'
+              variantUrl = '/api/itemlist/getby/hotsell/1'
+              break;
+            case "BAGGAGE":
+              productUrl = '/api/item/get/baggage/1'
+              variantUrl = '/api/itemlist/getby/baggage/1'
+              break;
+            case "MILAAN_OFFER":
+              productUrl = '/api/item/get/milaanoffer/1'
+              variantUrl = '/api/itemlist/getby/milaanoffer/1'
+              break;
+            case "ADITIONAL_DISCOUNT":
+              productUrl = '/api/item/get/aditionaldiscount/1'
+              variantUrl = '/api/itemlist/getby/aditionaldiscount/1'
+              break;
+          }
+        }
+      })
+      // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
+      // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
+      // this.props.setProductVariantByCat({ shopId: AppConstants.SHOP_ID, categoryId: categoryId, from: 0, to: 10 })
+      this.getAllSubCategory()
+      this.getAllBrand()
+      // console.log("offerId", variantUrl);
+      axios({
+        method: 'GET',
+        url: AppConstants.API_BASE_URL + productUrl,
+      }).then((response) => {
+        if (null != response.data) {
+          axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + variantUrl,
+          }).then((response1) => {
+            if (null != response1.data) {
+              // console.log("Variant", response1.data)
+              if (response.data && response.data != null && response1.data && response1.data != null) {
+                var data = []
+                for (var i = 0; i < response.data.length; i++) {
+                  var data1 = []
+                  var data2 = []
+                  data1.push(response.data[i])
+                  for (var j = 0; j < response1.data.length; j++) {
+                    if (response.data[i].id == response1.data[j].productId) {
+                      data2.push(response1.data[j])
+                    }
+                  }
+                  data1[0].itemList = data2
+                  data.push(data1[0])
+                }
+                this.setState({
+                  productWithVariant: data
+                })
+              }
+            }
+          }, (error) => {
+            Alert.alert("Server error!.")
+          });
+        }
+      }, (error) => {
+        Alert.alert("Server error!.")
+      });
     } else {
-      // this.props.changeProductData(AppConstants.SHOP_ID)
-      this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-      // this.props.fetchVarientByShopId(AppConstants.SHOP_ID)
-      this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-      this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
+      // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
+      // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
+      // this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
+      this.getAllSubCategory();
+      this.getAllBrand();
+      axios({
+        method: 'GET',
+        url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
+      }).then((response) => {
+        if (null != response.data) {
+          axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+          }).then((response1) => {
+            if (null != response1.data) {
+              if (response.data && response.data != null && response1.data && response1.data != null) {
+                var data = []
+                for (var i = 0; i < response.data.length; i++) {
+                  var data1 = []
+                  var data2 = []
+                  data1.push(response.data[i])
+                  for (var j = 0; j < response1.data.length; j++) {
+                    if (response.data[i].id == response1.data[j].productId) {
+                      data2.push(response1.data[j])
+                    }
+                  }
+                  data1[0].itemList = data2
+                  data.push(data1[0])
+                }
+                this.setState({
+                  productWithVariant: data
+                })
+              }
+            }
+          }, (error) => {
+            Alert.alert("Server error!.")
+          });
+        }
+      }, (error) => {
+        Alert.alert("Server error!.")
+      });
     }
 
-    this.setState({
-      allBrand: this.props.allBrand,
-      allProduct: this.props.productData,
-      allVarient: this.props.allVarient
-    })
+    // this.setState({
+    //   allBrand: this.props.allBrand,
+    //   allProduct: this.props.productData,
+    //   allVarient: this.props.allVarient
+    // })
+  }
+
+  getUser(userId: any) {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/user/get/' + userId
+    }).then((response: any) => {
+      if (null != response.data) {
+        this.setState({
+          user: response.data,
+          logedIn: true
+        })
+      }
+    }, (error: any) => {
+      console.log(error)
+      // Alert.alert("Server error.")
+    });
+  }
+
+  getMeasurement() {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/measurement/getbyshopid/' + AppConstants.SHOP_ID
+    }).then((response: any) => {
+      if (null != response.data) {
+        this.setState({
+          allMeasurement: response.data
+        })
+      }
+    }, (error: any) => {
+      console.log(error)
+      // Alert.alert("Server error.")
+    });
+  }
+
+  // getBrand() {
+  //   axios({
+  //     method: 'GET',
+  //     url: AppConstants.API_BASE_URL + '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID
+  //   }).then((response: any) => {
+  //     if (null != response.data) {
+  //       this.setState({
+  //         allBrand: response.data
+  //       })
+  //     }
+  //   }, (error: any) => {
+  //     console.log(error)
+  //     // Alert.alert("Server error.")
+  //   });
+  // }
+
+  getSubCategory(catId: any) {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/subcategory/getallcategory/' + catId
+    }).then((response: any) => {
+      if (null != response.data) {
+        this.setState({
+          subCategory: response.data
+        })
+      }
+    }, (error: any) => {
+      console.log(error)
+      // Alert.alert("Server error.")
+    });
+  }
+
+  getAllSubCategory() {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/subcategory/getall'
+    }).then((response: any) => {
+      if (null != response.data) {
+        this.setState({
+          subCategory: response.data
+        })
+      }
+    }, (error: any) => {
+      console.log(error)
+      // Alert.alert("Server error.")
+    });
+  }
+
+  getAllBrand() {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+    }).then((response: any) => {
+      if (null != response.data) {
+        this.setState({
+          allBrand: response.data
+        })
+      }
+    }, (error: any) => {
+      console.log(error)
+      // Alert.alert("Server error.")
+    });
+  }
+
+  getBrandByCategory(id: any) {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/brand/get/bycategory/' + id
+    }).then((response: any) => {
+      if (null != response.data) {
+        this.setState({
+          allBrand: response.data
+        })
+      }
+    }, (error: any) => {
+      console.log(error)
+      // Alert.alert("Server error.")
+    });
   }
 
   addToCart(productId) {
@@ -158,8 +432,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
           console.log("Data", response.data)
           if (response.data.status === 'true') {
             Alert.alert("Product added to cart.")
-            const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
-            this.props.fetchCartByShopIdUserId(data)
+            this.getCart(userData.userId)
           } else {
             Alert.alert("Product allready exists in your cart.")
           }
@@ -181,55 +454,102 @@ class ProductList extends Component<Props, ProductPageState & any> {
     // this.props.navigation.navigate(AppRoute.CART);
   }
 
-  selectCategory(id) {
-    const { shopId } = this.state;
-    axios({
-      method: 'GET',
-      url: AppConstants.API_BASE_URL + '/api/brand/getallDeactivebrandbyshopid/' + id,
-    }).then((response) => {
-      if (null != response.data) {
-        this.setState({
-          allBrand: response.data,
-          selectedCategory: id
-        })
-      }
-    }, (error) => {
-      Alert.alert("Server error!.")
-    });
-
-    axios({
-      method: 'GET',
-      url: AppConstants.API_BASE_URL + '/api/product/getproductbyshopidandcategory/' + shopId + '/' + id,
-    }).then((response) => {
-      if (null != response.data) {
-        // this.props.changeProductData(response.data)
-        this.setState({
-          allProduct: response.data,
-        })
-      }
-    }, (error) => {
-      Alert.alert("Server error!.")
-    });
-    // this.setState({ selectedCategory: id })
-  }
-
-  selectBrand(id, brandName) {
+  selectCategory(id: any, brandName: any) {
     const { shopId } = this.state
     axios({
       method: 'GET',
-      url: AppConstants.API_BASE_URL + '/api/product/getproduct/shopid/brand/' + shopId + '/' + id,
+      url: AppConstants.API_BASE_URL + '/api/brand/getbrand/bysubcategoryid/' + id,
     }).then((response) => {
       if (null != response.data) {
-        // this.props.changeProductData(response.data)
-        this.setState({
-          allProduct: response.data,
-          selectedBrand: id
-        })
+       this.setState({
+         allBrand: response.data,
+         selectedCategory: id
+       })
       }
     }, (error) => {
       Alert.alert("Server error!.")
     });
-    // this.setState({ selectedBrand: id })
+
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/item/getitem/online/' + id + '/true',
+    }).then((response) => {
+      if (null != response.data) {
+        axios({
+          method: 'GET',
+          url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+        }).then((response1) => {
+          if (null != response1.data) {
+            // console.log("Variant", response1.data)
+            if (response.data && response.data != null && response1.data && response1.data != null) {
+              var data = []
+              for (var i = 0; i < response.data.length; i++) {
+                var data1 = []
+                var data2 = []
+                data1.push(response.data[i])
+                for (var j = 0; j < response1.data.length; j++) {
+                  if (response.data[i].id == response1.data[j].productId) {
+                    data2.push(response1.data[j])
+                  }
+                }
+                data1[0].itemList = data2
+                data.push(data1[0])
+              }
+              this.setState({
+                productWithVariant: data,
+                selectedCategory: id
+              })
+            }
+          }
+        }, (error) => {
+          Alert.alert("Server error!.")
+        });
+      }
+    }, (error) => {
+      Alert.alert("Server error!.")
+    });    
+  }
+
+  selectBrand(id: any, brandName: any) {
+    const { shopId } = this.state
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + '/api/item/get/onlinebrand/' + id + '/true',
+    }).then((response) => {
+      if (null != response.data) {
+        axios({
+          method: 'GET',
+          url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+        }).then((response1) => {
+          if (null != response1.data) {
+            // console.log("Variant", response1.data)
+            if (response.data && response.data != null && response1.data && response1.data != null) {
+              var data = []
+              for (var i = 0; i < response.data.length; i++) {
+                var data1 = []
+                var data2 = []
+                data1.push(response.data[i])
+                for (var j = 0; j < response1.data.length; j++) {
+                  if (response.data[i].id == response1.data[j].productId) {
+                    data2.push(response1.data[j])
+                  }
+                }
+                data1[0].itemList = data2
+                data.push(data1[0])
+              }
+              this.setState({
+                productWithVariant: data,
+                selectedBrand: id
+              })
+            }
+          }
+        }, (error) => {
+          Alert.alert("Server error!.")
+        });
+      }
+    }, (error) => {
+      Alert.alert("Server error!.")
+    });
   }
 
   navigateProductDetail(id, shopId) {
@@ -243,22 +563,9 @@ class ProductList extends Component<Props, ProductPageState & any> {
 
   async handleAddToCart(productId, productName, itemList) {
     const { userData } = this.state;
-    // console.log('data in add to cart', productId);
     const logedIn = await AsyncStorage.getItem('logedIn');
-    var variant = []
 
-    // var check = []
     if (itemList.length > 0) {
-      // variant = this.props.allVarient.filter((data) => {
-      //   return data.productId == productId
-      // })
-      // console.log(check, "Data////-")
-      // this.props.allVarient.map((item, index) => {
-      //   if (item.productId == productId) {
-      //     variant.push(item)
-      //   }
-      // })
-
       this.setState({
         temp_variant: itemList,
         variantVisible: true,
@@ -275,7 +582,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
         method: "GET",
         url: AppConstants.API_BASE_URL + '/api/user/wishlist/add/' + userData.userId + "/" + productId,
       }).then((response) => {
-        this.props.fetchUserById(Number(userData.userId))
+        this.getUser(userData.userId)
         this.setState({
           isSelectedWish: !isSelectedWish
         })
@@ -303,10 +610,10 @@ class ProductList extends Component<Props, ProductPageState & any> {
   }
 
   clearSearch() {
-    this.setState({
-      searchTerm: '',
-      allProduct: this.props.productData
-    })
+    // this.setState({
+    //   searchTerm: '',
+    //   allProduct: this.props.productData
+    // })
   }
 
   toggleModal(modal) {
@@ -401,8 +708,9 @@ class ProductList extends Component<Props, ProductPageState & any> {
 
   search(index) {
     var product = [index]
+    // console.log("Product", product)
     this.setState({
-      allProduct: product,
+      productWithVariant: product,
       searchVisible1: false,
       searchTerm: index.name
     })
@@ -412,21 +720,41 @@ class ProductList extends Component<Props, ProductPageState & any> {
     this.setState({ searchTerm: term })
   }
 
+  getCart(userId) {
+    axios({
+      method: 'GET',
+      url: AppConstants.API_BASE_URL + "/api/cart/get/cartby/shopid/userid/" + AppConstants.SHOP_ID + '/' + userId,
+    }).then((response) => {
+      if (null != response.data) {
+        if (response.data[0].productList.length > 0) {
+          this.setState({
+            isCart: true
+          })
+        }
+
+        this.setState({
+          allCart: response.data
+        })
+      }
+    }, (error) => {
+      Alert.alert("Server error!.")
+    });
+  }
+
   handleIncrease(productId, cartId) {
-    const { userData } = this.props
+    const { user } = this.state
     axios({
       method: 'PUT',
       url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
     }).then((response) => {
-      const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
-      this.props.fetchCartByShopIdUserId(data)
+      this.getCart(user.userId)
     }, (error) => {
       Alert.alert("Server problem")
     })
   }
 
   handleDecrease(productId, cartId, quantity) {
-    const { userData } = this.props
+    const { user } = this.state
     if (quantity <= 1) {
       Alert.alert("You have already selected minimum quantity.")
     } else {
@@ -434,8 +762,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
         method: 'PUT',
         url: AppConstants.API_BASE_URL + '/api/cart/cartdecrease/' + cartId + '/' + productId
       }).then((response) => {
-        const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
-        this.props.fetchCartByShopIdUserId(data)
+        this.getCart(user.userId)
       }, (error) => {
         Alert.alert("Server problem")
       })
@@ -489,7 +816,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
   //                             {/* : null
   //                               } */}
   //                           </View>
-  //                           {this.props.allMeasurement.length > 0 ? this.props.allMeasurement.map((brand, index) => {
+  //                           {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
   //                             if (brand.id == data.measurement) {
   //                               return (
   //                                 <>
@@ -585,7 +912,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
                     <View style={[Styles.product_2nd_wish_view]}>
                       <TouchableOpacity onPress={() => { this.handleWishList(item.id) }}>
                         <Text
-                          style={this.state.logedIn && this.props.userData.wishList != null && this.props.userData.wishList.includes(item.id) ?
+                          style={this.state.logedIn && this.state.user.wishList != null && this.state.user.wishList.includes(item.id) ?
                             Styles.selected_wish_icon :
                             Styles.wish_icon
                           }
@@ -597,7 +924,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
                     {/* : null
                                 } */}
                   </View>
-                  {this.props.allMeasurement.length > 0 ? this.props.allMeasurement.map((brand, index) => {
+                  {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
                     if (brand.id == item.itemList[0].measurement) {
                       return (
                         <>
@@ -666,7 +993,7 @@ class ProductList extends Component<Props, ProductPageState & any> {
             <View style={Styles.variant_view_1}>
               <View style={Styles.variant_price_view}>
                 <View style={{ width: '55%', flexDirection: "column" }}>
-                  {this.props.allMeasurement.length > 0 ? this.props.allMeasurement.map((brand, index) => {
+                  {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
                     if (brand.id == item.measurement) {
                       return (
                         <View>
@@ -689,18 +1016,18 @@ class ProductList extends Component<Props, ProductPageState & any> {
                   }
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={Styles.cart_quantity_view}>
-                    {item.stock ? item.stock > 0 ?
-                      this.state.logedIn ?
-                        this.props.allCart != null && this.props.allCart.length ?
-                          this.props.allCart[0].productList.length > 0 ?
-                            this.props.allCart[0].productList.map((data, index) => {
 
-                              if (data.productId == item.id) {
-                                if (count == 0) {
-                                  count++
-                                  return (
-                                    <>
+                  {item.stock ? item.stock > 0 ?
+                    this.state.logedIn ?
+                      this.state.allCart != '' && this.state.allCart.length > 0 ?
+                        this.state.allCart[0].productList != null && this.state.allCart[0].productList.length > 0 ?
+                          this.state.allCart[0].productList.map((data, index) => {
+                            if (data.productId == item.id) {
+                              if (count == 0) {
+                                count++
+                                return (
+                                  <>
+                                    <View style={Styles.cart_quantity_view}>
                                       <Pressable onPress={() => { this.handleDecrease(item.id, data.cartId, data.productQuantity) }} style={Styles.cart_button}>
                                         <Text style={Styles.cart_button_text}><MinusIcon /></Text>
                                       </Pressable>
@@ -712,40 +1039,54 @@ class ProductList extends Component<Props, ProductPageState & any> {
                                       <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId) }}>
                                         <Text style={Styles.cart_button_text} ><AddIcon /></Text>
                                       </Pressable>
-                                    </>
-                                  )
-                                }
-                              } else if (count < 1 && index == this.props.allCart[0].productList.length - 1) {
-                                return (
+                                    </View>
+                                  </>
+                                )
+                              }
+                            } else if (count < 1 && index == this.state.allCart[0].productList.length - 1) {
+                              return (
+                                <View style={Styles.cart_quantity_view}>
                                   <Pressable onPress={() => { this.addToCart(item.id) }}>
                                     <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
                                       <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
                                     </View>
                                   </Pressable>
-                                )
-                              }
-                            }) :
-                            <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                              <Text style={{ color: 'white' }}>Out of Stock</Text>
-                            </View> :
+                                </View>
+                              )
+                            }
+                          }) :
+                          <View style={Styles.cart_quantity_view}>
+                            <Pressable onPress={() => { this.addToCart(item.id) }}>
+                              <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                              </View>
+                            </Pressable>
+                          </View> :
+                        <View style={Styles.cart_quantity_view}>
                           <Pressable onPress={() => { this.addToCart(item.id) }}>
                             <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
                               <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
                             </View>
-                          </Pressable> :
+                          </Pressable>
+                        </View> :
+                      <View style={Styles.cart_quantity_view}>
                         <Pressable onPress={() => { this.addToCart(item.id) }}>
                           <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
                             <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
                           </View>
-                        </Pressable> :
-                      <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: 'white' }}>Out of Stock</Text>
+                        </Pressable>
                       </View> :
-                      <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: 'white' }}>Out of Stock</Text>
-                      </View>
-                    }
-                  </View>
+                    <View style={Styles.cart_quantity_view}>
+                      <Pressable onPress={() => { this.addToCart(item.id) }}>
+                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                          <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                        </View>
+                      </Pressable>
+                    </View> :
+                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: 'white' }}>Out of Stock</Text>
+                    </View>
+                  }
                 </View>
               </View>
               {item.offersAvailable ?
@@ -754,14 +1095,16 @@ class ProductList extends Component<Props, ProductPageState & any> {
                 </View> : null
               }
             </View>
-            {item.offersAvailable ?
-              <View>
-                <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
-              </View> : null
+            {
+              item.offersAvailable ?
+                <View>
+                  <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
+                </View> : null
             }
-          </View>
+          </View >
           :
-          <ActivityIndicator size='large' color='green' />}
+          <ActivityIndicator size='large' color='green' />
+        }
 
       </ListItem>
     )
@@ -769,10 +1112,13 @@ class ProductList extends Component<Props, ProductPageState & any> {
   render() {
     // const productList = this.props.productData
     const productList = null
-    const { allVarient, productVariant, allBrand, allMeasurement, productData, allCart } = this.props
-    const { allProduct, user, temp_variant, productName, searchVisible1, variantVisible, searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing, shopId, search, allCategory, wishList, selectedBrand, selectedCategory } = this.state;
-    const filteredProduct = productList ? productList.length > 0 ? productList.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
-    console.log('User Data', productVariant, "ppop")
+    // const { allVarient, productVariant, allBrand, allMeasurement, productData } = this.props
+    const { allProduct, allBrand, temp_variant, productName, searchVisible1, variantVisible,
+      searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing,
+      shopId, search, allCategory, wishList, selectedBrand, selectedCategory, allCart,
+      subCategory, productWithVariant } = this.state;
+    const filteredProduct = productWithVariant ? productWithVariant.length > 0 ? productWithVariant.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
+    // console.log('User Data', productVariant, "ppop")
     return (
       <SafeAreaLayout
         style={Styles.safeArea}
@@ -858,7 +1204,6 @@ class ProductList extends Component<Props, ProductPageState & any> {
           </View>
         </Modal>
 
-
         <Toolbar
           title='Product List'
           backIcon={MenuIcon}
@@ -883,14 +1228,9 @@ class ProductList extends Component<Props, ProductPageState & any> {
             value={searchTerm}
             onChangeText={(term) => { this.searchUpdated(term) }}
             onFocus={() => { this.setState({ searchVisible1: true }) }}
-            onBlur={() => { this.setState({ searchVisible1: false }) }}
           />
 
           <View style={[{ width: '10%', }, Styles.center]}>
-            {/* {productList.length != allProduct.length || searchTerm != '' ?
-                      <TouchableOpacity onPress={() => { this.clearSearch() }}>
-                          <Text style={[Styles.searchIcon, { width: scale(30), height: scale(30) }]}><CancelIcon fontSize={scale(25)} /></Text>
-                      </TouchableOpacity> : null} */}
           </View>
           <View style={[{ width: '10%', }, Styles.center]}>
             <TouchableOpacity onPress={() => { this.productSearch(filteredProduct) }}>
@@ -901,33 +1241,31 @@ class ProductList extends Component<Props, ProductPageState & any> {
         <Divider />
         {/* </Header> */}
         <>
-          {/* <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}> */}
-
-          {/* <View style={{ flex: 1, flexDirection: 'column' }}>
-                      <View style={{ marginTop: 10 }}>
-                          <FlatList
-                              style={{}}
-                              horizontal={true}
-                              showsHorizontalScrollIndicator={false}
-                              data={allCategory}
-                              renderItem={({ item, index }) => {
-                                  return (
-                                      <TouchableOpacity key={index} onPress={() => { this.selectCategory(item.id) }}>
-                                          <View style={selectedCategory == item.id ? Styles.product_nav_button_selected : Styles.product_nav_button}>
-                                              <Text style={selectedCategory == item.id ? Styles.product_nav_button_selected_text : Styles.product_nav_button_text}>{item.name}</Text>
-                                          </View>
-                                      </TouchableOpacity>
-                                  )
-                              }}
-                          >
-                          </FlatList>
-                      </View>
-                  </View> */}
-          {/* </Header> */}
+          <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
+            <View style={{ flex: 1, flexDirection: 'column' }}>
+              <View style={{ marginTop: 10 }}>
+                <FlatList
+                  style={{}}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  data={subCategory}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <TouchableOpacity key={index} onPress={() => { this.selectCategory(item.id, item.name) }}>
+                        <View style={selectedCategory == item.id ? Styles.product_nav_button_selected : Styles.product_nav_button}>
+                          <Text style={selectedCategory == item.id ? Styles.product_nav_button_selected_text : Styles.product_nav_button_text}>{item.name}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    )
+                  }}
+                >
+                </FlatList>
+              </View>
+            </View>
+          </Header>
           <Divider />
-          {/* <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}> */}
-
-          <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0, flex: 1, flexDirection: 'column' }}>
+          <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
+            <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0, flex: 1, flexDirection: 'column' }}>
             <View style={{ marginTop: 10 }}>
               <FlatList
                 style={{}}
@@ -947,8 +1285,10 @@ class ProductList extends Component<Props, ProductPageState & any> {
               >
               </FlatList>
             </View>
-          </View>
-          {/* </Header> */}
+            </View>
+          </Header>
+          <Divider />
+
         </>
         {searchVisible1 ?
           <>
@@ -965,16 +1305,17 @@ class ProductList extends Component<Props, ProductPageState & any> {
             </ScrollView>
           </> :
           <>
-            {null != productVariant ?
-              <List data={productVariant}
+            {null != productWithVariant ?
+              <List data={productWithVariant}
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
                     onRefresh={this._onRefresh.bind(this)}
                   />}
                 renderItem={this.renderProduct}
-                onEndReached={() => this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: productVariant.length, to: productVariant.length + 10 })}
-              /> : null}
+              // onEndReached={() => this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: productVariant.length, to: productVariant.length + 10 })}
+              />
+              : null}
 
             {/* {
               <View>
@@ -984,10 +1325,19 @@ class ProductList extends Component<Props, ProductPageState & any> {
           </>}
         <View style={{ height: 10, width: '100%' }} />
 
-        {!isCart ?
-          <TouchableOpacity style={Styles.bottom_tab_bar} onPress={() => { this.navigateToCart() }}>
-            <Text style={Styles.bottom_view_cart_text}>View Cart</Text>
-          </TouchableOpacity>
+        {isCart ?
+          <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(10) }]} onPress={() => { this.navigateToCart() }}>
+            <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 10 }]}>
+              <Text style={Styles.bottom_view_cart_text}>View Cart </Text>
+              <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: -30 }]}>
+                <Text style={{ fontSize: scale(13), color: Color.COLOR }}>{allCart != null && allCart != '' ? allCart[0].productList.length : 0}</Text>
+              </View>
+            </View>
+            <View style={{ height: '100%', width: scale(1), backgroundColor: Color.BUTTON_NAME_COLOR }} />
+            <View style={[Styles.center, { width: '50%' }]}>
+              <Text style={{ fontSize: scale(15), color: Color.BUTTON_NAME_COLOR }}>Rs. {allCart != null && allCart != '' ? allCart[0].payableAmount : 0}</Text>
+            </View>
+          </Pressable>
           : null
         }
       </SafeAreaLayout>
@@ -995,55 +1345,76 @@ class ProductList extends Component<Props, ProductPageState & any> {
   }
 }
 
-interface LinkStateToProp {
-  productData: Product[],
-  productVariant: Product[],
-  userData: User,
-  allBrand: Brand[],
-  allMeasurement: Measurement[],
-  allVarient: Varient[];
-  allCart: Cart[];
-}
-
-interface LinkDispatchToProp {
-  changeProductData: (shopId: String) => void;
-  fetchBrandByShopId: (shopId: String) => void;
-  fetchVarientByShopId: (shopId: String) => void;
-  fetchMeasurementByShopId: (shopId: String) => void;
-  fetchUserById: (id: Number) => void;
-  fetchCartByShopIdUserId: (data: any) => void;
-  setProductVariant: (data: any) => void;
-  setProductVariantByCat: (data: any) => void;
-}
-
-const mapStateToProps = (
-  state: AppState,
-  ownProps: Brand
-): LinkStateToProp => ({
-  productData: state.productReducers.productData,
-  userData: state.userReducers.userData,
-  allVarient: state.varientReducers.allVarient,
-  allMeasurement: state.measurementReducers.measurementData,
-  allBrand: state.brandReducers.allBrand,
-  productVariant: state.productReducers.productVarient,
-  allCart: state.cartReducers.cartByUserId
-})
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<any, any, AppActions>,
-  ownProps: Brand
-): LinkDispatchToProp => ({
-  changeProductData: bindActionCreators(changeProductData, dispatch),
-  fetchUserById: bindActionCreators(fetchUserById, dispatch),
-  fetchVarientByShopId: bindActionCreators(fetchVarientByShopId, dispatch),
-  fetchMeasurementByShopId: bindActionCreators(fetchMeasurementByShopId, dispatch),
-  fetchCartByShopIdUserId: bindActionCreators(fetchCartByShopIdUserId, dispatch),
-  setProductVariant: bindActionCreators(setProductVariant, dispatch),
-  fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch),
-  setProductVariantByCat: bindActionCreators(setProductVariantByCat, dispatch)
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'flex-start'
+  },
+  emailItem: {
+    borderBottomWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.3)',
+    padding: 10
+  },
+  emailSubject: {
+    color: 'rgba(0,0,0,0.5)'
+  },
+  searchInput: {
+    padding: 10,
+    borderColor: '#CCC',
+    borderWidth: 1
+  }
 });
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+// interface LinkStateToProp {
+//   productData: Product[],
+//   productVariant: Product[],
+//   userData: User,
+//   allBrand: Brand[],
+//   allMeasurement: Measurement[],
+//   allVarient: Varient[];
+//   allCart: Cart[];
+// }
 
-type ProductListProps = ConnectedProps<typeof connector>;
-export const ProductListScreen = connector(ProductList)
+// interface LinkDispatchToProp {
+//   changeProductData: (shopId: String) => void;
+//   fetchBrandByShopId: (shopId: String) => void;
+//   fetchVarientByShopId: (shopId: String) => void;
+//   fetchMeasurementByShopId: (shopId: String) => void;
+//   fetchUserById: (id: Number) => void;
+//   fetchCartByShopIdUserId: (data: any) => void;
+//   setProductVariant: (data: any) => void;
+//   setProductVariantByCat: (data: any) => void;
+// }
+
+// const mapStateToProps = (
+//   state: AppState,
+//   ownProps: Brand
+// ): LinkStateToProp => ({
+//   productData: state.productReducers.productData,
+//   userData: state.userReducers.userData,
+//   allVarient: state.varientReducers.allVarient,
+//   allMeasurement: state.measurementReducers.measurementData,
+//   allBrand: state.brandReducers.allBrand,
+//   productVariant: state.productReducers.productVarient,
+//   allCart: state.cartReducers.cartByUserId
+// })
+
+// const mapDispatchToProps = (
+//   dispatch: ThunkDispatch<any, any, AppActions>,
+//   ownProps: Brand
+// ): LinkDispatchToProp => ({
+//   changeProductData: bindActionCreators(changeProductData, dispatch),
+//   fetchUserById: bindActionCreators(fetchUserById, dispatch),
+//   fetchVarientByShopId: bindActionCreators(fetchVarientByShopId, dispatch),
+//   fetchMeasurementByShopId: bindActionCreators(fetchMeasurementByShopId, dispatch),
+//   fetchCartByShopIdUserId: bindActionCreators(fetchCartByShopIdUserId, dispatch),
+//   setProductVariant: bindActionCreators(setProductVariant, dispatch),
+//   fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch),
+//   setProductVariantByCat: bindActionCreators(setProductVariantByCat, dispatch)
+// });
+
+// const connector = connect(mapStateToProps, mapDispatchToProps);
+
+// type ProductListProps = ConnectedProps<typeof connector>;
+// export const ProductListScreen = connector(ProductList)

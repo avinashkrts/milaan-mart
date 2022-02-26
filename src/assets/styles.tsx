@@ -191,8 +191,8 @@ export const Styles = ScaledSheet.create({
   },
 
   bottom_tab_bar: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
     width: '100%',
     backgroundColor: Color.COLOR
   },
@@ -204,7 +204,7 @@ export const Styles = ScaledSheet.create({
   },
 
   bottom_view_cart_text: {
-    fontSize: '20@s',
+    fontSize: '15@s',
     paddingVertical: '10@s',
     color: Color.BUTTON_NAME_COLOR
   },

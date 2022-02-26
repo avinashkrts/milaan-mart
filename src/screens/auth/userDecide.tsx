@@ -62,15 +62,16 @@ export class UserDecide extends Component<Props, State & any> {
                         const granted = await PermissionsAndroid.request(
                             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
                             {
-                                title: "Sone Biryani Location Permission",
+                                title: "Milaan Mart Location Permission",
                                 message:
-                                    "Sone Biryani needs access to your Location " +
+                                    "Milaan Mart needs access to your Location " +
                                     "so you can get your nearest shop.",
                                 buttonNeutral: "Ask Me Later",
                                 buttonNegative: "Cancel",
                                 buttonPositive: "OK"
                             }
                         );
+                      
                         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                             Geolocation.getCurrentPosition((position) => {
                                 var lat = position.coords.latitude

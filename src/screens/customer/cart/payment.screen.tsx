@@ -36,7 +36,7 @@ import { CustomerCartScreenProps } from '../../../navigation/customer-navigator/
 import RazorpayCheckout from 'react-native-razorpay';
 import moment from 'moment';
 import { scale } from 'react-native-size-matters';
-import { StackActions } from '@react-navigation/routers';
+import { StackActions, CommonActions } from '@react-navigation/core';
 import { PaymentScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
 
 type MyState = {
@@ -62,7 +62,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 type Props = PaymentScreenProps & ThemedComponentProps
 
-export class PaymentScreen extends React.Component< Props, MyState & any> {
+export class PaymentScreen extends React.Component<Props, MyState & any> {
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -320,8 +320,14 @@ export class PaymentScreen extends React.Component< Props, MyState & any> {
                     if (response.data) {
                         if (response.data.status) {
                             this.notification()
-
-                            // this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER)
+                            this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_NAV)
+                            // const resetAction = CommonActions.reset({
+                            //     index: 0,
+                            //     routes: [
+                            //         { name: AppRoute.CUSTOMER_ORDER_NAV }
+                            //     ],
+                            // });
+                            // this.props.navigation.dispatch(resetAction)
                         } else {
                             Alert.alert("Got error while placing Order.")
                         }
@@ -336,8 +342,7 @@ export class PaymentScreen extends React.Component< Props, MyState & any> {
     }
 
     backFunction() {
-        // Alert.alert('')
-        this.props.navigation.navigate(AppRoute.CUSTOMER_ALL_SHOP)
+      
     }
 
     startPayment(transactionId, orderId) {
@@ -378,7 +383,13 @@ export class PaymentScreen extends React.Component< Props, MyState & any> {
                         })
                         Alert.alert("Order placed.")
                         this.notification();
-                        this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER)
+                        const resetAction = CommonActions.reset({
+                            index: 0,
+                            routes: [
+                                { name: AppRoute.CUSTOMER_ORDER }
+                            ],
+                        });
+                        this.props.navigation.dispatch(resetAction)
                     } else {
                         Alert.alert("Got error while placing Order.")
                     }

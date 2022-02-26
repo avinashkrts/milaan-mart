@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { VARIENT_API } from '../config/api.config';
 
-const varientByShopId = (shopId: String) => axios.get(VARIENT_API.GET_BY_SHOP_ID + shopId)
+const varientByShopId = (shopId: String) => axios.get(VARIENT_API.GET_BY_SHOP_ID + shopId + '/true')
     .then((data) => data,
         (error) => error)
 

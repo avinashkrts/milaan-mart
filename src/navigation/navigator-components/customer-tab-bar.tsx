@@ -34,6 +34,7 @@ export const CustomerTabBar = (props: BottomCustomerScreenProps): SafeAreaLayout
       case 1: 
         props.navigation.dispatch(resetAction)
         AsyncStorage.setItem('categoryId', String(clean));
+        AsyncStorage.setItem('offerId', String(clean));
         break;
 
       case 2:

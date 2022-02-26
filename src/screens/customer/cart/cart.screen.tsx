@@ -355,10 +355,8 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
     }
 
     continiueShopping() {
-        const { single } = this.state;
-        single ?
-            this.props.navigation.navigate(AppRoute.COMBINED_PRODUCT) :
-            this.props.navigation.navigate(AppRoute.CUSTOMER_ALL_SHOP)
+        const { single } = this.state;          
+            this.props.navigation.navigate(AppRoute.PRODUCT_LIST)
     }
 
     addItem() { }

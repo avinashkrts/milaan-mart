@@ -28,6 +28,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Category } from '../../../redux/modules/category.modules';
 import { fetchCategoryByShopId } from '../../../redux/action/categoryAction';
 import { CommonActions, StackActions } from '@react-navigation/core';
+import axios from 'axios';
+import { OfferData } from './offerdata';
 
 interface ShopPageProps {
     CategoryListScreenProps: CategoryListScreenProps
@@ -48,13 +50,58 @@ class CategoryList extends Component<Props, ShopPageState & any> {
         this.state = {
             name: 'Avi',
             allBrand: [],
-            refreshing: false
+            refreshing: false,
+            productWithVariant: [],
+            offers: OfferData
         }
 
         this.logOut = this.logOut.bind(this);
         this.backAction = this.backAction.bind(this);
         this.handleBackButton = this.handleBackButton.bind(this);
         this.handleRecall = this.handleRecall.bind(this);
+    }
+
+    getProduct() {
+        this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
+        this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
+        // this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
+        // this.getAllSubCategory();
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
+        }).then((response) => {
+            if (null != response.data) {
+                axios({
+                    method: 'GET',
+                    url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                }).then((response1) => {
+                    if (null != response1.data) {
+                        if (response.data && response.data != null && response1.data && response1.data != null) {
+                            var data = []
+                            for (var i = 0; i < response.data.length; i++) {
+                                var data1 = []
+                                var data2 = []
+                                data1.push(response.data[i])
+                                for (var j = 0; j < response1.data.length; j++) {
+                                    if (response.data[i].id == response1.data[j].productId) {
+                                        data2.push(response1.data[j])
+                                    }
+                                }
+                                data1[0].itemList = data2
+                                data.push(data1[0])
+                            }
+                            this.setState({
+                                productWithVariant: data
+                            })
+                        }
+                    }
+                }, (error) => {
+                    Alert.alert("Server error!.")
+                });
+            }
+        }, (error) => {
+            Alert.alert("Server error!.")
+        });
     }
 
     backAction = () => {
@@ -156,10 +203,22 @@ class CategoryList extends Component<Props, ShopPageState & any> {
         const resetAction = CommonActions.reset({
             index: 0,
             routes: [
-              { name: AppRoute.PRODUCT_LIST }
+                { name: AppRoute.PRODUCT_LIST }
             ],
-          });
-          this.props.navigation.dispatch(resetAction)
+        });
+        this.props.navigation.dispatch(resetAction)
+    }
+
+    navigateProductOffer(id) {
+        // console.log("Check", id, shopId)
+        AsyncStorage.setItem("offerId", String(id))
+        const resetAction = CommonActions.reset({
+            index: 0,
+            routes: [
+                { name: AppRoute.PRODUCT_LIST }
+            ],
+        });
+        this.props.navigation.dispatch(resetAction)
     }
 
     renderCategory = ({ item }: any): ListItemElement => (
@@ -190,9 +249,29 @@ class CategoryList extends Component<Props, ShopPageState & any> {
         </ListItem>
     )
 
+    renderOffer = ({ item }: any): ListItemElement => (
+        <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+            <View style={Styles.category_card}>
+                <Pressable onPress={() => { this.navigateProductOffer(item.id) }}>
+                    <View style={[Styles.cat_card_img, Styles.center]}>
+                        <Image
+                            resizeMethod='auto'
+                            resizeMode='stretch'
+                            source={{ uri: AppConstants.IMAGE_BASE_URL + '/offer/' + item.image}}
+                            style={Styles.cat_card_avatar}
+                        />
+                    </View>
+                </Pressable>
+                <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
+                    {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
+                </View>
+            </View>
+        </ListItem>
+    )
+
     render() {
         const { allBrand, allVariant, allMeasurement, allCategory } = this.props
-        const { name, refreshing } = this.state
+        const { name, refreshing, offers } = this.state
         return (
             <SafeAreaLayout
                 style={styles.safeArea}
@@ -221,15 +300,15 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                         </> : null}
                 </View>
 
-                {/* <View style={{ marginTop: scale(10) }}>
+                <View style={{ marginTop: scale(10) }}>
                     <Text style={{ fontSize: scale(15), color: '#000', fontWeight: 'bold' }}>All Offers</Text>
-                    {null != allCategory ?
-                        <List data={allCategory}
+                    {null != offers ?
+                        <List data={offers}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
-                            renderItem={this.renderCategory}
+                            renderItem={this.renderOffer}
                         /> : null}
-                </View> */}
+                </View>
                 {/* </ScrollView> */}
             </SafeAreaLayout>
         );

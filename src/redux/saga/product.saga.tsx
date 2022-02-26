@@ -4,7 +4,7 @@ import { ProductActions } from '../action/constants';
 import { PRODUCT_SERVICE } from '../service/product.services';
 import { VARIENT_SERVICE } from '../service/varient.services';
 
-export function* fetchProductByShopIdAsync(action) {
+export function* fetchProductByShopIdAsync(action: any) {
     let response = yield PRODUCT_SERVICE.PRODUCT_BY_SHOP_ID(action.payload);
     if (response.data && response.data != null) {
         yield put({
@@ -16,7 +16,7 @@ export function* fetchProductByShopIdAsync(action) {
     }
 }
 
-export function* setProductVariantAsync(action) {
+export function* setProductVariantAsync(action: any) {
     let response = yield PRODUCT_SERVICE.PRODUCT_BY_SHOP_ID(action.payload.shopId);
     let response1 = yield VARIENT_SERVICE.VARIENT_BY_SHOP_ID(action.payload.shopId);
     if (response.data && response.data != null && response1.data && response1.data != null) {
@@ -40,7 +40,7 @@ export function* setProductVariantAsync(action) {
     }
 }
 
-export function* setProductVariantByCatAsync(action) {
+export function* setProductVariantByCatAsync(action: any) {
     let response = yield PRODUCT_SERVICE.PRODUCT_BY_CATEGORY_ID(action.payload.categoryId);
     let response1 = yield VARIENT_SERVICE.VARIENT_BY_SHOP_ID(action.payload.shopId);
     if (response.data && response.data != null && response1.data && response1.data != null) {
@@ -62,7 +62,7 @@ export function* setProductVariantByCatAsync(action) {
             payload: data
         });
     } else {
-         yield put({
+        yield put({
             type: ProductActions.SET_PRODUCT_VARIANT_BY_CAT_ASYNC,
             payload: []
         });

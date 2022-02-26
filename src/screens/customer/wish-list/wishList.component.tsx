@@ -79,22 +79,6 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
             shopId: AppConstants.SHOP_ID,
             allMeasurement: [],
             userData: [],
-            allData: [
-                {
-                    url: '/api/lookup/getallmeasurementtype',
-                    method: 'GET',
-                    variable: 'allMeasurement',
-                },
-                {
-                    url: '/api/category/getcategorybyshopid/' + AppConstants.SHOP_ID,
-                    method: 'GET',
-                    variable: 'allCategory',
-                },
-                {
-                    url: '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID,
-                    method: 'GET',
-                    variable: 'allBrand',
-                }],
             single: false,
             shopName: ''
         }
@@ -141,7 +125,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
             axios({
                 method: 'GET',
-                url: AppConstants.API_BASE_URL + '/api/product/getproduct/wishlist/' + AppConstants.SHOP_ID + '/' + userData.userId,
+                url: AppConstants.API_BASE_URL + '/api/item/getproduct/wishlist/' + AppConstants.SHOP_ID + '/' + userData.userId,
             }).then((response) => {
                 // console.log( response.data, 'ooo')
                 this.setState({ allProduct: response.data })
@@ -149,9 +133,9 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                 this.setState({ allProduct: null })
                 // Alert.alert("Server error.")
             });
+        } else {
+            this.props.navigation.navigate(AppRoute.AUTH)
         }
-
-
 
         allData.map((data, index) => {
             // console.log(allData)
@@ -256,8 +240,8 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
     renderProduct = ({ item }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
-            <Text>hjhjh</Text>
-            {/* {item != null ?
+            {/* <Text>hjhjh</Text> */}
+            {item != null ?
                 <View>
                     <View style={Styles.cart_main_view}>
                         <View style={Styles.cart_view_1}>
@@ -291,7 +275,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
                                         <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleAddTocart(item.productId, item.shopId) }}>
                                             <Text style={Styles.cart_button_text}>Add to cart</Text>
-                                        </TouchableOpacity>
+           </TouchableOpacity>*/}
                                     </View>
                                 </View>
 
@@ -309,7 +293,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                     </View>
 
                 </View> :
-                <ActivityIndicator size='large' color='green' />} */}
+                <ActivityIndicator size='large' color='green' />}
 
         </ListItem>
     )
