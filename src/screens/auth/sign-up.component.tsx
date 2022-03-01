@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Alert, View, Image, TextInput, TouchableOpacity, AsyncStorage, PermissionsAndroid } from 'react-native';
-import { Text } from 'react-native-ui-kitten';
+import { Alert, View, Text, Image, TextInput, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
 import { Content } from 'native-base';
-import { SignUpScreenProps } from '../../navigation/auth.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { EyeIcon, EyeOffIcon, } from '../../assets/icons';
 import axios from 'axios';
@@ -13,6 +11,8 @@ import DeviceInfo from 'react-native-device-info';
 import { scale } from 'react-native-size-matters';
 import Geolocation from 'react-native-geolocation-service';
 import { StackActions } from '@react-navigation/routers';
+import { SignUpScreenProps } from '../../navigation/auth-navigation/auth.navigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const data = [
   { text: 'Candidate' },
@@ -20,8 +20,10 @@ const data = [
 ];
 
 type State = {}
-export class SignUpScreen extends Component<SignUpScreenProps, any & State, any> {
-  constructor(props) {
+
+type Props = SignUpScreenProps & any
+export class SignUpScreen extends Component<Props, State, any> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {

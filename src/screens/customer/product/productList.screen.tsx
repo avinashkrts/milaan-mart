@@ -52,7 +52,7 @@ import { CartNavigatorProp } from '../../../navigation/customer-navigator/custom
 import { StackActions } from '@react-navigation/native';
 import { createFilter } from 'react-native-search-filter';
 import { Header } from 'native-base';
-import { OfferData } from './offerdata';
+import { OfferData } from './offerData';
 const KEYS_TO_FILTERS = ['name'];
 
 interface ProductPageProps {

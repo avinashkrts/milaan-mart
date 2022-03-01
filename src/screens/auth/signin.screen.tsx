@@ -160,7 +160,7 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                     } else {
                         if (response.data.token && response.data.token.length > 30) {
                             // console.log('Resdddd', response.data)
-                            if (response.data.shopId === 'MILAAN63') {
+                            // if (response.data.shopId === 'MILAAN63') {
                                 // console.log('Resdddd', response.data)        
                                 if (response.data.userType == admin) {
                                     AsyncStorage.setItem("logedIn", JSON.stringify(true))
@@ -175,9 +175,9 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                                         this.navigateCustomerHome();
                                     })
                                 }
-                            } else {
-                                Alert.alert("Please enter a valid email ID and password.")
-                            }
+                            // } else {
+                            //     Alert.alert("Please enter a valid email ID and password.")
+                            // }
                         } else {
                             Alert.alert("Please enter a valid email ID and password.")
                         }
@@ -266,15 +266,15 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                             </TouchableOpacity>
                         </View>
 
-                        <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.FORGET_PASSWORD) }}>
+                        {/* <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.FORGET_PASSWORD) }}>
                             <Text style={Styles.forgotPassword}>{LableText.FORGOT_PASSWORD}</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                         <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.SIGN_UP) }}>
                             <Text style={Styles.dontHaveAccount}>{LableText.DONT_HAVE_ACCOUNT}</Text>
                         </TouchableOpacity>
 
-                        <View style={{ marginHorizontal: '10%' }}>
+                        <View style={{ marginHorizontal: '10%', marginTop: scale(10) }}>
                             <TouchableOpacity style={[Styles.skip_buttonBox, Styles.center]} onPress={() => { this.navigateCustomerHome() }}>
                                 <Text style={Styles.skip_buttonName}>{LableText.SKIP_LOGIN}</Text>
                             </TouchableOpacity>
