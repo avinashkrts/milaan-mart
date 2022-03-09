@@ -149,11 +149,11 @@ const CustomerBottomNavigator = (): React.ReactElement => (
       options={{ title: 'Bill Book', tabBarIcon: LayoutIcon }}
     />
 
-    <BottomTab.Screen
+    {/* <BottomTab.Screen
       name={AppRoute.OFFERS_TAB}
       component={OffersListNavigator}
       options={{ title: 'Offers', tabBarIcon: LayoutIcon }}
-    />
+    /> */}
   </BottomTab.Navigator>
 );
 

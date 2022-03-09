@@ -27,9 +27,9 @@ interface ShopPageState {
     allBrand: Brand[]
 }
 
-type Props = ShopListScreenProps & ThemedComponentProps & ShopPageProps & CategoryListProps
+type Props = ShopListScreenProps & ThemedComponentProps & ShopPageProps
 
-class ShopList extends Component<Props, ShopPageState> {
+export class ShopListScreen extends Component<Props, ShopPageState> {
     backHandler: any;
     constructor(props: Props) {
         super(props);
@@ -150,29 +150,29 @@ const styles = StyleSheet.create({
     }
 });
 
-interface LinkStateProps {
-    allBrand: Brand[];
-}
+// interface LinkStateProps {
+//     allBrand: Brand[];
+// }
 
-interface LinkDispatchProps {
-    fetchBrandByShopId: (shopId: String) => void;
-}
+// interface LinkDispatchProps {
+//     fetchBrandByShopId: (shopId: String) => void;
+// }
 
-const mapStateToProps = (
-    state: AppState,
-    ownProps: ShopPageProps
-): LinkStateProps => ({
-    allBrand: state.brandReducers.allBrand
-});
+// const mapStateToProps = (
+//     state: AppState,
+//     ownProps: ShopPageProps
+// ): LinkStateProps => ({
+//     allBrand: state.brandReducers.allBrand
+// });
 
-const mapDispatchToProps = (
-    dispatch: ThunkDispatch<any, any, AppActions>,
-    ownProps: ShopPageProps
-): LinkDispatchProps => ({
-    fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch)
-});
+// const mapDispatchToProps = (
+//     dispatch: ThunkDispatch<any, any, AppActions>,
+//     ownProps: ShopPageProps
+// ): LinkDispatchProps => ({
+//     fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch)
+// });
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+// const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type CategoryListProps = ConnectedProps<typeof connector>;
-export const ShopListScreen = connector(ShopList)
+// type CategoryListProps = ConnectedProps<typeof connector>;
+// export const ShopListScreen = connector(ShopList)

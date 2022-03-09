@@ -5,11 +5,13 @@
  * @format
  */
 
- const MetroConfig = require('@ui-kitten/metro-config');
+const MetroConfig = require('@ui-kitten/metro-config');
 
- const evaConfig = {
+const evaConfig = {
   evaPackage: '@eva-design/eva',
+  resetCache: true
 };
+
 
 module.exports = MetroConfig.create(evaConfig, {
   transformer: {

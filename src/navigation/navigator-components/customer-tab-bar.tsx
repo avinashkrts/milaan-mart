@@ -28,25 +28,31 @@ export const CustomerTabBar = (props: BottomCustomerScreenProps): SafeAreaLayout
     // props.navigation.dispatch(resetAction);
 
     switch (index) {
-      case 0: props.navigation.dispatch(resetAction)
+      case 0:
+        // props.navigation.navigate(selectedTabRoute) 
+      props.navigation.navigate(selectedTabRoute)
         break;
 
-      case 1: 
-        props.navigation.dispatch(resetAction)
+      case 1:
+        // props.navigation.navigate(selectedTabRoute)
+        props.navigation.navigate(selectedTabRoute)
         AsyncStorage.setItem('categoryId', String(clean));
         AsyncStorage.setItem('offerId', String(clean));
         break;
 
       case 2:
         props.navigation.dispatch(resetAction)
+        // props.navigation.navigate(selectedTabRoute)
         break;
 
       case 3:
         props.navigation.dispatch(resetAction)
+        // props.navigation.navigate(selectedTabRoute)
         break;
 
       case 4:
         props.navigation.dispatch(resetAction)
+        // props.navigation.navigate(selectedTabRoute)
         break;
     }
   };

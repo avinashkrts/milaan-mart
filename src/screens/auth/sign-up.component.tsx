@@ -136,12 +136,12 @@ export class SignUpScreen extends Component<Props, State, any> {
       <SafeAreaLayout
         style={Styles.safeArea}
         insets={SaveAreaInset.TOP} >
-        < Content style={[Styles.content,{backgroundColor: '#e6e6e6'}]} >
+        < Content style={[Styles.content,{backgroundColor: '#ffffff'}]} >
           <View>
             <Image
               source={require('../../assets/logo.png')}
               resizeMode="contain"
-              style={[Styles.loginImage, {marginBottom: scale(50), marginTop: scale(70)}]}
+              style={[Styles.loginImage, { marginTop: scale(70)}]}
             />
             {/* <View style={Styles.center}>
               <Text style={[Styles.loginWelcome, { paddingTop: 10 }]}>{LableText.WELCOME_TEXT}</Text>

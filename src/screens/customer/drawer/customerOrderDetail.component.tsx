@@ -51,10 +51,12 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
             cashPay: '',
             onlinePay: '',
             walletPay: '',
-            totalItem: ''
+            totalItem: '',
+            allMeasurement: []
         }
         this._onRefresh = this._onRefresh.bind(this);
         this.navigationProductDetail = this.navigationProductDetail.bind(this);
+        this.getMeasurement = this.getMeasurement.bind(this);
     }
 
 
@@ -74,6 +76,7 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
             userData: userData
         })
         if (null != logedIn && logedIn === 'true') {
+            this.getMeasurement()
             // Alert.alert("" + userData.adminId, cartId)
             axios({
                 method: 'GET',
@@ -146,6 +149,21 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
         }
+    }
+
+    getMeasurement() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/measurement/getbyshopid/' + AppConstants.SHOP_ID
+        }).then((response: any) => {
+            if (null != response.data) {
+                this.setState({
+                    allMeasurement: response.data
+                })
+            }
+        }, (error: any) => {
+            console.log(error)
+        });
     }
 
     _onRefresh() {
@@ -235,6 +253,16 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                                     <Text style={Styles.cart_name_text}><CancelIcon fontSize={25} /></Text>
                                 </TouchableOpacity> */}
                                 </View>
+                                {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((data, index) => {
+                                    if (data.id == item.measurement) {
+                                        return (
+                                            <View style={{ flexDirection: 'row', width: '95%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                                <Text style={Styles.price_text}>{item.packSize}{data.name}</Text>
+                                            </View>
+                                        )
+                                    }
+                                }) : null}
+
                                 <View style={Styles.cart_price_view}>
                                     <View style={{ flexDirection: 'row', width: '55%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                                         <Text style={Styles.price_text}><RupeeIcon /> {item.price.toFixed(2)}</Text>
@@ -320,7 +348,7 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Order Id: {cartData.cartId ? cartData.cartId : null} </Text>
                         </View>
                         {null != addressData ?
-                            <Text style={{ marginVertical: 5 }}>{addressData.name}, {addressData.mobileNo}, {addressData.city}, {addressData.street}, {addressData.landmark}, {addressData.postOffice}, {addressData.policeStation}, {addressData.district}, {addressData.state}, {addressData.pinCode}, {addressData.country}</Text>
+                            <Text style={{ marginVertical: 5 }}>{addressData.name}, {addressData.mobileNo}, {addressData.city}, {addressData.pinCode}, {addressData.country}</Text>
                             : null}
                         <View style={{ width: '100%', alignItems: 'flex-end' }}>
                             {/* <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.CUSTOMER_ADDRESS) }} style={[Styles.center, { paddingVertical: 10, width: 100, borderRadius: 5, backgroundColor: Color.COLOR }]}>

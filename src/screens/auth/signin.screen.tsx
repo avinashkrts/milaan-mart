@@ -219,12 +219,12 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP} >
-                < ScrollView style={[Styles.content, { backgroundColor: '#e6e6e6' }]} >
+                < ScrollView style={[Styles.content, { backgroundColor: '#ffffff' }]} >
                     <View>
                         <Image
                             source={require('../../assets/logo.png')}
                             resizeMode="contain"
-                            style={[Styles.loginImage, { marginBottom: scale(50), marginTop: scale(80) }]}
+                            style={[Styles.loginImage, { marginTop: scale(80) }]}
                         />
 
                         {/* <View style={Styles.center}>

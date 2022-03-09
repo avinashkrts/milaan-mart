@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage } from "react-native";
+import { View, Text, RefreshControl, Alert, AsyncStorage, NativeModules } from "react-native";
 import { Avatar, Divider, ThemedComponentProps } from "@ui-kitten/components";
 import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
 import { Toolbar } from "../../../components/toolbar.component";
@@ -12,6 +12,7 @@ import Axios from "axios";
 import { getFirstInstallTime } from "react-native-device-info";
 import { AppRoute } from "../../../navigation/app-routes";
 import { CustomerProfileScreenProps } from "../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator";
+import FastImage from "react-native-fast-image";
 
 export class CustomerProfileScreen extends Component<CustomerProfileScreenProps, ThemedComponentProps & any> {
     constructor(props) {
@@ -44,6 +45,9 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
     }
 
     async componentDidMount() {
+        const FastImageViewNativeModule = NativeModules.FastImageView
+        FastImage.clearMemoryCache = () => FastImageViewNativeModule.clearMemoryCache()
+        FastImage.clearDiskCache = () => FastImageViewNativeModule.clearDiskCache()
         let userDetail = await AsyncStorage.getItem('userDetail');
         let logedIn = await AsyncStorage.getItem('logedIn');
         let userData = JSON.parse(userDetail);
@@ -184,7 +188,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
                     <View style={[Styles.profile, Styles.center]}>
                         <View style={Styles.profile_image}>
                             <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.ADD_CUSTOMER_IMAGE) }}>
-                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/avatar/' + userId + '_' + userType + '_avatar.png' }} style={Styles.profile_avatar} />
+                                <FastImage source={{ uri: AppConstants.IMAGE_BASE_URL + '/avatar/' + userId + '_' + userType + '_avatar.png' }} style={Styles.profile_avatar} />
                             </TouchableOpacity>
                         </View>
                     </View>

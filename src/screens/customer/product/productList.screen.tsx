@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -20,25 +20,8 @@ import {
 } from '../../../components/safe-area-layout.component';
 import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RupeeIcon, SearchIcon, WishIcon } from '../../../assets/icons';
 import { ProductListScreenProps } from '../../../navigation/customer-navigator/product-list.navigator';
-import { connect, ConnectedProps } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { fetchBrandByShopId } from '../../../redux/action/brandAction';
-import { fetchVarientByShopId } from '../../../redux/action/varientAction';
-import { fetchMeasurementByShopId } from '../../../redux/action/measurementAction';
-import { ThunkDispatch } from 'redux-thunk';
-import { AppActions } from '../../../redux/interfaces';
-import { AppState } from '../../../redux/store';
 import { Brand } from '../../../redux/modules/brand.modules';
-import { Varient } from '../../../redux/modules/varient.modules';
-import { Measurement } from '../../../redux/modules/measurement.modules';
-import { Category } from '../../../redux/modules/category.modules';
 import { Styles } from '../../../assets/styles';
-import { changeProductData, setProductVariant, setProductVariantByCat } from '../../../redux/action/productActions';
-import { fetchUserById } from '../../../redux/action/userAction';
-import { fetchCartByShopIdUserId } from '../../../redux/action/cartAction';
-import { Product } from '../../../redux/modules/product';
-import { User } from '../../../redux/modules/user.modules';
-import { Cart } from '../../../redux/modules/cart.modules';
 import { AppConstants, Color, LableText } from '../../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -67,7 +50,7 @@ interface ProductPageState {
 
 type Props = ProductListScreenProps & CartNavigatorProp & ThemedComponentProps & ProductPageProps
 
-export class ProductListScreen extends Component<Props, ProductPageState & any> {
+export class ProductListScreen extends PureComponent<Props, ProductPageState & any> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -86,7 +69,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       search: '',
       lat: '',
       long: '',
-      searchVisible: '',
+      searchVisible: false,
       refreshing: false,
       location: '',
       isCart: false,
@@ -97,6 +80,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       temp_variant: [],
       productName: '',
       productWithVariant: [],
+      tempProductWithVariant: [],
       subCategory: [],
       allData: [
         {
@@ -115,9 +99,20 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
     this.getSubCategory = this.getSubCategory.bind(this);
     this.getAllSubCategory = this.getAllSubCategory.bind(this);
     this.getMeasurement = this.getMeasurement.bind(this);
+    this.initialData = this.initialData.bind(this);
   }
 
   async componentDidMount() {
+    this.props.navigation.addListener('focus', () => {
+      this.setState({
+        isCart: false
+      })
+      this.initialData()
+    })
+  }
+
+  async initialData() {
+    // Alert.alert("")
     const { allData } = this.state;
     let userDetail = await AsyncStorage.getItem('userDetail');
     let categoryId = await AsyncStorage.getItem('categoryId');
@@ -139,9 +134,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
     }
 
     if (categoryId != null && categoryId !== '') {
-      // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-      // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-      // this.props.setProductVariantByCat({ shopId: AppConstants.SHOP_ID, categoryId: categoryId, from: 0, to: 10 })
       this.getSubCategory(categoryId)
       this.getBrandByCategory(categoryId)
       axios({
@@ -154,7 +146,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
             url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
           }).then((response1) => {
             if (null != response1.data) {
-              // console.log("Variant", response1.data)
               if (response.data && response.data != null && response1.data && response1.data != null) {
                 var data = []
                 for (var i = 0; i < response.data.length; i++) {
@@ -207,12 +198,8 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
           }
         }
       })
-      // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-      // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-      // this.props.setProductVariantByCat({ shopId: AppConstants.SHOP_ID, categoryId: categoryId, from: 0, to: 10 })
       this.getAllSubCategory()
       this.getAllBrand()
-      // console.log("offerId", variantUrl);
       axios({
         method: 'GET',
         url: AppConstants.API_BASE_URL + productUrl,
@@ -223,7 +210,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
             url: AppConstants.API_BASE_URL + variantUrl,
           }).then((response1) => {
             if (null != response1.data) {
-              // console.log("Variant", response1.data)
               if (response.data && response.data != null && response1.data && response1.data != null) {
                 var data = []
                 for (var i = 0; i < response.data.length; i++) {
@@ -251,11 +237,29 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
         Alert.alert("Server error!.")
       });
     } else {
-      // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-      // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-      // this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
       this.getAllSubCategory();
       this.getAllBrand();
+      // axios({
+      //   method: 'GET',
+      //   url: AppConstants.API_BASE_URL + '/api/item/getproduct/forlocal/' + AppConstants.SHOP_ID,
+      // }).then((response) => {
+      //   if (null != response.data) {
+      //     var data = []
+      //     this.setState({
+      //       productWithVariant: response.data
+      //     })
+
+      //     // for (var i = 0; i <= 1000; i++) {
+      //     //   data.push(response.data[i])
+      //     // }
+      //     // this.setState({
+      //     //   tempProductWithVariant: data
+      //     // })
+      //     // AsyncStorage.setItem('productVariant', JSON.stringify(data))
+      //   }
+      // }, (error) => {
+      //   Alert.alert("Server error!.")
+      // });
       axios({
         method: 'GET',
         url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
@@ -293,12 +297,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
         Alert.alert("Server error!.")
       });
     }
-
-    // this.setState({
-    //   allBrand: this.props.allBrand,
-    //   allProduct: this.props.productData,
-    //   allVarient: this.props.allVarient
-    // })
   }
 
   getUser(userId: any) {
@@ -314,7 +312,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error: any) => {
       console.log(error)
-      // Alert.alert("Server error.")
     });
   }
 
@@ -330,8 +327,19 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error: any) => {
       console.log(error)
-      // Alert.alert("Server error.")
     });
+  }
+
+  loadData() {
+    const { productWithVariant, tempProductWithVariant } = this.state
+    var last = tempProductWithVariant.length + 20
+    var data = []
+    for (var i = 0; i <= last; i++) {
+      data.push(productWithVariant[i])
+    }
+    this.setState({
+      tempProductWithVariant: data
+    })
   }
 
   // getBrand() {
@@ -362,7 +370,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error: any) => {
       console.log(error)
-      // Alert.alert("Server error.")
     });
   }
 
@@ -378,14 +385,13 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error: any) => {
       console.log(error)
-      // Alert.alert("Server error.")
     });
   }
 
   getAllBrand() {
     axios({
       method: 'GET',
-      url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+      url: AppConstants.API_BASE_URL + '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID,
     }).then((response: any) => {
       if (null != response.data) {
         this.setState({
@@ -394,7 +400,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error: any) => {
       console.log(error)
-      // Alert.alert("Server error.")
     });
   }
 
@@ -410,7 +415,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error: any) => {
       console.log(error)
-      // Alert.alert("Server error.")
     });
   }
 
@@ -429,7 +433,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
         }
       }).then((response) => {
         if (null != response.data) {
-          console.log("Data", response.data)
           if (response.data.status === 'true') {
             Alert.alert("Product added to cart.")
             this.getCart(userData.userId)
@@ -438,8 +441,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
           }
         }
       }, (error) => {
-        // console.log(error)
-        // Alert.alert("Server error.")
+        console.log(error)
       });
     } else {
       const pushAction = StackActions.push(AppRoute.AUTH)
@@ -448,10 +450,8 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
   }
 
   navigateToCart() {
-    // Alert.alert("")
     const pushAction = StackActions.push(AppRoute.CART);
     this.props.navigation.dispatch(pushAction);
-    // this.props.navigation.navigate(AppRoute.CART);
   }
 
   selectCategory(id: any, brandName: any) {
@@ -461,10 +461,10 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       url: AppConstants.API_BASE_URL + '/api/brand/getbrand/bysubcategoryid/' + id,
     }).then((response) => {
       if (null != response.data) {
-       this.setState({
-         allBrand: response.data,
-         selectedCategory: id
-       })
+        this.setState({
+          allBrand: response.data,
+          selectedCategory: id
+        })
       }
     }, (error) => {
       Alert.alert("Server error!.")
@@ -480,7 +480,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
           url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
         }).then((response1) => {
           if (null != response1.data) {
-            // console.log("Variant", response1.data)
             if (response.data && response.data != null && response1.data && response1.data != null) {
               var data = []
               for (var i = 0; i < response.data.length; i++) {
@@ -507,7 +506,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       }
     }, (error) => {
       Alert.alert("Server error!.")
-    });    
+    });
   }
 
   selectBrand(id: any, brandName: any) {
@@ -522,7 +521,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
           url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
         }).then((response1) => {
           if (null != response1.data) {
-            // console.log("Variant", response1.data)
             if (response.data && response.data != null && response1.data && response1.data != null) {
               var data = []
               for (var i = 0; i < response.data.length; i++) {
@@ -650,12 +648,10 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       AsyncStorage.setItem('longitude', String(lng))
       AsyncStorage.setItem('location', String(data.structured_formatting.main_text))
 
-      console.log('Location', data.structured_formatting.main_text)
       axios({
         method: 'GET',
         url: AppConstants.API_BASE_URL + '/api/product/getbylocation/' + lat + '/' + lng,
       }).then((response) => {
-        // this.props.changeProductData(response.data)
         this.setState({
           allProduct: response.data,
           lat: lat,
@@ -672,13 +668,10 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
   }
 
   async onCurrentLocation() {
-    console.log('Map Clicked')
     this.toggleModal("SEARCH");
-    // if (granted === PermissionsAndroid.RESULTS.GRANTED) {
     Geolocation.getCurrentPosition((position) => {
       var lat = position.coords.latitude
       var long = position.coords.longitude
-      console.log('location', lat, position.coords.accuracy)
       AsyncStorage.setItem('latitude', String(lat))
       AsyncStorage.setItem('longitude', String(long))
       AsyncStorage.setItem('location', 'Current Location')
@@ -687,7 +680,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
         method: 'GET',
         url: AppConstants.API_BASE_URL + '/api/product/getbylocation/' + lat + '/' + long,
       }).then((response) => {
-        // this.props.changeProductData(response.data)
         this.setState({
           allProduct: response.data,
           lat: position.coords.latitude,
@@ -701,14 +693,10 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
     }, (erroe) => {
 
     }, { enableHighAccuracy: true })
-    // } else {
-    //     console.log("Camera permission denied");
-    // }
   }
 
   search(index) {
     var product = [index]
-    // console.log("Product", product)
     this.setState({
       productWithVariant: product,
       searchVisible1: false,
@@ -741,16 +729,21 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
     });
   }
 
-  handleIncrease(productId, cartId) {
+  handleIncrease(productId, cartId, quantity, stock) {
     const { user } = this.state
-    axios({
-      method: 'PUT',
-      url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
-    }).then((response) => {
-      this.getCart(user.userId)
-    }, (error) => {
-      Alert.alert("Server problem")
-    })
+
+    if (quantity >= stock) {
+      Alert.alert(`Only ${stock} product left.`)
+    } else {
+      axios({
+        method: 'PUT',
+        url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
+      }).then((response) => {
+        this.getCart(user.userId)
+      }, (error) => {
+        Alert.alert("Server problem")
+      })
+    }
   }
 
   handleDecrease(productId, cartId, quantity) {
@@ -768,120 +761,6 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
       })
     }
   }
-
-  // renderProduct = ({ item }: any): ListItemElement => {
-  //   const { allVarient } = this.props
-  //   return (
-  //     <>
-  //       {null != allVarient && allVarient.length > 0 ?
-  //         allVarient.map((data) => {
-  //           if (data.productId == item.id) {
-  //             return (
-  //               <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
-  //                 <View style={Styles.product_list_main}>
-  //                   <View style={Styles.product_list_img}>
-  //                     <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
-  //                       <View style={[Styles.all_Item_Image_2, Styles.center]}>
-  //                         <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.id + '_' + 1 + "_" + item.shopId + '_product.png' }} style={Styles.product_avatar} />
-  //                       </View>
-  //                     </TouchableOpacity>
-  //                   </View>
-  //                   <View style={Styles.product_list_detail}>
-  //                     <View style={Styles.all_Item_List1}>
-  //                       <View style={Styles.all_Item_Detail}>
-  //                         <View style={{ backgroundColor: '#fff', paddingHorizontal: 0 }}>
-  //                           <View style={{ flexDirection: 'row' }}>
-  //                             {null != this.state.allBrand ? this.state.allBrand.map((brand, index) => {
-  //                               if (brand.id == item.brand) {
-  //                                 return (
-  //                                   <View style={{ width: '80%', flexWrap: 'wrap', flexDirection: 'row' }}>
-  //                                     <Text style={{ color: '#000', marginTop: scale(5), fontSize: scale(14) }}>{item.name} {`\n`}{brand.name}</Text>
-  //                                   </View>
-  //                                 );
-  //                               }
-  //                             }) : null}
-  //                             {/* {this.props.userData != null && this.props.userData.length > 0 ? */}
-  //                             <View style={[Styles.product_2nd_wish_view]}>
-  //                               <TouchableOpacity onPress={() => { this.handleWishList(item.id) }}>
-  //                                 <Text
-  //                                   style={this.state.logedIn && this.props.userData.wishList.includes(item.id) ?
-  //                                     Styles.selected_wish_icon :
-  //                                     Styles.wish_icon
-  //                                   }
-  //                                 >
-  //                                   <WishIcon />
-  //                                 </Text>
-  //                               </TouchableOpacity>
-  //                             </View>
-  //                             {/* : null
-  //                               } */}
-  //                           </View>
-  //                           {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
-  //                             if (brand.id == data.measurement) {
-  //                               return (
-  //                                 <>
-  //                                   <Text style={{ color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{data.quantity} {brand.name}</Text>
-  //                                 </>
-  //                               );
-  //                             }
-  //                           }) : null}
-  //                           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginVertical: 5 }}>
-  //                             <Text style={{ color: '#000', fontSize: scale(14) }}>Rs. {data.sellingPrice}</Text>
-  //                             {item.offerActiveInd ?
-  //                               <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
-  //                               : null
-  //                             }
-  //                           </View>
-  //                           {null != item.offerActiveInd ? item.offerActiveInd ?
-
-  //                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-  //                               <Text style={{ color: Color.COLOR }}>{item.offerPercent} % off</Text>
-  //                               <Text style={{ color: Color.COLOR }}>{item.offerActiveInd && item.offerTo ? item.offerTo.substr(8, 2) + "/" + item.offerTo.substr(5, 2) + "/" + item.offerTo.substr(0, 4) : null}</Text>
-  //                             </View> :
-  //                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-  //                               <Text style={{ color: Color.COLOR, marginTop: 2.5 }}></Text>
-  //                               <Text style={{ color: Color.COLOR }}></Text>
-  //                             </View> : null
-  //                           }
-  //                         </View>
-
-  //                         <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.name) }}>
-  //                           <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
-  //                             <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
-  //                           </View>
-  //                         </TouchableOpacity>
-  //                         {/* {item.stock ? item.stock > 0 ?
-  //                               <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.shopId) }}>
-  //                                   <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
-  //                                       <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
-  //                                   </View>
-  //                               </TouchableOpacity> :
-
-  //                               <TouchableOpacity >
-  //                                   <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
-  //                                       <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Out of Stock</Text>
-  //                                   </View>
-  //                               </TouchableOpacity> :
-  //                               <TouchableOpacity >
-  //                                   <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
-  //                                       <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Out of Stock</Text>
-  //                                   </View>
-  //                               </TouchableOpacity>
-  //                           } */}
-  //                       </View>
-  //                     </View>
-  //                   </View>
-
-  //                 </View>
-  //               </ListItem>
-  //             )
-  //           }
-  //         })
-  //         : null
-  //       }
-  //     </>
-  //   )
-  // }
 
   renderProduct = ({ item }: any): ListItemElement => (
     item.itemList != null && item.itemList.length > 0 ?
@@ -928,7 +807,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
                     if (brand.id == item.itemList[0].measurement) {
                       return (
                         <>
-                          <Text style={{ color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].quantity} {brand.name}</Text>
+                          <Text style={{ color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].unitQuantity} {brand.name}</Text>
                         </>
                       );
                     }
@@ -997,7 +876,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
                     if (brand.id == item.measurement) {
                       return (
                         <View>
-                          <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.quantity} {brand.name}</Text>
+                          <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
                         </View>
                       );
                     }
@@ -1036,7 +915,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
                                         <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
                                       </View>
 
-                                      <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId) }}>
+                                      <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId, data.productQuantity, item.stock) }}>
                                         <Text style={Styles.cart_button_text} ><AddIcon /></Text>
                                       </Pressable>
                                     </View>
@@ -1083,7 +962,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
                         </View>
                       </Pressable>
                     </View> :
-                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[Styles.cart_quantity_view, { paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }]}>
                       <Text style={{ color: 'white' }}>Out of Stock</Text>
                     </View>
                   }
@@ -1116,7 +995,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
     const { allProduct, allBrand, temp_variant, productName, searchVisible1, variantVisible,
       searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing,
       shopId, search, allCategory, wishList, selectedBrand, selectedCategory, allCart,
-      subCategory, productWithVariant } = this.state;
+      subCategory, productWithVariant, tempProductWithVariant } = this.state;
     const filteredProduct = productWithVariant ? productWithVariant.length > 0 ? productWithVariant.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
     // console.log('User Data', productVariant, "ppop")
     return (
@@ -1127,7 +1006,9 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
         <Modal isVisible={variantVisible}>
           <View style={Styles.variant_modal}>
             <View style={Styles.varient_modalHeader}>
-              <Text style={{ fontSize: scale(20), fontWeight: '400' }}>{productName}</Text>
+              <View style={{ width: '90%' }}>
+                <Text style={{ fontSize: scale(20), fontWeight: '400' }}>{productName}</Text>
+              </View>
               <TouchableOpacity>
                 <Text onPress={() => { this.setState({ variantVisible: false }); }}><CancelIcon fontSize={25} /></Text>
               </TouchableOpacity>
@@ -1163,7 +1044,7 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
               styles={{}}
               onPress={(data, details = null) => {
                 this.handleSearchLatLong(data, details)
-                console.log('New Location', data);
+                // console.log('New Location', data);
               }}
               query={{
                 key: AppConstants.GOOGLE_MAP_KEY,
@@ -1266,25 +1147,25 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
           <Divider />
           <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
             <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0, flex: 1, flexDirection: 'column' }}>
-            <View style={{ marginTop: 10 }}>
-              <FlatList
-                style={{}}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                data={allBrand}
-                renderItem={({ item, index }) => {
-                  return (
-                    <TouchableOpacity onPress={() => { this.selectBrand(item.id, item.name) }}>
-                      <View style={selectedBrand == item.id ? Styles.product_nav_button_selected : Styles.product_nav_button}>
-                        <Text style={selectedBrand == item.id ? Styles.product_nav_button_selected_text : Styles.product_nav_button_text}>{item.name}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  )
-                }}
-                keyExtractor={(item) => item.id}
-              >
-              </FlatList>
-            </View>
+              <View style={{ marginTop: 10 }}>
+                <FlatList
+                  style={{}}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  data={allBrand}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <TouchableOpacity onPress={() => { this.selectBrand(item.id, item.name) }}>
+                        <View style={selectedBrand == item.id ? Styles.product_nav_button_selected : Styles.product_nav_button}>
+                          <Text style={selectedBrand == item.id ? Styles.product_nav_button_selected_text : Styles.product_nav_button_text}>{item.name}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    )
+                  }}
+                  keyExtractor={(item) => item.id}
+                >
+                </FlatList>
+              </View>
             </View>
           </Header>
           <Divider />
@@ -1313,7 +1194,8 @@ export class ProductListScreen extends Component<Props, ProductPageState & any> 
                     onRefresh={this._onRefresh.bind(this)}
                   />}
                 renderItem={this.renderProduct}
-              // onEndReached={() => this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: productVariant.length, to: productVariant.length + 10 })}
+                // onEndReached={() => { this.loadData() }}
+                keyExtractor={item => item.id}
               />
               : null}
 

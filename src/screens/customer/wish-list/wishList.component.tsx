@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     ListRenderItemInfo, View, StyleSheet, TouchableOpacity,
-    ActivityIndicator, Image, Alert, FlatList, ScrollView, RefreshControl, TextInput, Dimensions
+    ActivityIndicator, Image, Alert, FlatList, ScrollView, RefreshControl, TextInput, Dimensions, Pressable
 } from 'react-native';
 import {
     // Input,
@@ -18,7 +18,7 @@ import {
 import { ScrollableTab, Tab, Item, Container, Content, Tabs, Header, TabHeading, Thumbnail, Input, Label, Footer, FooterTab, Col } from 'native-base';
 import { AppRoute } from '../../../navigation/app-routes';
 import { ProgressBar } from '../../../components/progress-bar.component';
-import { SearchIcon, MinusIcon, RupeeIcon, PlusCircle, BackIcon, CancelIcon, AddIcon, RightArrowIcon } from '../../../assets/icons';
+import { SearchIcon, MinusIcon, RupeeIcon, PlusCircle, BackIcon, CancelIcon, AddIcon, RightArrowIcon, WishIcon } from '../../../assets/icons';
 import { AppConstants } from '../../../constants/AppConstants';
 import { Toolbar } from '../../../components/toolbar.component';
 import {
@@ -30,6 +30,7 @@ import { MenuIcon, ExperienceIcon, LocationIcon, PublicIcon, PencilIcon } from '
 import { any } from 'prop-types';
 import { AsyncStorage } from 'react-native';
 import axios from 'axios';
+import Modal from "react-native-modal";
 import { truncate, open } from 'fs';
 // import VideoPlayer from 'react-native-video-player';
 // import { FlatList } from 'react-native-gesture-handler';
@@ -41,6 +42,8 @@ import { Styles } from '../../../assets/styles'
 import { Color } from '../../../constants/LabelConstants';
 import Axios from 'axios';
 import { WishListScreenProps } from '../../../navigation/customer-navigator/wish-list.navigator';
+import { scale } from 'react-native-size-matters';
+import { StackActions } from '@react-navigation/core';
 // import axios from 'axios';  
 // import Container from '@react-navigation/core/lib/typescript/NavigationContainer';
 
@@ -80,7 +83,12 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
             allMeasurement: [],
             userData: [],
             single: false,
-            shopName: ''
+            allCart: [],
+            shopName: '',
+            temp_variant: [],
+            logedIn: false,
+            variantVisible: false,
+            productName: ''
         }
         this._onRefresh = this._onRefresh.bind(this);
         this.navigationProductDetail = this.navigationProductDetail.bind(this);
@@ -110,18 +118,8 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
         const logedIn = await AsyncStorage.getItem('logedIn');
         if (null != logedIn && logedIn === 'true') {
-            // Alert.alert('')
-            axios({
-                method: 'GET',
-                url: AppConstants.API_BASE_URL + '/api/user/get/' + userData.userId,
-            }).then((response) => {
-                this.setState({
-                    userData: response.data,
-                    wishList: response.data.wishList
-                })
-            }, (error) => {
-                Alert.alert("Server error.")
-            });
+            this.getCart(userData.userId)
+            this.getUser(userData.userId)
 
             axios({
                 method: 'GET',
@@ -133,38 +131,83 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                 this.setState({ allProduct: null })
                 // Alert.alert("Server error.")
             });
+
+            this.getAllBrand()
+            this.getMeasurement()
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
         }
 
-        allData.map((data, index) => {
-            // console.log(allData)
-            axios({
-                method: data.method,
-                url: AppConstants.API_BASE_URL + data.url,
-            }).then((response) => {
-                if (data.variable === 'allCategory') {
-                    // console.log(data.variable, response.data)
+    }
+
+    getUser(userId: any) {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/user/get/' + userId
+        }).then((response: any) => {
+            if (null != response.data) {
+                this.setState({
+                    user: response.data,
+                    logedIn: true
+                })
+            }
+        }, (error: any) => {
+            console.log(error)
+            // Alert.alert("Server error.")
+        });
+    }
+
+    getCart(userId: any) {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + "/api/cart/get/cartby/shopid/userid/" + AppConstants.SHOP_ID + '/' + userId,
+        }).then((response) => {
+            if (null != response.data) {
+                if (response.data[0].productList.length > 0) {
                     this.setState({
-                        allCategory: response.data,
-                        selectedCategory: response.data[0].id
-                    })
-                } else if (data.variable === 'allBrand') {
-                    // console.log(data.variable, response.data)
-                    this.setState({
-                        allBrand: response.data,
-                        selectedBrand: response.data[0].id
-                    })
-                } else if (data.variable === 'allMeasurement') {
-                    console.log(data.variable, response.data)
-                    this.setState({
-                        allMeasurement: response.data,
+                        isCart: true
                     })
                 }
-            }, (error) => {
-                Alert.alert("Server error.")
-            });
-        })
+
+                this.setState({
+                    allCart: response.data
+                })
+            }
+        }, (error) => {
+            Alert.alert("Server error!.")
+        });
+    }
+
+    getMeasurement() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/measurement/getbyshopid/' + AppConstants.SHOP_ID
+        }).then((response: any) => {
+            if (null != response.data) {
+                this.setState({
+                    allMeasurement: response.data
+                })
+            }
+        }, (error: any) => {
+            console.log(error)
+            // Alert.alert("Server error.")
+        });
+    }
+
+    getAllBrand() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+        }).then((response: any) => {
+            if (null != response.data) {
+                this.setState({
+                    allBrand: response.data
+                })
+            }
+        }, (error: any) => {
+            console.log(error)
+            // Alert.alert("Server error.")
+        });
     }
 
     async handleAddTocart(productId, shopId) {
@@ -200,8 +243,6 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
             }, (error) => {
                 Alert.alert("Server error.")
             });
-
-
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
         }
@@ -238,72 +279,335 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
         }
     }
 
+    handleIncrease(productId, cartId, quantity, stock) {
+        const { user } = this.state
+            
+        if (quantity >= stock) {
+          Alert.alert(`Only ${stock} product left.`)
+        } else {
+          axios({
+            method: 'PUT',
+            url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
+          }).then((response) => {
+            this.getCart(user.userId)
+          }, (error) => {
+            Alert.alert("Server problem")
+          })
+        }
+      }
+
+    handleDecrease(productId, cartId, quantity) {
+        const { user } = this.state
+        if (quantity <= 1) {
+            Alert.alert("You have already selected minimum quantity.")
+        } else {
+            axios({
+                method: 'PUT',
+                url: AppConstants.API_BASE_URL + '/api/cart/cartdecrease/' + cartId + '/' + productId
+            }).then((response) => {
+                this.getCart(user.userId)
+            }, (error) => {
+                Alert.alert("Server problem")
+            })
+        }
+    }
+
+    addToCart(productId) {
+        const { shopId, logedIn, userData } = this.state
+        if (null != logedIn && logedIn) {
+            // Alert.alert('' + userData.userId + productId + logedIn + shopId)
+            axios({
+                method: 'POST',
+                url: AppConstants.API_BASE_URL + '/api/cart/create',
+                data: {
+                    shopId: shopId,
+                    userId: userData.userId,
+                    productId: productId,
+                    productQuantity: 1
+                }
+            }).then((response) => {
+                if (null != response.data) {
+                    console.log("Data", response.data)
+                    if (response.data.status === 'true') {
+                        Alert.alert("Product added to cart.")
+                        this.getCart(userData.userId)
+                    } else {
+                        Alert.alert("Product allready exists in your cart.")
+                    }
+                }
+            }, (error) => {
+                // console.log(error)
+                // Alert.alert("Server error.")
+            });
+        } else {
+            const pushAction = StackActions.push(AppRoute.AUTH)
+            this.props.navigation.dispatch(pushAction);
+        }
+    }
+
+    async handleAddToCart(productId, productName, itemList) {
+        const { userData } = this.state;
+        const logedIn = await AsyncStorage.getItem('logedIn');
+
+        if (itemList.length > 0) {
+            this.setState({
+                temp_variant: itemList,
+                variantVisible: true,
+                productName: productName
+            })
+        }
+    }
+
+
     renderProduct = ({ item }: any): ListItemElement => (
-        <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
-            {/* <Text>hjhjh</Text> */}
-            {item != null ?
-                <View>
-                    <View style={Styles.cart_main_view}>
-                        <View style={Styles.cart_view_1}>
-                            <View style={Styles.cart_view_1_1}>
-                                <View style={[Styles.cart_avatar_view, Styles.center]}>
-                                    <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productId + '_' + 1 + "_" + item.shopId + '_product.png' }} style={Styles.product_avatar} />
-                                </View>
+        item.itemList != null && item.itemList.length > 0 ?
+            <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+                <View style={Styles.product_list_main}>
+                    <View style={Styles.product_list_img}>
+                        <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
+                            <View style={[Styles.all_Item_Image_2, Styles.center]}>
+                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.id + '_' + 1 + "_" + item.shopId + '_product.png' }} style={Styles.product_avatar} />
                             </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={Styles.product_list_detail}>
+                        <View style={Styles.all_Item_List1}>
+                            <View style={Styles.all_Item_Detail}>
+                                <View style={{ backgroundColor: '#fff', paddingHorizontal: 0 }}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        {null != this.state.allBrand ? this.state.allBrand.map((brand, index) => {
+                                            if (brand.id == item.brand) {
+                                                return (
+                                                    <View style={{ width: '80%', flexWrap: 'wrap', flexDirection: 'row' }}>
+                                                        <Text style={{ color: '#000', marginTop: scale(5), fontSize: scale(14) }}>{item.name} {`\n`}{brand.name}</Text>
+                                                    </View>
+                                                );
+                                            }
+                                        }) : null}
+                                        {/* {this.props.userData != null && this.props.userData.length > 0 ? */}
+                                        <View style={[Styles.product_2nd_wish_view]}>
+                                            <TouchableOpacity onPress={() => { this.handleDelete(item.id) }}>
+                                                <Text style={Styles.cart_name_text}><CancelIcon fontSize={25} /></Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        {/* : null
+                                    } */}
+                                    </View>
+                                    {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
+                                        if (brand.id == item.itemList[0].measurement) {
+                                            return (
+                                                <>
+                                                    <Text style={{ color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].unitQuantity} {brand.name}</Text>
+                                                </>
+                                            );
+                                        }
+                                    }) : null}
+                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginVertical: 5 }}>
+                                        <Text style={{ color: '#000', fontSize: scale(14) }}>Rs. {item.itemList[0].sellingPrice}</Text>
+                                        {item.offerActiveInd ?
+                                            <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
+                                            : null
+                                        }
+                                    </View>
+                                    {null != item.offerActiveInd ? item.offerActiveInd ?
 
-                            <View style={Styles.cart_view_1_2}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={Styles.cart_name_text}>{item.name}</Text>
-                                    <TouchableOpacity onPress={() => { this.handleDelete(item.productId) }}>
-                                        <Text style={Styles.cart_name_text}><CancelIcon fontSize={25} /></Text>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                                            <Text style={{ color: Color.COLOR }}>{item.offerPercent} % off</Text>
+                                            <Text style={{ color: Color.COLOR }}>{item.offerActiveInd && item.offerTo ? item.offerTo.substr(8, 2) + "/" + item.offerTo.substr(5, 2) + "/" + item.offerTo.substr(0, 4) : null}</Text>
+                                        </View> :
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                                            <Text style={{ color: Color.COLOR, marginTop: 2.5 }}></Text>
+                                            <Text style={{ color: Color.COLOR }}></Text>
+                                        </View> : null
+                                    }
+                                </View>
+
+                                <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.name, item.itemList) }}>
+                                    <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
+                                        <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                {/* {item.stock ? item.stock > 0 ?
+                                    <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.shopId) }}>
+                                        <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
+                                            <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
+                                        </View>
+                                    </TouchableOpacity> :
+    
+                                    <TouchableOpacity >
+                                        <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
+                                            <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Out of Stock</Text>
+                                        </View>
+                                    </TouchableOpacity> :
+                                    <TouchableOpacity >
+                                        <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
+                                            <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Out of Stock</Text>
+                                        </View>
                                     </TouchableOpacity>
-                                </View>
-                                <View style={Styles.cart_price_view}>
-                                    <View style={{ flexDirection: 'column' }}>
-                                        <Text style={Styles.price_text}><RupeeIcon /> {item.price}</Text>
-                                        <Text style={Styles.offer_price_text}>{item.offerPercent ? item.offerPercent > 0 && item.offerActiveInd ? item.oldPrice : '' : ''}</Text>
-                                    </View>
-
-                                    <View style={[Styles.cart_quantity_view, Styles.center]}>
-                                        {/* <TouchableOpacity style={Styles.cart_button} onPress={() => { }}>
-                                            <Text style={Styles.cart_button_text}><MinusIcon /></Text>
-                                        </TouchableOpacity>
-
-                                        <View style={Styles.cart_quantity_text_view}>
-                                            <Text style={Styles.cart_quantity_text}>3</Text>
-                                        </View> 
-
-                                        <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleAddTocart(item.productId, item.shopId) }}>
-                                            <Text style={Styles.cart_button_text}>Add to cart</Text>
-           </TouchableOpacity>*/}
-                                    </View>
-                                </View>
-
-                                <View>
-                                    {item.offerPercent ? item.offerPercent > 0 && item.offerActiveInd ?
-                                        <Text style={Styles.cart_offer_text}>{item.offerPercent}% off</Text> : null : null}
-                                </View>
+                                } */}
                             </View>
-                        </View>
-
-                        <View>
-                            {item.offerPercent ? item.offerPercent > 0 && item.offerActiveInd ?
-                                <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}> offers available</Text> : null : null}
                         </View>
                     </View>
 
-                </View> :
-                <ActivityIndicator size='large' color='green' />}
-
-        </ListItem>
+                </View>
+            </ListItem> : <></>
     )
 
+    renderVariant = ({ item }: any): ListItemElement => {
+        var count = 0;
+        return (
+            <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+                {item != null ?
+                    <View style={Styles.variant_main_view}>
+                        <View style={Styles.variant_view_1}>
+                            <View style={Styles.variant_price_view}>
+                                <View style={{ width: '55%', flexDirection: "column" }}>
+                                    {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
+                                        if (brand.id == item.measurement) {
+                                            return (
+                                                <View>
+                                                    <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
+                                                </View>
+                                            );
+                                        }
+                                    }) : null}
+                                    <View>
+                                        <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.sellingPrice.toFixed(2)}</Text>
+                                    </View>
+
+                                    {item.sellingPrice != item.mrp ?
+                                        <View>
+                                            <Text style={Styles.offer_price_text}>
+                                                {item.mrp.toFixed(2)}
+                                            </Text>
+                                        </View>
+                                        : null
+                                    }
+                                </View>
+                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+
+                                    {item.stock ? item.stock > 0 ?
+                                        this.state.logedIn ?
+                                            this.state.allCart != '' && this.state.allCart.length > 0 ?
+                                                this.state.allCart[0].productList != null && this.state.allCart[0].productList.length > 0 ?
+                                                    this.state.allCart[0].productList.map((data, index) => {
+                                                        if (data.productId == item.id) {
+                                                            if (count == 0) {
+                                                                count++
+                                                                return (
+                                                                    <>
+                                                                        <View style={Styles.cart_quantity_view}>
+                                                                            <Pressable onPress={() => { this.handleDecrease(item.id, data.cartId, data.productQuantity) }} style={Styles.cart_button}>
+                                                                                <Text style={Styles.cart_button_text}><MinusIcon /></Text>
+                                                                            </Pressable>
+
+                                                                            <View style={Styles.cart_quantity_text_view}>
+                                                                                <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
+                                                                            </View>
+
+                                                                            <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId, data.productQuantity, item.stock) }}>
+                                                                                <Text style={Styles.cart_button_text} ><AddIcon /></Text>
+                                                                            </Pressable>
+                                                                        </View>
+                                                                    </>
+                                                                )
+                                                            }
+                                                        } else if (count < 1 && index == this.state.allCart[0].productList.length - 1) {
+                                                            return (
+                                                                <View style={Styles.cart_quantity_view}>
+                                                                    <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                                                            <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                                                        </View>
+                                                                    </Pressable>
+                                                                </View>
+                                                            )
+                                                        }
+                                                    }) :
+                                                    <View style={Styles.cart_quantity_view}>
+                                                        <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                                            <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                                            </View>
+                                                        </Pressable>
+                                                    </View> :
+                                                <View style={Styles.cart_quantity_view}>
+                                                    <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                                        </View>
+                                                    </Pressable>
+                                                </View> :
+                                            <View style={Styles.cart_quantity_view}>
+                                                <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                                    </View>
+                                                </Pressable>
+                                            </View> :
+                                        <View style={Styles.cart_quantity_view}>
+                                            <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                                <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                                </View>
+                                            </Pressable>
+                                        </View> :
+                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                            <Text style={{ color: 'white' }}>Out of Stock</Text>
+                                        </View>
+                                    }
+                                </View>
+                            </View>
+                            {item.offersAvailable ?
+                                <View>
+                                    <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
+                                </View> : null
+                            }
+                        </View>
+                        {
+                            item.offersAvailable ?
+                                <View>
+                                    <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
+                                </View> : null
+                        }
+                    </View >
+                    :
+                    <ActivityIndicator size='large' color='green' />
+                }
+
+            </ListItem>
+        )
+    }
+
     render() {
-        const { allProduct, single, shopName, allCategory, allMeasurement, wishList, allBrand, selectedBrand, selectedCategory } = this.state;
+        const { allProduct, temp_variant, variantVisible, productName, single, shopName, allCategory, allMeasurement, wishList, allBrand, selectedBrand, selectedCategory } = this.state;
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP}>
+                <Modal isVisible={variantVisible}>
+                    <View style={Styles.variant_modal}>
+                        <View style={Styles.varient_modalHeader}>
+                            <Text style={{ fontSize: scale(20), fontWeight: '400' }}>{productName}</Text>
+                            <TouchableOpacity>
+                                <Text onPress={() => { this.setState({ variantVisible: false }); }}><CancelIcon fontSize={25} /></Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Divider />
+                        <Divider />
+                        <Divider />
+                        <ScrollView>
+
+                            <View>
+                                {null != temp_variant ?
+                                    <List
+                                        data={temp_variant}
+                                        renderItem={this.renderVariant}
+                                    /> : null}
+                            </View>
+                        </ScrollView>
+                    </View>
+                </Modal>
                 <Toolbar
                     title='Wish List'
                     backIcon={MenuIcon}

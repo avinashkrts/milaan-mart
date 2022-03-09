@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage, BackHandler } from "react-native";
+import { View, Text, RefreshControl, Alert, AsyncStorage, BackHandler, Pressable } from "react-native";
 import { Avatar, Divider, ThemedComponentProps, ListItem, ListItemElement, List } from "@ui-kitten/components";
 import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
 import { Toolbar } from "../../../components/toolbar.component";
@@ -16,6 +16,7 @@ import { Contents } from "../../../constants/LabelConstants";
 import { StackActions } from "@react-navigation/core";
 import { scale } from "react-native-size-matters";
 import { CustomerOrderScreenProps } from "../../../navigation/customer-navigator/order-navigation/order.navigator";
+import { Notification } from "../../../components/notification";
 
 type Props = CustomerOrderScreenProps & ThemedComponentProps
 
@@ -184,7 +185,6 @@ export class CustomerOrderScreen extends Component<Props, any> {
                 Alert.alert("Server error!.")
             });
         }
-
     }
 
     renderCart = ({ item, index }: any): ListItemElement => (
@@ -193,9 +193,9 @@ export class CustomerOrderScreen extends Component<Props, any> {
                 <View style={{ paddingHorizontal: scale(10) }}>
                     <Modal style={Styles.modal} isVisible={this.state.reviewModal}>
                         <View style={Styles.modalHeader}>
-                            <TouchableOpacity>
-                                <Text onPress={() => { this.toggleModal('CLOSE', '') }}><CancelIcon fontSize={25} /></Text>
-                            </TouchableOpacity>
+                            <Pressable onPress={() => { this.toggleModal('CLOSE', '') }}>
+                                <Text><CancelIcon fontSize={25} /></Text>
+                            </Pressable>
                         </View>
                         <View style={Styles.user_detail}>
                             <View style={Styles.user_detail_header}>
@@ -210,9 +210,11 @@ export class CustomerOrderScreen extends Component<Props, any> {
                                     onChangeText={(value) => { this.setState({ review: value }) }}
                                 />
                             </View>
-                            <View style={[Styles.center, { marginTop: 30 }]}>
-                                <Text onPress={() => { this.handleOrderStatus(item.cartId, item.shopId) }} style={[{ backgroundColor: Color.COLOR, fontSize: 18, color: '#fff', padding: 10, borderRadius: 5, marginTop: 3 }]}>{LableText.SUBMIT}</Text>
-                            </View>
+                            <Pressable onPress={() => { this.handleOrderStatus(item.cartId, item.shopId) }}>
+                                <View style={[Styles.center, { marginTop: 30 }]}>
+                                    <Text style={[{ backgroundColor: Color.COLOR, fontSize: 18, color: '#fff', padding: 10, borderRadius: 5, marginTop: 3 }]}>{LableText.SUBMIT}</Text>
+                                </View>
+                            </Pressable>
                         </View>
                     </Modal>
 

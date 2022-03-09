@@ -6,7 +6,8 @@ import {
     Alert, RefreshControl,
     Dimensions,
     ScrollView,
-    Text
+    Text,
+    Pressable
 } from 'react-native';
 import { AppRoute } from '../../../navigation/app-routes';
 import {
@@ -65,13 +66,13 @@ interface CartPageState {
     refreshing: Boolean
 }
 
-type Props = CartScreenProps & ThemedComponentProps & CartPageProps & RenderCartProps
+type Props = CartScreenProps & ThemedComponentProps & CartPageProps
 
 var SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 
-class RenderCart extends React.Component<Props, CartPageState & any> {
+export class CartScreen extends React.Component<Props, CartPageState & any> {
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -86,7 +87,8 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
             isModalVisible: false,
             selectedCartId: '',
             insideShop: false,
-            content: {}
+            content: {},
+            allMeasurement: []
         }
         this._onRefresh = this._onRefresh.bind(this);
         this.navigationProductDetail = this.navigationProductDetail.bind(this);
@@ -104,7 +106,8 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
         let userData = JSON.parse(userDetail);
 
         if (null != logedIn && logedIn === 'true') {
-            // Alert.alert("" + userData.userId)           
+            // Alert.alert("" + userData.userId) 
+            this.getMeasurement()          
             axios({
                 method: 'GET',
                 url: AppConstants.API_BASE_URL + '/api/cart/get/cartby/shopid/userid/' + AppConstants.SHOP_ID + '/' + userData.userId
@@ -123,7 +126,20 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
             this.props.navigation.navigate(AppRoute.AUTH)
         }
     }
-
+    getMeasurement() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/measurement/getbyshopid/' + AppConstants.SHOP_ID
+        }).then((response: any) => {
+            if (null != response.data) {
+                this.setState({
+                    allMeasurement: response.data
+                })
+            }
+        }, (error: any) => {
+            console.log(error)
+        });
+    }
     _onRefresh() {
         this.setState({ refreshing: true });
         this.componentDidMount().then(() => {
@@ -131,18 +147,22 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
         });
     }
 
-    handleIncrease(productId, cartId) {
-        // const { cartId } = this.state;
-        // Alert.alert(productId + cartId)
-        axios({
+    handleIncrease(productId, cartId, quantity, stock) {
+        const { user } = this.state
+            
+        if (quantity >= stock) {
+          Alert.alert(`Only ${stock} product left.`)
+        } else {
+          axios({
             method: 'PUT',
             url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
-        }).then((response) => {
-            this._onRefresh();
-        }, (error) => {
+          }).then((response) => {
+            this.getCart(user.userId)
+          }, (error) => {
             Alert.alert("Server problem")
-        })
-    }
+          })
+        }
+      }
 
     handleDecrease(productId, cartId, quantity) {
         // const { cartId } = this.state;
@@ -206,9 +226,7 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
     renderCart = ({ item }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
             {item != null ?
-
                 <View style={Styles.cart_main_view}>
-
                     <View style={Styles.cart_view_1}>
                         <View style={Styles.cart_view_1_1}>
                             <View style={[Styles.cart_avatar_view, Styles.center]}>
@@ -225,6 +243,15 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
                                     <Text style={Styles.cart_name_text}><CancelIcon fontSize={scale(25)} /></Text>
                                 </TouchableOpacity>
                             </View>
+                            {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((data, index) => {
+                                    if (data.id == item.measurement) {
+                                        return (
+                                            <View style={{ flexDirection: 'row', width: '95%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                                <Text style={Styles.price_text}>{item.packSize}{data.name}</Text>
+                                            </View>
+                                        )
+                                    }
+                                }) : null}
                             <View style={Styles.cart_price_view}>
 
                                 <View style={{ flexDirection: 'row', width: '55%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
@@ -245,7 +272,7 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
                                                 <Text style={Styles.cart_quantity_text}>{item.productQuantity}</Text>
                                             </View>
 
-                                            <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleIncrease(item.productId, item.cartId) }}>
+                                            <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleIncrease(item.productId, item.cartId, item.productQuantity, item.currentStock) }}>
                                                 <Text style={Styles.cart_button_text}><AddIcon /></Text>
                                             </TouchableOpacity>
                                         </> :
@@ -355,8 +382,8 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
     }
 
     continiueShopping() {
-        const { single } = this.state;          
-            this.props.navigation.navigate(AppRoute.PRODUCT_LIST)
+        const { single } = this.state;
+        this.props.navigation.navigate(AppRoute.PRODUCT_LIST)
     }
 
     addItem() { }
@@ -486,10 +513,7 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
                                 <Text style={Styles.cart_price_text_data}>You will save <RupeeIcon fontSize={18} />{null != cartData.discount ? cartData.discount.toFixed(2) : null} on this order.</Text>
                             </View>
                         </View>
-
                     </>
-
-
                     <View style={{ height: 10, width: '100%' }} />
                 </ScrollView>
                 <>
@@ -502,9 +526,9 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
                         </View>
 
                         <View>
-                            <TouchableOpacity style={[Styles.cart_bottom_box_button, Styles.center]} onPress={() => { this.handlePlaceOrder(cartData.cartId) }}>
+                            <Pressable disabled={productList != null && productList.length > 0 ? false : true} style={[Styles.cart_bottom_box_button, Styles.center]} onPress={() => { this.handlePlaceOrder(cartData.cartId) }}>
                                 <Text style={Styles.cart_bottom_box_button_text}>Place Order</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </>
@@ -516,53 +540,53 @@ class RenderCart extends React.Component<Props, CartPageState & any> {
     }
 }
 
-interface LinkStateToProp {
-    productData: Product[],
-    productVariant: Product[],
-    userData: User,
-    allBrand: Brand[],
-    allMeasurement: Measurement[],
-    allVarient: Varient[];
-    allCart: Cart[];
-}
+// interface LinkStateToProp {
+//     productData: Product[],
+//     productVariant: Product[],
+//     userData: User,
+//     allBrand: Brand[],
+//     allMeasurement: Measurement[],
+//     allVarient: Varient[];
+//     allCart: Cart[];
+// }
 
-interface LinkDispatchToProp {
-    changeProductData: (shopId: String) => void;
-    fetchBrandByShopId: (shopId: String) => void;
-    fetchVarientByShopId: (shopId: String) => void;
-    fetchMeasurementByShopId: (shopId: String) => void;
-    fetchUserById: (id: Number) => void;
-    fetchCartByShopIdUserId: (data: any) => void;
-    setProductVariant: (data: any) => void;
-}
+// interface LinkDispatchToProp {
+//     changeProductData: (shopId: String) => void;
+//     fetchBrandByShopId: (shopId: String) => void;
+//     fetchVarientByShopId: (shopId: String) => void;
+//     fetchMeasurementByShopId: (shopId: String) => void;
+//     fetchUserById: (id: Number) => void;
+//     fetchCartByShopIdUserId: (data: any) => void;
+//     setProductVariant: (data: any) => void;
+// }
 
-const mapStateToProps = (
-    state: AppState,
-    ownProps: Brand
-): LinkStateToProp => ({
-    productData: state.productReducers.productData,
-    userData: state.userReducers.userData,
-    allVarient: state.varientReducers.allVarient,
-    allMeasurement: state.measurementReducers.measurementData,
-    allBrand: state.brandReducers.allBrand,
-    productVariant: state.productReducers.productVarient,
-    allCart: state.cartReducers.cartByUserId
-})
+// const mapStateToProps = (
+//     state: AppState,
+//     ownProps: Brand
+// ): LinkStateToProp => ({
+//     productData: state.productReducers.productData,
+//     userData: state.userReducers.userData,
+//     allVarient: state.varientReducers.allVarient,
+//     allMeasurement: state.measurementReducers.measurementData,
+//     allBrand: state.brandReducers.allBrand,
+//     productVariant: state.productReducers.productVarient,
+//     allCart: state.cartReducers.cartByUserId
+// })
 
-const mapDispatchToProps = (
-    dispatch: ThunkDispatch<any, any, AppActions>,
-    ownProps: Brand
-): LinkDispatchToProp => ({
-    changeProductData: bindActionCreators(changeProductData, dispatch),
-    fetchUserById: bindActionCreators(fetchUserById, dispatch),
-    fetchVarientByShopId: bindActionCreators(fetchVarientByShopId, dispatch),
-    fetchMeasurementByShopId: bindActionCreators(fetchMeasurementByShopId, dispatch),
-    fetchCartByShopIdUserId: bindActionCreators(fetchCartByShopIdUserId, dispatch),
-    setProductVariant: bindActionCreators(setProductVariant, dispatch),
-    fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch)
-});
+// const mapDispatchToProps = (
+//     dispatch: ThunkDispatch<any, any, AppActions>,
+//     ownProps: Brand
+// ): LinkDispatchToProp => ({
+//     changeProductData: bindActionCreators(changeProductData, dispatch),
+//     fetchUserById: bindActionCreators(fetchUserById, dispatch),
+//     fetchVarientByShopId: bindActionCreators(fetchVarientByShopId, dispatch),
+//     fetchMeasurementByShopId: bindActionCreators(fetchMeasurementByShopId, dispatch),
+//     fetchCartByShopIdUserId: bindActionCreators(fetchCartByShopIdUserId, dispatch),
+//     setProductVariant: bindActionCreators(setProductVariant, dispatch),
+//     fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch)
+// });
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+// const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type RenderCartProps = ConnectedProps<typeof connector>;
-export const CartScreen = connector(RenderCart)
+// type RenderCartProps = ConnectedProps<typeof connector>;
+// export const CartScreen = connector(RenderCart)

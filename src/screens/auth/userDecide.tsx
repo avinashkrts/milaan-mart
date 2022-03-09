@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Alert, Image, Text, ActivityIndicator, PermissionsAndroid, Platform, BackHandler, Linking, } from 'react-native';
 import { AppRoute } from '../../navigation/app-routes';
-import { Placeholder, LableText } from '../../constants';
+import { Placeholder, LableText, AppConstants } from '../../constants';
 import axios from 'axios';
 import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
@@ -16,6 +16,7 @@ import moment from 'moment';
 import VersionCheck from 'react-native-version-check';
 import { UserDecideProps } from '../../navigation/user-decide/userDecide.navigator';
 import { ThemedComponentProps } from '@ui-kitten/components';
+import Geocoder from 'react-native-geocoding';
 
 interface State {
     email: string | undefined;
@@ -44,6 +45,7 @@ export class UserDecide extends Component<Props, State & any> {
         const { data, playerId } = this.state;
         OneSignal.setLogLevel(6, 0);
         OneSignal.setAppId("43e3395b-0019-492b-b999-4321444f25ad");
+        Geocoder.init(AppConstants.GOOGLE_MAP_KEY);
         AsyncStorage.setItem('categoryId', '')
 
         VersionCheck.getLatestVersion({
@@ -122,21 +124,22 @@ export class UserDecide extends Component<Props, State & any> {
             if (logedIn === 'true') {
                 const userType = Number(user.userType);
                 const token = user.token;
-                if (token !== '' && token.length !== null) {
-                    if (token.length > 30) {
-                        if (userType == customer) {
-                            this.props.navigation.navigate(AppRoute.CUSTOMER)
-                        } else if (userType == admin) {
-                            this.props.navigation.navigate(AppRoute.HOME)
-                        } else {
-                            this.props.navigation.navigate(AppRoute.CUSTOMER)
-                        }
-                    } else {
-                        this.props.navigation.navigate(AppRoute.CUSTOMER)
-                    }
-                } else {
-                    this.props.navigation.navigate(AppRoute.CUSTOMER)
-                }
+                this.props.navigation.navigate(AppRoute.CUSTOMER)
+                // if (token !== '' && token.length !== null) {
+                //     if (token.length > 30) {
+                //         if (userType == customer) {
+                //             this.props.navigation.navigate(AppRoute.CUSTOMER)
+                //         } else if (userType == admin) {
+                //             this.props.navigation.navigate(AppRoute.HOME)
+                //         } else {
+                //             this.props.navigation.navigate(AppRoute.CUSTOMER)
+                //         }
+                //     } else {
+                //         this.props.navigation.navigate(AppRoute.CUSTOMER)
+                //     }
+                // } else {
+                //     this.props.navigation.navigate(AppRoute.CUSTOMER)
+                // }
             } else {
                 this.props.navigation.navigate(AppRoute.CUSTOMER)
             }

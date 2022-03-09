@@ -7,9 +7,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
 import { RootNavigator } from "./navigation/root.navigator";
 import { AppRoute } from "./navigation/app-routes";
-import { Provider } from "react-redux";
-import { PersistGate } from 'redux-persist/integration/react';
-import store, { persistor } from "./redux/store";
+// import { Provider } from "react-redux";
+// import { PersistGate } from 'redux-persist/integration/react';
+// import store, { persistor } from "./redux/store";
 
 interface Props { }
 
@@ -21,8 +21,8 @@ const App: FC<Props> = () => {
   
   return (
     <Fragment>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
+      {/* <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}> */}
           <IconRegistry icons={EvaIconsPack} />
           <ApplicationProvider
             mapping={mapping}
@@ -33,8 +33,8 @@ const App: FC<Props> = () => {
               </NavigationContainer>
             </SafeAreaProvider>
           </ApplicationProvider>
-        </PersistGate>
-      </Provider>
+        {/* </PersistGate>
+      </Provider> */}
     </Fragment>
   )
 }

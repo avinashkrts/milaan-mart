@@ -149,8 +149,8 @@ export const Styles = ScaledSheet.create({
 
   /*---------------------------------------------This Style is for Log In Image--------------------------------------------------------- */
   loginImage: {
-    width: '150@s',
-    height: '150@s',
+    width: '200@s',
+    height: '200@s',
     marginTop: '10@s',
     alignSelf: 'center'
   },
@@ -610,7 +610,7 @@ export const Styles = ScaledSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: '25@s',
+    marginTop: '10@s',
   },
 
   variant_price_view: {
@@ -1627,7 +1627,7 @@ export const Styles = ScaledSheet.create({
     backgroundColor: Color.COLOR,
     // width: '50%',
     justifyContent: 'space-between',
-    padding: '1@s',
+    padding: '2@s',
     borderRadius: '2@s'
   },
 

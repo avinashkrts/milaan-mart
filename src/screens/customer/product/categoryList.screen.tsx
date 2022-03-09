@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, BackHandler, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Avatar, Divider, Layout, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
 import { Toolbar } from '../../../components/toolbar.component';
 import {
@@ -26,25 +26,24 @@ import { scale } from 'react-native-size-matters';
 import { Measurement } from '../../../redux/modules/measurement.modules';
 import { fetchMeasurementByShopId } from '../../../redux/action/measurementAction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Category } from '../../../redux/modules/category.modules';
-import { fetchCategoryByShopId } from '../../../redux/action/categoryAction';
 import { CommonActions, StackActions } from '@react-navigation/core';
 import axios from 'axios';
 import { OfferData } from './offerData';
+import { Content } from 'native-base';
 
-interface ShopPageProps {
-    CategoryListScreenProps: CategoryListScreenProps
-}
+// interface ShopPageProps {
+//     CategoryListScreenProps: CategoryListScreenProps
+// }
 
-interface ShopPageState {
-    name: String,
-    allBrand: Brand[],
-    refreshing: Boolean
-}
+// interface ShopPageState {
+//     name: String,
+//     allBrand: Brand[],
+//     refreshing: Boolean
+// }
 
-type Props = CategoryListScreenProps & ThemedComponentProps & ShopPageProps & CategoryListProps
+type Props = CategoryListScreenProps & ThemedComponentProps
 
-class CategoryList extends Component<Props, ShopPageState & any> {
+export class CategoryListScreen extends Component<Props & any, any> {
     backHandler: any;
     constructor(props: Props) {
         super(props);
@@ -53,8 +52,10 @@ class CategoryList extends Component<Props, ShopPageState & any> {
             allBrand: [],
             refreshing: false,
             productWithVariant: [],
+            tempProductWithVariant: [],
             offers: OfferData,
             searchTerm: '',
+            isEnd: false,
             searchVisible1: '',
             allProduct: [],
             allCart: [],
@@ -93,13 +94,10 @@ class CategoryList extends Component<Props, ShopPageState & any> {
         this.backAction = this.backAction.bind(this);
         this.handleBackButton = this.handleBackButton.bind(this);
         this.handleRecall = this.handleRecall.bind(this);
+        this.initialData = this.initialData.bind(this);
     }
 
     getProduct() {
-        this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-        this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-        // this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: 0, to: 10 })
-        // this.getAllSubCategory();
         axios({
             method: 'GET',
             url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
@@ -179,20 +177,24 @@ class CategoryList extends Component<Props, ShopPageState & any> {
         })
     }
 
+
     async componentDidMount() {
         this.handleBackButton()
-
         this.props.navigation.addListener('blur', () => {
             if (this.backHandler) {
                 this.backHandler.remove();
             }
         })
 
-        // this.props.fetchBrandByShopId(AppConstants.SHOP_ID)
-        // this.props.fetchVarientByShopId(AppConstants.SHOP_ID)
-        // this.props.fetchMeasurementByShopId(AppConstants.SHOP_ID)
-        this.props.fetchCategoryByShopId(AppConstants.SHOP_ID)
+        this.props.navigation.addListener('focus', () => {
+            this.setState({
+                isCart: false
+            })
+            this.initialData()
+        })
+    }
 
+    async initialData() {
         let userDetail = await AsyncStorage.getItem('userDetail');
         let categoryId = await AsyncStorage.getItem('categoryId');
         let offerId = await AsyncStorage.getItem('offerId');
@@ -215,42 +217,85 @@ class CategoryList extends Component<Props, ShopPageState & any> {
 
         this.getAllSubCategory();
         this.getAllBrand();
-        axios({
-            method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
-        }).then((response) => {
-            if (null != response.data) {
-                axios({
-                    method: 'GET',
-                    url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
-                }).then((response1) => {
-                    if (null != response1.data) {
-                        if (response.data && response.data != null && response1.data && response1.data != null) {
-                            var data = []
-                            for (var i = 0; i < response.data.length; i++) {
-                                var data1 = []
-                                var data2 = []
-                                data1.push(response.data[i])
-                                for (var j = 0; j < response1.data.length; j++) {
-                                    if (response.data[i].id == response1.data[j].productId) {
-                                        data2.push(response1.data[j])
-                                    }
-                                }
-                                data1[0].itemList = data2
-                                data.push(data1[0])
-                            }
-                            this.setState({
-                                productWithVariant: data
-                            })
-                        }
-                    }
-                }, (error) => {
-                    Alert.alert("Server error!.")
-                });
-            }
-        }, (error) => {
-            Alert.alert("Server error!.")
-        });
+        // axios({
+        //     method: 'GET',
+        //     url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
+        // }).then((response) => {
+        //     if (null != response.data) {
+        //         axios({
+        //             method: 'GET',
+        //             url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+        //         }).then((response1) => {
+        //             if (null != response1.data) {
+        //                 if (response.data && response.data != null && response1.data && response1.data != null) {
+        //                     var data = []
+        //                     for (var i = 0; i < response.data.length; i++) {
+        //                         var data1 = []
+        //                         var data2 = []
+        //                         data1.push(response.data[i])
+        //                         for (var j = 0; j < response1.data.length; j++) {
+        //                             if (response.data[i].id == response1.data[j].productId) {
+        //                                 data2.push(response1.data[j])
+        //                             }
+        //                         }
+        //                         data1[0].itemList = data2
+        //                         data.push(data1[0])
+        //                     }
+        //                     this.setState({
+        //                         productWithVariant: data
+        //                     })
+        //                 }
+        //             }
+        //         }, (error) => {
+        //             Alert.alert("Server error!.")
+        //         });
+        //     }
+        // }, (error) => {
+        //     Alert.alert("Server error!.")
+        // });
+
+        // const value = await AsyncStorage.getItem('productVariant')
+        // const data = JSON.parse(value)
+        // this.setState({
+        //     productWithVariant: data
+        // })
+        // axios({
+        //     method: 'GET',
+        //     url: AppConstants.API_BASE_URL + '/api/item/getproduct/forlocal/' + AppConstants.SHOP_ID,
+        // }).then((response) => {
+        //     if (null != response.data) {
+        //         var data = []
+        //         this.setState({
+        //             productWithVariant: response.data
+        //         })
+
+        //         for (var i = 0; i <= 10; i++) {
+        //             data.push(response.data[i])
+        //         }
+        //         this.setState({
+        //             tempProductWithVariant: data
+        //         })
+        //     }
+        // }, (error) => {
+        //     Alert.alert("Server error!.")
+        // });
+    }
+
+    loadData() {
+        console.log("qqq")
+        this.setState({
+            isEnd: true
+        })
+        const { productWithVariant, tempProductWithVariant } = this.state
+        var last = tempProductWithVariant.length + 10
+        var data = []
+        for (var i = 0; i <= last; i++) {
+            data.push(productWithVariant[i])
+        }
+        this.setState({
+            tempProductWithVariant: data,
+            isEnd: false
+        })
     }
 
     getAllCategory() {
@@ -364,7 +409,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
     getAllBrand() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+            url: AppConstants.API_BASE_URL + '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID,
         }).then((response: any) => {
             if (null != response.data) {
                 this.setState({
@@ -455,16 +500,21 @@ class CategoryList extends Component<Props, ShopPageState & any> {
         });
     }
 
-    handleIncrease(productId, cartId) {
+    handleIncrease(productId, cartId, quantity, stock) {
         const { user } = this.state
-        axios({
-            method: 'PUT',
-            url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
-        }).then((response) => {
-            this.getCart(user.userId)
-        }, (error) => {
-            Alert.alert("Server problem")
-        })
+
+        if (quantity >= stock) {
+            Alert.alert(`Only ${stock} product left.`)
+        } else {
+            axios({
+                method: 'PUT',
+                url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
+            }).then((response) => {
+                this.getCart(user.userId)
+            }, (error) => {
+                Alert.alert("Server problem")
+            })
+        }
     }
 
     handleDecrease(productId, cartId, quantity) {
@@ -484,7 +534,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
     }
 
     renderCategory = ({ item }: any): ListItemElement => (
-        <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+        <ListItem key={item} style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
             <View style={Styles.category_card}>
                 <Pressable onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
                     <View style={[Styles.cat_card_img, Styles.center]}>
@@ -504,7 +554,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
     )
 
     renderCategory1 = ({ item }: any): ListItemElement => (
-        <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+        <ListItem key={item} style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
             <Pressable onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
                 <Text style={{ fontSize: scale(13), fontWeight: '400', borderWidth: 1, borderColor: Color.SILVER, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, color: '#000' }}>{item.name}</Text>
             </Pressable>
@@ -512,7 +562,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
     )
 
     renderOffer = ({ item }: any): ListItemElement => (
-        <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+        <ListItem key={item} style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
             <View style={Styles.category_card}>
                 <Pressable onPress={() => { this.navigateProductOffer(item.id) }}>
                     <View style={[Styles.cat_card_img, Styles.center]}>
@@ -567,7 +617,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
 
     renderProduct = ({ item }: any): ListItemElement => (
         item.itemList != null && item.itemList.length > 0 ?
-            <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+            <ListItem key={item} style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
                 <View style={Styles.product_list_main}>
                     <View style={Styles.product_list_img}>
                         <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
@@ -669,7 +719,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
     renderVariant = ({ item }: any): ListItemElement => {
         var count = 0;
         return (
-            <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+            <ListItem key={item} style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
                 {item != null ?
                     <View style={Styles.variant_main_view}>
                         <View style={Styles.variant_view_1}>
@@ -718,7 +768,7 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                                                                                 <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
                                                                             </View>
 
-                                                                            <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId) }}>
+                                                                            <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId, data.productQuantity, item.stock) }}>
                                                                                 <Text style={Styles.cart_button_text} ><AddIcon /></Text>
                                                                             </Pressable>
                                                                         </View>
@@ -787,17 +837,16 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                     :
                     <ActivityIndicator size='large' color='green' />
                 }
-
             </ListItem>
         )
     }
 
     render() {
         // const { allBrand, allVariant, allMeasurement, allCategory } = this.props        
-        const { allProduct, allBrand, offers, temp_variant, productName, searchVisible1, variantVisible,
+        const { allProduct, isEnd, allBrand, offers, temp_variant, productName, searchVisible1, variantVisible,
             searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing,
             shopId, search, allCategory, wishList, selectedBrand, selectedCategory, allCart,
-            subCategory, productWithVariant } = this.state;
+            subCategory, productWithVariant, tempProductWithVariant } = this.state;
         return (
             <SafeAreaLayout
                 style={styles.safeArea}
@@ -813,16 +862,16 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                         <Divider />
                         <Divider />
                         <Divider />
-                        <ScrollView>
+                        {/* <ScrollView> */}
 
-                            <View>
-                                {null != temp_variant ?
-                                    <List
-                                        data={temp_variant}
-                                        renderItem={this.renderVariant}
-                                    /> : null}
-                            </View>
-                        </ScrollView>
+                        <View>
+                            {null != temp_variant ?
+                                <List
+                                    data={temp_variant}
+                                    renderItem={this.renderVariant}
+                                /> : null}
+                        </View>
+                        {/* </ScrollView> */}
                     </View>
                 </Modal>
                 <Toolbar
@@ -831,7 +880,15 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                     onBackPress={this.props.navigation.toggleDrawer}
                 />
                 <Divider />
-                <ScrollView>
+                <Content
+                    style={Styles.content}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={this._onRefresh.bind(this)}
+                        />
+                    }
+                >
                     <View style={{ borderTopWidth: scale(1), borderTopColor: Color.SILVER, paddingTop: scale(10) }}>
                         <Text style={{ fontSize: scale(15), color: '#000', fontWeight: '600' }}>Category</Text>
                         {null != allCategory ?
@@ -858,31 +915,33 @@ class CategoryList extends Component<Props, ShopPageState & any> {
                                 renderItem={this.renderOffer}
                             /> : null}
                     </View>
-                    {null != productWithVariant ?
-                        <List data={productWithVariant}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={refreshing}
-                                    onRefresh={this._onRefresh.bind(this)}
-                                />}
-                            renderItem={this.renderProduct}
-                        // onEndReached={() => this.props.setProductVariant({ shopId: AppConstants.SHOP_ID, from: productVariant.length, to: productVariant.length + 10 })}
-                        />
-                        : null}
-                </ScrollView>
+                    {/* {null != productWithVariant ?
+                        <View>
+                            <List data={productWithVariant}
+                                renderItem={this.renderProduct}
+                                // onEndReached={() => { this.loadData() }}
+                            />
+                        </View>
+                        : null} */}
+                </Content>
                 {isCart ?
-                    <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(10) }]} onPress={() => { this.navigateToCart() }}>
-                        <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 10 }]}>
-                            <Text style={Styles.bottom_view_cart_text}>View Cart </Text>
-                            <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: -30 }]}>
-                                <Text style={{ fontSize: scale(13), color: Color.COLOR }}>{allCart != null && allCart != '' ? allCart[0].productList.length : 0}</Text>
+                    <>
+                        {isEnd ?
+                            <ActivityIndicator size="large" /> :
+                            null}
+                        <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(10) }]} onPress={() => { this.navigateToCart() }}>
+                            <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 10 }]}>
+                                <Text style={Styles.bottom_view_cart_text}>View Cart </Text>
+                                <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: -30 }]}>
+                                    <Text style={{ fontSize: scale(13), color: Color.COLOR }}>{allCart != null && allCart != '' ? allCart[0].productList.length : 0}</Text>
+                                </View>
                             </View>
-                        </View>
-                        <View style={{ height: '100%', width: scale(1), backgroundColor: Color.BUTTON_NAME_COLOR }} />
-                        <View style={[Styles.center, { width: '50%' }]}>
-                            <Text style={{ fontSize: scale(15), color: Color.BUTTON_NAME_COLOR }}>Rs. {allCart != null && allCart != '' ? allCart[0].payableAmount : 0}</Text>
-                        </View>
-                    </Pressable>
+                            <View style={{ height: '100%', width: scale(1), backgroundColor: Color.BUTTON_NAME_COLOR }} />
+                            <View style={[Styles.center, { width: '50%' }]}>
+                                <Text style={{ fontSize: scale(15), color: Color.BUTTON_NAME_COLOR }}>Rs. {allCart != null && allCart != '' ? allCart[0].payableAmount : 0}</Text>
+                            </View>
+                        </Pressable>
+                    </>
                     : null
                 }
             </SafeAreaLayout>
@@ -905,42 +964,3 @@ const styles = StyleSheet.create({
         fontWeight: '500'
     }
 });
-
-interface LinkStateProps {
-    allBrand: Brand[];
-    allVariant: Varient[];
-    allMeasurement: Measurement[];
-    allCategory: Category[];
-}
-
-interface LinkDispatchProps {
-    fetchBrandByShopId: (shopId: String) => void;
-    fetchVarientByShopId: (shopId: String) => void;
-    fetchCategoryByShopId: (shopId: String) => void;
-    fetchMeasurementByShopId: (shopId: String) => void;
-}
-
-const mapStateToProps = (
-    state: AppState,
-    ownProps: ShopPageProps
-): LinkStateProps => ({
-    allBrand: state.brandReducers.allBrand,
-    allVariant: state.varientReducers.allVarient,
-    allMeasurement: state.measurementReducers.measurementData,
-    allCategory: state.categoryReducers.allCategory
-});
-
-const mapDispatchToProps = (
-    dispatch: ThunkDispatch<any, any, AppActions>,
-    ownProps: ShopPageProps
-): LinkDispatchProps => ({
-    fetchBrandByShopId: bindActionCreators(fetchBrandByShopId, dispatch),
-    fetchVarientByShopId: bindActionCreators(fetchVarientByShopId, dispatch),
-    fetchMeasurementByShopId: bindActionCreators(fetchMeasurementByShopId, dispatch),
-    fetchCategoryByShopId: bindActionCreators(fetchCategoryByShopId, dispatch)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type CategoryListProps = ConnectedProps<typeof connector>;
-export const CategoryListScreen = connector(CategoryList)

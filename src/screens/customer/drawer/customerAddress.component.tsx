@@ -1,22 +1,29 @@
 import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage, ActivityIndicator } from "react-native";
+import { View, Text, RefreshControl, Alert, AsyncStorage, ActivityIndicator, Pressable } from "react-native";
 import { Avatar, Divider, ListItemElement, ThemedComponentProps, List, ListItem } from "@ui-kitten/components";
 import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
 import { Toolbar } from "../../../components/toolbar.component";
-import { AddressEditIcon, BackIcon, CancelIcon, MenuIcon, PencilIcon } from "../../../assets/icons";
+import { AddressEditIcon, BackIcon, CancelIcon, LocationIcon, MenuIcon, PencilIcon } from "../../../assets/icons";
 import { Styles } from "../../../assets/styles";
 import { ScrollView, TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { AppConstants, Color, LableText } from "../../../constants";
 import { Content } from "native-base";
 import Modal from "react-native-modal";
 import Axios from "axios";
-import { isDate } from "util";
 import { AppRoute } from "../../../navigation/app-routes";
 import { CustomerAddressScreenProps } from "../../../navigation/customer-navigator/customer.navigator";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import Geolocation from "@react-native-community/geolocation";
+import { scale } from "react-native-size-matters";
+import Geocoder from 'react-native-geocoding';
+import { CommonActions } from "@react-navigation/core";
+import { CartAddressScreenProps } from "../../../navigation/customer-navigator/cart-navigation/cart.navigator";
 
+type Props = CartAddressScreenProps & CustomerAddressScreenProps & ThemedComponentProps
 
-export class CustomerAddressScreen extends Component<CustomerAddressScreenProps, ThemedComponentProps & any> {
-    constructor(props) {
+export class CustomerAddressScreen extends Component<Props, any> {
+    constructor(props: Props) {
         super(props);
         this.state = {
             city: '',
@@ -26,7 +33,7 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
             district: '',
             pinCode: '',
             state: '',
-            country: '',
+            country: 'India',
             shopId: AppConstants.SHOP_ID,
             userId: '',
             userType: '2',
@@ -38,7 +45,10 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
             edit: false,
             name: '',
             mobileNo: '',
-            street: ''
+            street: '',
+            searchVisible: false,
+            lat: '',
+            long: ''
         }
 
         this.onRefresh = this.onRefresh.bind(this);
@@ -50,21 +60,13 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
     async componentDidMount() {
         let userDetail = await AsyncStorage.getItem('userDetail');
         let userData = JSON.parse(userDetail);
-        // Alert.alert(""+userData.userId);
-        // console.log("User Data",userData.userId)
 
-        this.setState({
-            userData: userData,
-            userId: userData.userId,
-            shopId: userData.shopId
-        })
         const logedIn = await AsyncStorage.getItem('logedIn');
         if (null != logedIn && logedIn === 'true') {
             Axios({
                 method: 'GET',
                 url: AppConstants.API_BASE_URL + '/api/address/getby/userid/' + userData.userId,
             }).then((response) => {
-                console.log("Address", response.data)
                 if (null != response.data) {
                     this.setState({
                         allAddress: response.data
@@ -73,37 +75,27 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
             }, (error) => {
                 Alert.alert("Server error!.")
             });
+            this.setState({
+                userData: userData,
+                userId: userData.userId,
+                shopId: userData.shopId
+            })
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
         }
     }
 
     handleSubmit() {
-        const { isEditable, name, mobileNo, street, city, shopId, userId, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType } = this.state
-        // Alert.alert("Clicked"+ userId)
-        console.log(userId, isEditable, shopId, city, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType);
-        if (city == null || city === '') {
-            Alert.alert("Please enter city.");
-        } else if (postOffice == null || postOffice === '') {
-            Alert.alert("Please enter postOffice.");
-        } else if (policeStation == null || policeStation === '') {
-            Alert.alert("Please enter policeStation.");
-        } else if (district == null || district === '') {
-            Alert.alert("Please enter district.");
-        } else if (landMark == null || landMark === '') {
-            Alert.alert("Please enter landmark.");
-        } else if (pinCode == null || pinCode === '') {
-            Alert.alert("Please enter pincode.");
-        } else if (state == null || state === '') {
-            Alert.alert("Please enter state.");
-        } else if (country == null || country === '') {
-            Alert.alert("Please enter country.");
-        } else if (name == null || name === '') {
+        const { isEditable, lat, long, name, mobileNo, street, city, shopId, userId, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType } = this.state
+        
+        if (name == null || name === '') {
             Alert.alert("Please enter name.");
         } else if (mobileNo == null || mobileNo === '') {
             Alert.alert("Please enter mobile number.");
-        } else if (street == null || street === '') {
-            Alert.alert("Please enter street.");
+        } else if (pinCode == null || pinCode === '') {
+            Alert.alert("Please enter pincode.");
+        } else if (city == null || city === '') {
+            Alert.alert("Please enter address.");
         } else {
             Axios({
                 method: 'POST',
@@ -122,10 +114,14 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                     userType: String(userType),
                     name: name,
                     mobileNo: mobileNo,
-                    street: street
+                    street: street,
+                    latitude: lat,
+                    longitude: long
                 }
             }).then((response) => {
+                console.log(response.data)
                 this.toggleModal();
+                this.props.navigation.dispatch(CommonActions.goBack());
                 this.onRefresh()
             }, (error) => {
                 Alert.alert("Server error!");
@@ -149,7 +145,9 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
             name: allAddress[index].name,
             mobileNo: allAddress[index].mobileNo,
             street: allAddress[index].street,
-            edit: true
+            edit: true,
+            lat: allAddress[index].latitude,
+            long: allAddress[index].longitude
         })
         this.toggleModal();
     }
@@ -162,31 +160,17 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
     }
 
     handleEditSubmit() {
-        const { isEditable, name, mobileNo, street, id, city, shopId, userId, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType } = this.state
+        const { isEditable, lat, long, name, mobileNo, street, id, city, shopId, userId, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType } = this.state
         // Alert.alert("Clicked"+ userId)
-        console.log(isEditable, city, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType);
-        if (city == null || city === '') {
-            Alert.alert("Please enter city.");
-        } else if (postOffice == null || postOffice === '') {
-            Alert.alert("Please enter postOffice.");
-        } else if (policeStation == null || policeStation === '') {
-            Alert.alert("Please enter policeStation.");
-        } else if (district == null || district === '') {
-            Alert.alert("Please enter district.");
-        } else if (landMark == null || landMark === '') {
-            Alert.alert("Please enter landmark.");
-        } else if (pinCode == null || pinCode === '') {
-            Alert.alert("Please enter pincode.");
-        } else if (state == null || state === '') {
-            Alert.alert("Please enter state.");
-        } else if (country == null || country === '') {
-            Alert.alert("Please enter country.");
-        } else if (name == null || name === '') {
+        // console.log(isEditable, city, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType);
+        if (name == null || name === '') {
             Alert.alert("Please enter name.");
         } else if (mobileNo == null || mobileNo === '') {
             Alert.alert("Please enter mobile number.");
-        } else if (street == null || street === '') {
-            Alert.alert("Please enter street.");
+        } else if (pinCode == null || pinCode === '') {
+            Alert.alert("Please enter pincode.");
+        } else if (city == null || city === '') {
+            Alert.alert("Please enter address.");
         } else {
             Axios({
                 method: 'PUT',
@@ -206,7 +190,9 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                     userType: userType,
                     name: name,
                     mobileNo: mobileNo,
-                    street: street
+                    street: street,
+                    latitude: lat,
+                    longitude: long
                 }
             }).then((response) => {
                 this.setState({
@@ -242,6 +228,22 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
         });
     }
 
+    toggleModal1(modal) {
+        switch (modal) {
+            case 'VARIANT':
+                this.setState({
+                    variantVisible: false
+                })
+                break;
+            case 'SEARCH':
+                this.setState({
+                    searchVisible: false
+                })
+                break;
+        }
+
+    }
+
     renderAddress = ({ item, index }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
             {item != null ?
@@ -256,16 +258,21 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                             <Text style={Styles.address_text}>Name :- {item.name}</Text>
                             <Text style={Styles.address_text}>Mobile No. :- {item.mobileNo}</Text>
                             <Text style={Styles.address_text}>City :- {item.city}</Text>
-                            <Text style={Styles.address_text}>Street :- {item.street}</Text>
+                            {/* <Text style={Styles.address_text}>Street :- {item.street}</Text>
                             <Text style={Styles.address_text}>Land Mark :- {item.landmark}</Text>
                             <Text style={Styles.address_text}>Post Office :- {item.postOffice}</Text>
                             <Text style={Styles.address_text}>District :- {item.district}</Text>
-                            <Text style={Styles.address_text}>State :- {item.state} </Text>
+                            <Text style={Styles.address_text}>State :- {item.state} </Text> */}
                             <Text style={Styles.address_text}>Pincode :- {item.pinCode} </Text>
                             <Text style={Styles.address_text}>Country :-{item.country}</Text>
                         </View>
 
-                        <TouchableOpacity style={{ padding: 5 }} onPress={() => { this.handleEdit(index) }}>
+                        <TouchableOpacity style={{ padding: 5 }} onPress={() => {
+                            this.handleEdit(index);
+                            this.setState({
+                                country: 'India'
+                            })
+                        }}>
                             <Text style={Styles.address_text}><AddressEditIcon fontSize={20} />
                             </Text>
                         </TouchableOpacity>
@@ -276,12 +283,142 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
         </ListItem>
     )
 
+    handleSearchLatLong(data, details) {
+        Axios({
+            url: 'https://maps.googleapis.com/maps/api/place/details/json?key=' + AppConstants.GOOGLE_MAP_KEY + '&place_id=' + data.place_id
+        }).then((response) => {
+            const { data: { result: { geometry: { location } } } } = response
+            const { lat, lng } = location
+            this.setState({
+                city: data.description,
+                lat: lat,
+                long: lng
+            })
+            this.toggleModal1("SEARCH");
+        }, (error) => {
+            console.log(error);
+        })
+    }
+
+    async onCurrentLocation() {
+        Geolocation.getCurrentPosition((position) => {
+            var lat = position.coords.latitude
+            var long = position.coords.longitude
+            this.setState({
+                lat: lat,
+                long: long
+            })
+            Geocoder.from(lat, long)
+                .then((json) => {
+                    var addressComponent = json.results[0].address_components[1].long_name
+                    // console.log(json.results[0].address_components[1].long_name);
+                    this.setState({
+                        city: addressComponent
+                    })
+                })
+                .catch((error) => {
+                    console.warn(error)
+                });
+        })
+        this.toggleModal1("SEARCH");
+
+
+
+        // if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // Geolocation.getCurrentPosition((position) => {
+        //     var lat = position.coords.latitude
+        //     var long = position.coords.longitude
+        //     console.log('location', lat, position.coords.accuracy)
+        //     AsyncStorage.setItem('latitude', String(lat))
+        //     AsyncStorage.setItem('longitude', String(long))
+        //     AsyncStorage.setItem('location', 'Current Location')
+
+        //     Axios({
+        //         method: 'GET',
+        //         url: AppConstants.API_BASE_URL + '/api/product/getbylocation/' + lat + '/' + long,
+        //     }).then((response) => {
+        //         // this.props.changeProductData(response.data)
+        //         this.setState({
+        //             allProduct: response.data,
+        //             lat: position.coords.latitude,
+        //             long: position.coords.longitude,
+        //             searchVisible: false,
+        //             location: 'Current Location'
+        //         })
+        //     }, (error) => {
+        //         Alert.alert("Server error.")
+        //     });
+        // }, (erroe) => {
+
+        // }, { enableHighAccuracy: true })
+        // } else {
+        //     console.log("Camera permission denied");
+        // }
+    }
+
     render() {
-        const { allAddress, name, mobileNo, street, edit, modalVisible, isEditable, city, postOffice, policeStation, district, landMark, pinCode, state, latitude, longitude, country } = this.state
+        const { allAddress, name, searchVisible, lat, long, mobileNo, street, edit, modalVisible, isEditable, city, postOffice, policeStation, district, landMark, pinCode, state, latitude, longitude, country } = this.state
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP}>
+                <Modal style={Styles.modal} isVisible={searchVisible}>
+                    <View style={Styles.modalHeader}>
+                        <Pressable onPress={() => { this.toggleModal1("SEARCH"); }}>
+                            <Text><CancelIcon fontSize={25} /></Text>
+                        </Pressable>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <View>
+                            <Pressable onPress={() => { this.onCurrentLocation() }}>
+                                <Text style={{ color: Color.BUTTON_NAME_COLOR, padding: 10, backgroundColor: Color.COLOR, opacity: 0.8, borderRadius: 10, marginTop: 10 }}>{LableText.USE_CURRENT_LOCATION}</Text>
+                            </Pressable>
+                        </View>
+                        <GooglePlacesAutocomplete
+                            placeholder='Search'
+                            styles={{}}
+                            onPress={(data, details = null) => {
+                                this.handleSearchLatLong(data, details)
+                                console.log('New Location', data);
+                            }}
+                            query={{
+                                key: AppConstants.GOOGLE_MAP_KEY,
+                                language: 'en',
+                            }}
+                        />
+                        {lat !== '' && long !== '' ?
+                            <>
+                                <MapView
+                                    style={{ flex: 1 }}
+                                    provider={PROVIDER_GOOGLE}
+                                    showsUserLocation={true}
+                                    initialRegion={{
+                                        latitude: Number(lat),
+                                        longitude: Number(long),
+                                        latitudeDelta: 0.0922,
+                                        longitudeDelta: 0.0421,
+                                    }}
+
+                                    region={{
+                                        latitude: Number(lat),
+                                        longitude: Number(long),
+                                        latitudeDelta: 0.0922,
+                                        longitudeDelta: 0.0421,
+                                    }}
+                                >
+
+                                    <Marker
+                                        coordinate={{
+                                            latitude: Number(lat),
+                                            longitude: Number(long),
+                                        }
+                                        }
+                                    >
+                                    </Marker>
+                                </MapView>
+                            </> : null}
+                    </View>
+                </Modal>
                 <Toolbar
                     title='Address'
                     backIcon={BackIcon}
@@ -289,16 +426,11 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                     style={{ marginTop: -5, marginLeft: -5 }}
                 />
                 <Divider />
-                <Content style={Styles.content}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.refreshing}
-                            onRefresh={this.onRefresh.bind(this)}
-                        />
-                    }
-                >
+                {/* <Content style={Styles.content}
+                   
+                > */}
 
-                    {/* <View style={Styles.address_container}>
+                {/* <View style={Styles.address_container}>
                         <View style={Styles.address_edit_pen}>
                             <View>
                                 <Text style={Styles.address_text}>Name :- Avinash Kumar</Text>
@@ -313,71 +445,120 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                             </TouchableOpacity>
                         </View>
                     </View> */}
-
+                <Content
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={this.onRefresh.bind(this)}
+                        />
+                    }
+                >
                     {null != allAddress ?
                         <List data={allAddress}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={this.state.refreshing}
+                                    onRefresh={this.onRefresh.bind(this)}
+                                />
+                            }
                             renderItem={this.renderAddress}
                         /> : null}
+                </Content>
 
+                {allAddress.length <= 0 && this.props.route.name == AppRoute.CART_ADDRESS ?
                     <View style={{ marginHorizontal: '10%' }}>
-                        <TouchableOpacity style={[Styles.buttonBox, Styles.center]} onPress={() => { this.toggleModal() }}>
-                            <Text style={[{ fontSize: 18, color: 'white' }]}>{LableText.ADDNEWADDRESS}</Text>
+                        <TouchableOpacity style={[Styles.buttonBox, Styles.center]} onPress={() => { this.props.navigation.navigate(AppRoute.CUSTOMER_CART) }}>
+                            <Text style={[{ fontSize: 18, color: 'white' }]}>{LableText.SKIP}</Text>
+                        </TouchableOpacity>
+                    </View> : null}
+
+                <View style={{ marginHorizontal: '10%' }}>
+                    <TouchableOpacity style={[Styles.buttonBox, Styles.center]} onPress={() => {
+                        this.toggleModal();
+                        this.setState({
+                            name: '',
+                            mobileNo: '',
+                            pinCode: '',
+                            city: '',
+                            country: 'India'
+                        })
+                    }}>
+                        <Text style={[{ fontSize: 18, color: 'white' }]}>{LableText.ADDNEWADDRESS}</Text>
+                    </TouchableOpacity>
+                </View>
+                <Modal style={Styles.modal} isVisible={modalVisible}>
+                    <View style={Styles.modalHeader}>
+                        <TouchableOpacity>
+                            <Text onPress={() => { this.toggleModal() }}><CancelIcon fontSize={25} /></Text>
                         </TouchableOpacity>
                     </View>
-
-                    <Modal style={Styles.modal} isVisible={modalVisible}>
-                        <View style={Styles.modalHeader}>
-                            <TouchableOpacity>
-                                <Text onPress={() => { this.toggleModal() }}><CancelIcon fontSize={25} /></Text>
-                            </TouchableOpacity>
+                    <ScrollView>
+                        <Pressable onPress={() => { this.setState({ searchVisible: true }) }}>
+                            <View style={{ backgroundColor: Color.COLOR, width: '100%', height: scale(30), justifyContent: 'center', alignItems: 'center', borderRadius: 5 }}>
+                                <Text style={{ color: Color.BUTTON_NAME_COLOR }}> Choose Location</Text>
+                            </View>
+                        </Pressable>
+                        <View style={Styles.user_detail}>
+                            <View style={Styles.user_detail_header}>
+                                <Text style={Styles.user_detail_header_text}>{LableText.NAME}</Text>
+                            </View>
+                            <View style={Styles.user_detail_data}>
+                                <TextInput
+                                    editable={isEditable}
+                                    style={Styles.cash_pay_input}
+                                    placeholder={LableText.NAME}
+                                    value={name}
+                                    onChangeText={(value) => { this.setState({ name: value }) }}
+                                />
+                            </View>
                         </View>
-                        <ScrollView>
-                            <View style={Styles.user_detail}>
-                                <View style={Styles.user_detail_header}>
-                                    <Text style={Styles.user_detail_header_text}>{LableText.NAME}</Text>
-                                </View>
-                                <View style={Styles.user_detail_data}>
-                                    <TextInput
-                                        editable={isEditable}
-                                        style={Styles.cash_pay_input}
-                                        placeholder={LableText.NAME}
-                                        value={name}
-                                        onChangeText={(value) => { this.setState({ name: value }) }}
-                                    />
-                                </View>
-                            </View>
 
-                            <View style={Styles.user_detail}>
-                                <View style={Styles.user_detail_header}>
-                                    <Text style={Styles.user_detail_header_text}>{LableText.MOBILE}</Text>
-                                </View>
-                                <View style={Styles.user_detail_data}>
-                                    <TextInput
-                                        editable={isEditable}
-                                        style={Styles.cash_pay_input}
-                                        placeholder={LableText.MOBILE}
-                                        value={mobileNo}
-                                        onChangeText={(value) => { this.setState({ mobileNo: value }) }}
-                                    />
-                                </View>
+                        <View style={Styles.user_detail}>
+                            <View style={Styles.user_detail_header}>
+                                <Text style={Styles.user_detail_header_text}>{LableText.MOBILE}</Text>
                             </View>
-
-                            <View style={Styles.user_detail}>
-                                <View style={Styles.user_detail_header}>
-                                    <Text style={Styles.user_detail_header_text}>{LableText.VILLAGE}</Text>
-                                </View>
-                                <View style={Styles.user_detail_data}>
-                                    <TextInput
-                                        editable={isEditable}
-                                        style={Styles.cash_pay_input}
-                                        placeholder={LableText.VILLAGE}
-                                        value={city}
-                                        onChangeText={(value) => { this.setState({ city: value }) }}
-                                    />
-                                </View>
+                            <View style={Styles.user_detail_data}>
+                                <TextInput
+                                    editable={isEditable}
+                                    style={Styles.cash_pay_input}
+                                    placeholder={LableText.MOBILE}
+                                    value={mobileNo}
+                                    onChangeText={(value) => { this.setState({ mobileNo: value }) }}
+                                />
                             </View>
+                        </View>
 
-                            <View style={Styles.user_detail}>
+                        <View style={Styles.user_detail}>
+                            <View style={Styles.user_detail_header}>
+                                <Text style={Styles.user_detail_header_text}>{LableText.PIN_CODE}</Text>
+                            </View>
+                            <View style={Styles.user_detail_data}>
+                                <TextInput
+                                    editable={isEditable}
+                                    style={Styles.cash_pay_input}
+                                    placeholder={LableText.PIN_CODE}
+                                    value={pinCode}
+                                    onChangeText={(value) => { this.setState({ pinCode: value }) }}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={Styles.user_detail}>
+                            <View style={Styles.user_detail_header}>
+                                <Text style={Styles.user_detail_header_text}>{LableText.ADDRESS}</Text>
+                            </View>
+                            <View style={Styles.user_detail_data}>
+                                <TextInput
+                                    style={Styles.cash_pay_input}
+                                    placeholder={LableText.ADDRESS}
+                                    multiline={true}
+                                    value={city}
+                                    onChangeText={(value) => { this.setState({ city: value }) }}
+                                />
+                            </View>
+                        </View>
+
+                        {/* <View style={Styles.user_detail}>
                                 <View style={Styles.user_detail_header}>
                                     <Text style={Styles.user_detail_header_text}>{LableText.STREET}</Text>
                                 </View>
@@ -450,24 +631,9 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                                         onChangeText={(value) => { this.setState({ district: value }) }}
                                     />
                                 </View>
-                            </View>
+                            </View> */}
 
-                            <View style={Styles.user_detail}>
-                                <View style={Styles.user_detail_header}>
-                                    <Text style={Styles.user_detail_header_text}>{LableText.PIN_CODE}</Text>
-                                </View>
-                                <View style={Styles.user_detail_data}>
-                                    <TextInput
-                                        editable={isEditable}
-                                        style={Styles.cash_pay_input}
-                                        placeholder={LableText.PIN_CODE}
-                                        value={pinCode}
-                                        onChangeText={(value) => { this.setState({ pinCode: value }) }}
-                                    />
-                                </View>
-                            </View>
-
-                            <View style={Styles.user_detail}>
+                        {/* <View style={Styles.user_detail}>
                                 <View style={Styles.user_detail_header}>
                                     <Text style={Styles.user_detail_header_text}>{LableText.STATE}</Text>
                                 </View>
@@ -480,9 +646,9 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                                         onChangeText={(value) => { this.setState({ state: value }) }}
                                     />
                                 </View>
-                            </View>
+                            </View> */}
 
-                            {/* 
+                        {/* 
                             <View style={Styles.user_detail}>
                                 <View style={Styles.user_detail_header}>
                                     <Text style={Styles.user_detail_header_text}>{LableText.LATITUDE}</Text>
@@ -513,7 +679,7 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                                 </View>
                             </View> */}
 
-                            <View style={Styles.user_detail}>
+                        {/* <View style={Styles.user_detail}>
                                 <View style={Styles.user_detail_header}>
                                     <Text style={Styles.user_detail_header_text}>{LableText.COUNTRY}</Text>
                                 </View>
@@ -526,26 +692,26 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                                         onChangeText={(value) => { this.setState({ country: value }) }}
                                     />
                                 </View>
-                            </View>
+                            </View> */}
 
-                            {null != edit ? edit ?
-                                <View style={{ marginHorizontal: '10%' }}>
-                                    <View style={[{ marginVertical: 20 }, Styles.center]} >
-                                        <Text onPress={() => { this.handleEditSubmit() }} style={[Styles.buttonName, { backgroundColor: Color.COLOR, paddingHorizontal: '30%', paddingVertical: 10, borderRadius: 40 }]}>{LableText.EDIT}</Text>
-                                    </View>
-                                </View> :
+                        {null != edit ? edit ?
+                            <View style={{ marginHorizontal: '10%' }}>
+                                <View style={[{ marginVertical: 20 }, Styles.center]} >
+                                    <Text onPress={() => { this.handleEditSubmit() }} style={[Styles.buttonName, { backgroundColor: Color.COLOR, paddingHorizontal: '30%', paddingVertical: 10, borderRadius: 40 }]}>{LableText.EDIT}</Text>
+                                </View>
+                            </View> :
 
-                                <View style={{ marginHorizontal: '10%' }}>
-                                    <View style={[{ marginVertical: 20 }, Styles.center]} >
-                                        <Text onPress={() => { this.handleSubmit() }} style={[Styles.buttonName, { backgroundColor: Color.COLOR, paddingHorizontal: '30%', paddingVertical: 10, borderRadius: 40 }]}>{LableText.SAVE}</Text>
-                                    </View>
-                                </View> :
-                                null
-                            }
-                        </ScrollView>
-                    </Modal>
-                    <View style={Styles.bottomSpace}></View>
-                </Content>
+                            <View style={{ marginHorizontal: '10%' }}>
+                                <View style={[{ marginVertical: 20 }, Styles.center]} >
+                                    <Text onPress={() => { this.handleSubmit() }} style={[Styles.buttonName, { backgroundColor: Color.COLOR, paddingHorizontal: '30%', paddingVertical: 10, borderRadius: 40 }]}>{LableText.SAVE}</Text>
+                                </View>
+                            </View> :
+                            null
+                        }
+                    </ScrollView>
+                </Modal>
+                {/* <View style={Styles.bottomSpace}></View> */}
+                {/* </Content> */}
 
             </SafeAreaLayout>
         );

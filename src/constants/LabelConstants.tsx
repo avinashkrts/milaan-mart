@@ -59,6 +59,7 @@ export class LableText {
     public static readonly LAST_NAME = 'Last Name';
     public static readonly FATHER_NAME = "Father's Name";
     public static readonly VILLAGE = 'Village / City';
+    public static readonly ADDRESS = 'Address';
     public static readonly POST_OFFICE = 'Post Office';
     public static readonly POLICE_STATION = 'Police Station';
     public static readonly DISTRICT = 'District';
@@ -104,7 +105,7 @@ export class LableText {
     public static readonly PAYMENT = 'Payment';
     public static readonly CART = 'Cart';
     public static readonly BUY = 'Buy';
-    public static readonly ADDRESS = 'Adress';
+    public static readonly SKIP = 'Skip';
     public static readonly MOBILE = 'Mobile Number.';
     public static readonly SAVE = 'Save';
     public static readonly EDIT = 'Edit';

@@ -96,9 +96,14 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             orderPlacing: false
         }
         this.backFunction = this.backFunction.bind(this)
+        this.getAddress = this.getAddress.bind(this)
     }
 
     async componentDidMount() {
+        this.props.navigation.addListener('focus', () => {
+            this.getAddress();
+        })
+
         SCREEN_WIDTH = Dimensions.get('window').width;
         let userDetail = await AsyncStorage.getItem('userDetail');
         let logedIn = await AsyncStorage.getItem('logedIn');
@@ -118,21 +123,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             orderPlacing: false
         })
         if (null != logedIn && logedIn === 'true') {
-            // Alert.alert("" + userData.userId)
-            axios({
-                method: 'GET',
-                url: AppConstants.API_BASE_URL + '/api/address/getdefaultaddress/' + userData.userId
-            }).then((response) => {
-                if (response.data) {
-                    this.setState({
-                        addressData: response.data,
-                        addressId: response.data.id
-                    })
-                }
-
-            }, (error) => {
-                Alert.alert("Please add your address.")
-            })
+            // Alert.alert("" + userData.userId, cartId)   
 
             axios({
                 method: 'GET',
@@ -155,14 +146,13 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                 adminData: response.data[0],
                             })
                         }
-
                     }, (error) => {
                         Alert.alert("Server problem")
                     })
                 }
 
             }, (error) => {
-                Alert.alert("Server problem")
+                // Alert.alert("Server problem")
             })
 
             axios({
@@ -230,6 +220,33 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         }
     }
 
+    async getAddress() {
+        let userDetail = await AsyncStorage.getItem('userDetail');
+        let logedIn = await AsyncStorage.getItem('logedIn');
+        let userData = JSON.parse(userDetail);
+
+        if (null != logedIn && logedIn === 'true') {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/address/getdefaultaddress/' + userData.userId
+            }).then((response) => {
+                if (response.data) {
+                    this.setState({
+                        addressData: response.data,
+                        addressId: response.data.id
+                    })
+                } else {
+                this.props.navigation.navigate(AppRoute.CART_ADDRESS)
+                }
+            }, (error) => {
+                // Alert.alert("Please add your address.")
+                this.props.navigation.navigate(AppRoute.CART_ADDRESS)
+            })
+        } else {
+            this.props.navigation.navigate(AppRoute.AUTH)
+        }
+    }
+
     _onRefresh() {
         this.setState({ refreshing: true });
         this.componentDidMount().then(() => {
@@ -274,7 +291,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
     handlePlaceOrder() {
         const { orderType, insideShop, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
-        console.log('data', orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId);
+        console.log('data', orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId, addressId);
         this.setState({
             orderPlacing: true
         })
@@ -296,12 +313,15 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     if (response.data) {
                         if (response.data.status) {
                             // Alert.alert(response.data.transactionId)
+                            console.log(response.data)
+
                             this.startPayment(response.data.transactionId, response.data.orderId);
                         } else {
                             Alert.alert("Got error while placing Order.")
                         }
                     }
                 }, (error) => {
+                    console.log(error)
                     Alert.alert("Please select your address.")
                 })
             } else if (cashDelivery) {
@@ -320,6 +340,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     if (response.data) {
                         if (response.data.status) {
                             this.notification()
+                            console.log(response.data)
                             this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_NAV)
                             // const resetAction = CommonActions.reset({
                             //     index: 0,
@@ -333,6 +354,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         }
                     }
                 }, (error) => {
+                    console.log(error)
                     Alert.alert("Please select your address.")
                 })
             }
@@ -342,7 +364,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
     }
 
     backFunction() {
-      
+
     }
 
     startPayment(transactionId, orderId) {
@@ -541,10 +563,10 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     <View style={{ backgroundColor: '#fff', borderColor: Color.BORDER, borderWidth: 0.5, padding: 20, marginBottom: 10 }}>
                         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Address</Text>
                         {null != addressData ?
-                            <Text style={{ marginVertical: 5 }}>{addressData.name}, {addressData.mobileNo}, {addressData.city}, {addressData.street}, {addressData.landmark}, {addressData.postOffice}, {addressData.policeStation}, {addressData.district}, {addressData.state}, {addressData.pinCode}, {addressData.country}</Text>
+                            <Text style={{ marginVertical: 5 }}>{addressData.name}, {addressData.mobileNo}, {addressData.city}, {addressData.pinCode}, {addressData.country}</Text>
                             : null}
                         <View style={{ width: '100%', alignItems: 'flex-end' }}>
-                            <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.CUSTOMER_ADDRESS) }} style={[Styles.center, { paddingVertical: 10, width: 100, borderRadius: 5, backgroundColor: Color.COLOR }]}>
+                            <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.CART_ADDRESS) }} style={[Styles.center, { paddingVertical: 10, width: 100, borderRadius: 5, backgroundColor: Color.COLOR }]}>
                                 <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Change</Text>
                             </TouchableOpacity>
                         </View>
@@ -569,10 +591,10 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         <Text style={Styles.payment_selection_text}>Home Delivery</Text>
                                     </View>
 
-                                    {/* <View style={{ flexDirection: 'row' }}>
+                                    <View style={{ flexDirection: 'row' }}>
                                         <Radio selected={selfPick} selectedColor='#501B1D' onPress={() => { this.handleOrderType('SELF') }} />
                                         <Text style={Styles.payment_selection_text}>Self Pickup</Text>
-                                    </View> */}
+                                    </View>
                                 </View>
                             </View>
                         </View> :

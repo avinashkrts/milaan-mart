@@ -81,12 +81,12 @@ export class OtpScreen extends Component<OtpScreenProps, any & State & any> {
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP} >
-                < Content style={[Styles.content, { backgroundColor: '#e6e6e6' }]} >
+                < Content style={[Styles.content, { backgroundColor: '#ffffff' }]} >
                     <View>
                         <Image
                             source={require('../../assets/logo.png')}
                             resizeMode="contain"
-                            style={[Styles.loginImage, { marginBottom: scale(50), marginTop: scale(80) }]}
+                            style={[Styles.loginImage, { marginTop: scale(80) }]}
                         />
                         {/* <View style={Styles.center}>
                             <Text style={Styles.loginWelcome}>{LableText.WELCOME_TEXT}</Text>

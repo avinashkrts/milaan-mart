@@ -15,6 +15,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { scale } from "react-native-size-matters";
 import Modal from "react-native-modal";
 import { AddCustomerImageScreenProps } from "../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator";
+import { StackActions } from "@react-navigation/core";
 
 const options = {
     quality: 0.7,
@@ -23,8 +24,9 @@ const options = {
     mediaType: 'photo'
 }
 
-export class AddCustomerImageScreen extends Component<AddCustomerImageScreenProps, ThemedComponentProps & any> {
-    constructor(props) {
+type Props = AddCustomerImageScreenProps & ThemedComponentProps
+export class AddCustomerImageScreen extends Component<Props, any> {
+    constructor(props: Props) {
         super(props);
         this.state = {
             shopId: AppConstants.SHOP_ID,
@@ -38,6 +40,7 @@ export class AddCustomerImageScreen extends Component<AddCustomerImageScreenProp
             openModal: false
         }
         this.onRefresh = this.onRefresh.bind(this);
+        this.handleFinish = this.handleFinish.bind(this);
     }
 
     async componentDidMount() {
@@ -117,6 +120,11 @@ export class AddCustomerImageScreen extends Component<AddCustomerImageScreenProp
     handleModal() {
         const { openModal } = this.state;
         this.setState({ openModal: !openModal })
+    }
+
+    handleFinish() {
+        const pushAction = StackActions.push(AppRoute.CUSTOMER);
+        this.props.navigation.dispatch(pushAction);
     }
 
     uploadImage() {
@@ -217,7 +225,7 @@ export class AddCustomerImageScreen extends Component<AddCustomerImageScreenProp
                             </View>
                             {null != imageUploaded ? imageUploaded ?
                                 <View style={{ marginHorizontal: '10%' }}>
-                                    <TouchableOpacity style={[Styles.buttonBox, Styles.center]} onPress={() => { this.props.navigation.navigate(AppRoute.CUSTOMER) }}>
+                                    <TouchableOpacity style={[Styles.buttonBox, Styles.center]} onPress={() => {this.handleFinish()}}>
                                         <Text style={Styles.buttonName}>{LableText.FINISH}</Text>
                                     </TouchableOpacity>
                                 </View> : null : null}
