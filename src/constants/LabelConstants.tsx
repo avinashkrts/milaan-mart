@@ -12,6 +12,9 @@ export class Color {
     public static readonly CART_BACKGROUND = '#f2f2f2';
     public static readonly SILVER = '#8f8f8f';
     public static readonly STATUS_BAR = '#dfdfdf';
+    public static readonly BLACK = '#000000';
+    public static readonly CARD_BORDER = '#d2f7ef';
+    public static readonly CARD_BACKGROUND = '#ebf7f5';
 }
 
 /*------------------------------------------------------------PADDING CODE------------------------------------------------------------*/

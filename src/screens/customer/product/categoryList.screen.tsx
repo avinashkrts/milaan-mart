@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, Alert, BackHandler, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Avatar, Divider, Layout, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import { ActivityIndicator, Alert, BackHandler, Image, Pressable, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
 import { Toolbar } from '../../../components/toolbar.component';
 import {
     SafeAreaLayout,
@@ -30,16 +30,6 @@ import { CommonActions, StackActions } from '@react-navigation/core';
 import axios from 'axios';
 import { OfferData } from './offerData';
 import { Content } from 'native-base';
-
-// interface ShopPageProps {
-//     CategoryListScreenProps: CategoryListScreenProps
-// }
-
-// interface ShopPageState {
-//     name: String,
-//     allBrand: Brand[],
-//     refreshing: Boolean
-// }
 
 type Props = CategoryListScreenProps & ThemedComponentProps
 
@@ -179,7 +169,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
 
 
     async componentDidMount() {
-        this.handleBackButton()
+        this.handleBackButton();
+        this.initialData();
         this.props.navigation.addListener('blur', () => {
             if (this.backHandler) {
                 this.backHandler.remove();
@@ -217,68 +208,6 @@ export class CategoryListScreen extends Component<Props & any, any> {
 
         this.getAllSubCategory();
         this.getAllBrand();
-        // axios({
-        //     method: 'GET',
-        //     url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
-        // }).then((response) => {
-        //     if (null != response.data) {
-        //         axios({
-        //             method: 'GET',
-        //             url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
-        //         }).then((response1) => {
-        //             if (null != response1.data) {
-        //                 if (response.data && response.data != null && response1.data && response1.data != null) {
-        //                     var data = []
-        //                     for (var i = 0; i < response.data.length; i++) {
-        //                         var data1 = []
-        //                         var data2 = []
-        //                         data1.push(response.data[i])
-        //                         for (var j = 0; j < response1.data.length; j++) {
-        //                             if (response.data[i].id == response1.data[j].productId) {
-        //                                 data2.push(response1.data[j])
-        //                             }
-        //                         }
-        //                         data1[0].itemList = data2
-        //                         data.push(data1[0])
-        //                     }
-        //                     this.setState({
-        //                         productWithVariant: data
-        //                     })
-        //                 }
-        //             }
-        //         }, (error) => {
-        //             Alert.alert("Server error!.")
-        //         });
-        //     }
-        // }, (error) => {
-        //     Alert.alert("Server error!.")
-        // });
-
-        // const value = await AsyncStorage.getItem('productVariant')
-        // const data = JSON.parse(value)
-        // this.setState({
-        //     productWithVariant: data
-        // })
-        // axios({
-        //     method: 'GET',
-        //     url: AppConstants.API_BASE_URL + '/api/item/getproduct/forlocal/' + AppConstants.SHOP_ID,
-        // }).then((response) => {
-        //     if (null != response.data) {
-        //         var data = []
-        //         this.setState({
-        //             productWithVariant: response.data
-        //         })
-
-        //         for (var i = 0; i <= 10; i++) {
-        //             data.push(response.data[i])
-        //         }
-        //         this.setState({
-        //             tempProductWithVariant: data
-        //         })
-        //     }
-        // }, (error) => {
-        //     Alert.alert("Server error!.")
-        // });
     }
 
     loadData() {
@@ -546,8 +475,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
                         />
                     </View>
                 </Pressable>
-                <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
-                    {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
+                <View style={{ width: '100%', alignItems: 'center' }}>
+                    <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text>
                 </View>
             </View>
         </ListItem>
@@ -842,11 +771,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
     }
 
     render() {
-        // const { allBrand, allVariant, allMeasurement, allCategory } = this.props        
-        const { allProduct, isEnd, allBrand, offers, temp_variant, productName, searchVisible1, variantVisible,
-            searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing,
-            shopId, search, allCategory, wishList, selectedBrand, selectedCategory, allCart,
-            subCategory, productWithVariant, tempProductWithVariant } = this.state;
+        const { isEnd, offers, temp_variant, productName, variantVisible,
+            isCart, refreshing, allCategory, allCart } = this.state;
         return (
             <SafeAreaLayout
                 style={styles.safeArea}
@@ -889,23 +815,6 @@ export class CategoryListScreen extends Component<Props & any, any> {
                         />
                     }
                 >
-                    <View style={{ borderTopWidth: scale(1), borderTopColor: Color.SILVER, paddingTop: scale(10) }}>
-                        <Text style={{ fontSize: scale(15), color: '#000', fontWeight: '600' }}>Category</Text>
-                        {null != allCategory ?
-                            <>
-                                <List data={allCategory}
-                                    horizontal={true}
-                                    showsHorizontalScrollIndicator={false}
-                                    renderItem={this.renderCategory1}
-                                />
-                                <List data={allCategory}
-                                    horizontal={true}
-                                    showsHorizontalScrollIndicator={false}
-                                    renderItem={this.renderCategory}
-                                />
-                            </> : null}
-                    </View>
-
                     <View style={{ marginTop: scale(10) }}>
                         <Text style={{ fontSize: scale(15), color: '#000', fontWeight: 'bold' }}>All Offers</Text>
                         {null != offers ?
@@ -915,14 +824,42 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                 renderItem={this.renderOffer}
                             /> : null}
                     </View>
-                    {/* {null != productWithVariant ?
-                        <View>
-                            <List data={productWithVariant}
-                                renderItem={this.renderProduct}
-                                // onEndReached={() => { this.loadData() }}
-                            />
+
+                    <View style={{ borderTopWidth: scale(1), borderTopColor: Color.SILVER, paddingTop: scale(10) }}>
+                        <Text style={{ fontSize: scale(15), color: '#000', fontWeight: '600' }}>Shop By Category</Text>
+                        <View style={Styles.category_card_main}>
+                            {null != allCategory ?
+                                allCategory.map((item, index) => {
+                                    return (
+                                        <Pressable key={'cat' + index} style={Styles.category_card1} onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
+                                            <View style={[Styles.cat_card_img, Styles.center]}>
+                                                <Image
+                                                    resizeMethod='auto'
+                                                    resizeMode='stretch'
+                                                    source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + item.id + "_" + item.shopId + '_category.png' }}
+                                                    style={Styles.cat_card_avatar1}
+                                                />
+                                            </View>
+                                            <View style={Styles.cat_card_title_view}>
+                                                <Text style={Styles.cat_card_title} > {item.name} </Text>
+                                            </View>
+                                        </Pressable>
+                                    )
+                                })
+                                // <>
+                                //     <List data={allCategory}
+                                //         horizontal={true}
+                                //         showsHorizontalScrollIndicator={false}
+                                //         renderItem={this.renderCategory1}
+                                //     />
+                                //     <List data={allCategory}
+                                //         showsHorizontalScrollIndicator={false}
+                                //         renderItem={this.renderCategory}
+                                //     />
+                                // </>
+                                : null}
                         </View>
-                        : null} */}
+                    </View>
                 </Content>
                 {isCart ?
                     <>

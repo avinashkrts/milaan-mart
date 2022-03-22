@@ -82,6 +82,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       productWithVariant: [],
       tempProductWithVariant: [],
       subCategory: [],
+      allProductWithVariant: [],
       allData: [
         {
           url: '/api/lookup/getallmeasurementtype',
@@ -103,9 +104,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
   }
 
   async componentDidMount() {
+    this.initialData()
     this.props.navigation.addListener('focus', () => {
       this.setState({
-        isCart: false
+        isCart: false,
+        allCart: []
       })
       this.initialData()
     })
@@ -161,7 +164,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   data.push(data1[0])
                 }
                 this.setState({
-                  productWithVariant: data
+                  productWithVariant: data,
+                  allProductWithVariant: data
                 })
               }
             }
@@ -225,7 +229,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   data.push(data1[0])
                 }
                 this.setState({
-                  productWithVariant: data
+                  productWithVariant: data,
+                  allProductWithVariant: data
                 })
               }
             }
@@ -239,27 +244,6 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
     } else {
       this.getAllSubCategory();
       this.getAllBrand();
-      // axios({
-      //   method: 'GET',
-      //   url: AppConstants.API_BASE_URL + '/api/item/getproduct/forlocal/' + AppConstants.SHOP_ID,
-      // }).then((response) => {
-      //   if (null != response.data) {
-      //     var data = []
-      //     this.setState({
-      //       productWithVariant: response.data
-      //     })
-
-      //     // for (var i = 0; i <= 1000; i++) {
-      //     //   data.push(response.data[i])
-      //     // }
-      //     // this.setState({
-      //     //   tempProductWithVariant: data
-      //     // })
-      //     // AsyncStorage.setItem('productVariant', JSON.stringify(data))
-      //   }
-      // }, (error) => {
-      //   Alert.alert("Server error!.")
-      // });
       axios({
         method: 'GET',
         url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
@@ -285,7 +269,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   data.push(data1[0])
                 }
                 this.setState({
-                  productWithVariant: data
+                  productWithVariant: data,
+                  allProductWithVariant: data
                 })
               }
             }
@@ -341,22 +326,6 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       tempProductWithVariant: data
     })
   }
-
-  // getBrand() {
-  //   axios({
-  //     method: 'GET',
-  //     url: AppConstants.API_BASE_URL + '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID
-  //   }).then((response: any) => {
-  //     if (null != response.data) {
-  //       this.setState({
-  //         allBrand: response.data
-  //       })
-  //     }
-  //   }, (error: any) => {
-  //     console.log(error)
-  //     // Alert.alert("Server error.")
-  //   });
-  // }
 
   getSubCategory(catId: any) {
     axios({
@@ -705,7 +674,19 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
   }
 
   searchUpdated(term) {
+    const { allProductWithVariant, searchTerm } = this.state
     this.setState({ searchTerm: term })
+    if (term != '' && term != null) {
+      this.setState({
+        searchTerm: term,
+        searchVisible1: true
+      })
+    } else {
+      this.setState({
+        productWithVariant: allProductWithVariant,
+        searchVisible1: false
+      })
+    }
   }
 
   getCart(userId) {
@@ -813,11 +794,18 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                     }
                   }) : null}
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginVertical: 5 }}>
-                    <Text style={{ color: '#000', fontSize: scale(14) }}>Rs. {item.itemList[0].sellingPrice}</Text>
-                    {item.offerActiveInd ?
-                      <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
+                    {item.itemList[0].customerMarginPercent <= 0 ? <Text style={Styles.old_price_text}><RupeeIcon fontSize={scale(14)} /> {item.itemList[0].mrp.toFixed(2)}</Text> : null}
+                  <Text style={{ color: '#000', fontSize: scale(12) }}><RupeeIcon fontSize={scale(14)} /> {item.itemList[0].unitSellingPrice}</Text>
+                    {item.itemList[0].customerMarginPercent <= 0 ?
+                        <Text style={Styles.offer_price_text}>
+                          {Math.round(item.itemList[0].customerSingleOffer)} % Off
+                        </Text>                     
                       : null
                     }
+                    {/* {item.offerActiveInd ?
+                      <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
+                      : null
+                    } */}
                   </View>
                   {null != item.offerActiveInd ? item.offerActiveInd ?
 
@@ -881,14 +869,15 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                       );
                     }
                   }) : null}
-                  <View>
-                    <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.sellingPrice.toFixed(2)}</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.unitSellingPrice.toFixed(2)}</Text>
+                    {item.customerMarginPercent > 0 ? <Text style={Styles.old_price_text}><RupeeIcon fontSize={scale(14)} /> {item.mrp.toFixed(2)}</Text> : null}
                   </View>
 
-                  {item.sellingPrice != item.mrp ?
+                  {item.customerMarginPercent > 0 ?
                     <View>
                       <Text style={Styles.offer_price_text}>
-                        {item.mrp.toFixed(2)}
+                        {Math.round(item.customerSingleOffer)} % Off
                       </Text>
                     </View>
                     : null
@@ -989,15 +978,12 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
     )
   }
   render() {
-    // const productList = this.props.productData
     const productList = null
-    // const { allVarient, productVariant, allBrand, allMeasurement, productData } = this.props
-    const { allProduct, allBrand, temp_variant, productName, searchVisible1, variantVisible,
-      searchTerm, isCart, shopName, single, searchVisible, location, lat, long, refreshing,
-      shopId, search, allCategory, wishList, selectedBrand, selectedCategory, allCart,
-      subCategory, productWithVariant, tempProductWithVariant } = this.state;
-    const filteredProduct = productWithVariant ? productWithVariant.length > 0 ? productWithVariant.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
-    // console.log('User Data', productVariant, "ppop")
+    const { allBrand, temp_variant, productName, searchVisible1, variantVisible,
+      searchTerm, isCart, searchVisible, lat, long, refreshing,
+      selectedBrand, selectedCategory, allCart,
+      subCategory, productWithVariant } = this.state;
+    var filteredProduct = productWithVariant ? productWithVariant.length > 0 ? productWithVariant.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
     return (
       <SafeAreaLayout
         style={Styles.safeArea}
@@ -1111,9 +1097,9 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
             onFocus={() => { this.setState({ searchVisible1: true }) }}
           />
 
-          <View style={[{ width: '10%', }, Styles.center]}>
+          <View style={[{ width: '10%' }, Styles.center]}>
           </View>
-          <View style={[{ width: '10%', }, Styles.center]}>
+          <View style={[{ width: '10%' }, Styles.center]}>
             <TouchableOpacity onPress={() => { this.productSearch(filteredProduct) }}>
               <Text style={Styles.searchIcon}><SearchIcon /></Text>
             </TouchableOpacity>
@@ -1171,10 +1157,10 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           <Divider />
 
         </>
-        {searchVisible1 ?
+        {searchVisible1 && searchTerm != '' && searchTerm != null ?
           <>
             <ScrollView>
-              {filteredProduct.map((product, i) => {
+              {searchTerm != '' && searchTerm != null ? filteredProduct.map((product, i) => {
                 return (
                   <TouchableOpacity onPress={() => { this.search(product) }} key={product.id} style={styles.emailItem}>
                     <View>
@@ -1182,7 +1168,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                     </View>
                   </TouchableOpacity>
                 )
-              })}
+              }) : null}
             </ScrollView>
           </> :
           <>

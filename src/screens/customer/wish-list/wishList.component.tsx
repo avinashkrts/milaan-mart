@@ -281,20 +281,20 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
     handleIncrease(productId, cartId, quantity, stock) {
         const { user } = this.state
-            
+
         if (quantity >= stock) {
-          Alert.alert(`Only ${stock} product left.`)
+            Alert.alert(`Only ${stock} product left.`)
         } else {
-          axios({
-            method: 'PUT',
-            url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
-          }).then((response) => {
-            this.getCart(user.userId)
-          }, (error) => {
-            Alert.alert("Server problem")
-          })
+            axios({
+                method: 'PUT',
+                url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
+            }).then((response) => {
+                this.getCart(user.userId)
+            }, (error) => {
+                Alert.alert("Server problem")
+            })
         }
-      }
+    }
 
     handleDecrease(productId, cartId, quantity) {
         const { user } = this.state
@@ -471,14 +471,15 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                                             );
                                         }
                                     }) : null}
-                                    <View>
-                                        <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.sellingPrice.toFixed(2)}</Text>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.unitSellingPrice.toFixed(2)}</Text>
+                                        {item.customerMarginPercent > 0 ? <Text style={Styles.old_price_text}><RupeeIcon fontSize={scale(14)} /> {item.mrp.toFixed(2)}</Text> : null}
                                     </View>
 
-                                    {item.sellingPrice != item.mrp ?
+                                    {item.customerMarginPercent > 0 ?
                                         <View>
                                             <Text style={Styles.offer_price_text}>
-                                                {item.mrp.toFixed(2)}
+                                                {Math.round(item.customerSingleOffer)} % Off
                                             </Text>
                                         </View>
                                         : null

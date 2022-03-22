@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/core';
 import { AppConstants } from '../../constants';
 import { AppRoute } from '../app-routes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 // const DrawerHeader = (): React.ReactElement<ImageBackgroundProps> => (
 //   <ImageBackground
@@ -33,10 +34,17 @@ export const CustomerDrawer = (props: DrawerCustomerScreenProps): DrawerElement 
       setLogedIn(JSON.parse(logIn));
       if (value) {
         const user = JSON.parse(value);
-        setData(user);
-
+        axios({
+          method: 'GET',
+          url: AppConstants.API_BASE_URL + '/api/user/get/' + user.userId
+      }).then((response) => {
+        setData(response.data);
         console.log('data from async', user)
+      }, (error) => {
 
+      });
+
+        
       };
     }
     fetchData();
@@ -54,7 +62,7 @@ export const CustomerDrawer = (props: DrawerCustomerScreenProps): DrawerElement 
           }}>
             <ImageBackground
               style={styles.header} borderRadius={80}
-              source={{ uri: AppConstants.IMAGE_BASE_URL + '/avatar/' + data.userId + '_' + data.userType + '_avatar.png' }}
+              source={{cache: 'reload', uri: AppConstants.IMAGE_BASE_URL + '/avatar/' + data.avatar }}
             />
           </Pressable>
           <Text style={styles.displayName}>{data.firstName} {data.lastName}</Text>

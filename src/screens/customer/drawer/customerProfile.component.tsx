@@ -12,7 +12,6 @@ import Axios from "axios";
 import { getFirstInstallTime } from "react-native-device-info";
 import { AppRoute } from "../../../navigation/app-routes";
 import { CustomerProfileScreenProps } from "../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator";
-import FastImage from "react-native-fast-image";
 
 export class CustomerProfileScreen extends Component<CustomerProfileScreenProps, ThemedComponentProps & any> {
     constructor(props) {
@@ -38,16 +37,14 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
             postOffice: '',
             policeStation: '',
             landmark: '',
-            id: ''
+            id: '',
+            userAllData: []
         }
 
         this.onRefresh = this.onRefresh.bind(this);
     }
 
     async componentDidMount() {
-        const FastImageViewNativeModule = NativeModules.FastImageView
-        FastImage.clearMemoryCache = () => FastImageViewNativeModule.clearMemoryCache()
-        FastImage.clearDiskCache = () => FastImageViewNativeModule.clearDiskCache()
         let userDetail = await AsyncStorage.getItem('userDetail');
         let logedIn = await AsyncStorage.getItem('logedIn');
         let userData = JSON.parse(userDetail);
@@ -61,6 +58,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
                     url: AppConstants.API_BASE_URL + '/api/user/get/' + userData.userId
                 }).then((response) => {
                     this.setState({
+                        userAllData: response.data,
                         firstName: response.data.firstName,
                         emailId: response.data.emailId,
                         lastName: response.data.lastName,
@@ -165,7 +163,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
     }
 
     render() {
-        const { street, firstName, isEditable, lastName, city, mobileNo, pinCode, state, country, userType, shopId, district, postOffice, policeStation, landmark, userId, emailId } = this.state
+        const { street, firstName, userAllData, isEditable, lastName, city, mobileNo, pinCode, state, country, userType, shopId, district, postOffice, policeStation, landmark, userId, emailId } = this.state
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
@@ -188,7 +186,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
                     <View style={[Styles.profile, Styles.center]}>
                         <View style={Styles.profile_image}>
                             <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.ADD_CUSTOMER_IMAGE) }}>
-                                <FastImage source={{ uri: AppConstants.IMAGE_BASE_URL + '/avatar/' + userId + '_' + userType + '_avatar.png' }} style={Styles.profile_avatar} />
+                                <Avatar source={{ cache: 'reload', uri: AppConstants.IMAGE_BASE_URL + '/avatar/' + userAllData.avatar }} style={Styles.profile_avatar} />
                             </TouchableOpacity>
                         </View>
                     </View>

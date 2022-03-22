@@ -210,7 +210,7 @@ export const Styles = ScaledSheet.create({
   },
 
   /*---------------------------------------------This Style is for All Category Page--------------------------------------------------------- */
-  category_card : {
+  category_card: {
     width: '220@s',
     height: '120@s',
     borderColor: Color.SILVER,
@@ -218,14 +218,51 @@ export const Styles = ScaledSheet.create({
     borderRadius: 10
   },
 
-  cat_card_img : {
+  cat_card_img: {
     borderRadius: 5,
   },
 
-  cat_card_avatar : {
+  cat_card_avatar: {
     height: '118@s',
     width: '218@s',
     borderRadius: 5
+  },
+
+  category_card_main: {
+    width: '100%',
+    flexDirection: 'row',
+    paddingHorizontal: '10@s',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap'
+  },
+
+  category_card1: {
+    width: '100@s',
+    height: '150@s',
+    marginVertical: '10@s',
+    borderColor: Color.CARD_BORDER,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: Color.CARD_BACKGROUND
+  },
+
+  cat_card_avatar1: {
+    height: '90@s',
+    width: '100%',
+    borderRadius: 6
+  },
+
+  cat_card_title_view: {
+    paddingVertical: '10@s',
+    paddingHorizontal: '5@s',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  cat_card_title: {
+   color: Color.BLACK,
+   textAlign: 'center',
+   fontSize: '11@s'
   },
 
   /*---------------------------------------------This Style is for All Item Page--------------------------------------------------------- */
@@ -625,16 +662,16 @@ export const Styles = ScaledSheet.create({
     fontWeight: 'bold'
   },
 
-  offer_price_text: {
-    fontSize: '14@s',
-    marginHorizontal: '20@s',
+  old_price_text: {
+    fontSize: '12@s',
+    marginLeft: '5@s',
     textDecorationLine: 'line-through'
   },
 
-  // cart_quantity_view: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between'
-  // },
+  offer_price_text: {
+    fontSize: '12@s',
+    marginHorizontal: '0@s',
+  },
 
   cart_quantity_text_view: {
 

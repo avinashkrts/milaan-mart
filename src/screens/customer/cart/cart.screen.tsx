@@ -209,11 +209,6 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
         // this.toggleModal()
         const pushAction = StackActions.push(AppRoute.PAYMENT, { cartId: String(cartId), insideShop: false })
         this.props.navigation.dispatch(pushAction);
-        //             }
-        //         }
-        //     })
-        // }
-
     }
 
     handleCartId(cartId) {
@@ -256,9 +251,9 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
 
                                 <View style={{ flexDirection: 'row', width: '55%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                                     <Text style={Styles.price_text}><RupeeIcon /> {item.price.toFixed(2)}</Text>
-                                    {item.offersAvailable ?
+                                    {/* {item.offersAvailable ?
                                         <Text style={Styles.offer_price_text}>{item.oldPrice.toFixed(2)}</Text> : null
-                                    }
+                                    } */}
                                 </View>
 
                                 <View style={Styles.cart_quantity_view}>
@@ -284,18 +279,18 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                                         </View>}
                                 </View>
                             </View>
-                            {item.offersAvailable ?
+                            {/* {item.offersAvailable ?
                                 <View>
                                     <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
                                 </View> : null
-                            }
+                            } */}
                         </View>
                     </View>
-                    {item.offersAvailable ?
+                    {/* {item.offersAvailable ?
                         <View>
                             <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
                         </View> : null
-                    }
+                    } */}
                 </View>
                 :
                 <ActivityIndicator size='large' color='green' />}
