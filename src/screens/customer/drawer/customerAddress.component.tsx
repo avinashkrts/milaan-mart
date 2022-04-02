@@ -1,24 +1,24 @@
-import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage, ActivityIndicator, Pressable } from "react-native";
-import { Avatar, Divider, ListItemElement, ThemedComponentProps, List, ListItem } from "@ui-kitten/components";
-import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { AddressEditIcon, BackIcon, CancelIcon, LocationIcon, MenuIcon, PencilIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { ScrollView, TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AppConstants, Color, LableText } from "../../../constants";
-import { Content } from "native-base";
-import Modal from "react-native-modal";
-import Axios from "axios";
-import { AppRoute } from "../../../navigation/app-routes";
-import { CustomerAddressScreenProps } from "../../../navigation/customer-navigator/customer.navigator";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import Geolocation from "@react-native-community/geolocation";
-import { scale } from "react-native-size-matters";
+import Geolocation from '@react-native-community/geolocation';
+import { CommonActions } from '@react-navigation/core';
+import { Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import Axios from 'axios';
+import React, { Component } from 'react';
+import { ActivityIndicator, Alert, AsyncStorage, Pressable, RefreshControl, Text, View } from 'react-native';
 import Geocoder from 'react-native-geocoding';
-import { CommonActions } from "@react-navigation/core";
-import { CartAddressScreenProps } from "../../../navigation/customer-navigator/cart-navigation/cart.navigator";
+import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Modal from 'react-native-modal';
+import { scale } from 'react-native-size-matters';
+
+import { AddressEditIcon, BackIcon, CancelIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, Color, LableText } from '../../../constants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { CartAddressScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
+import { CustomerAddressScreenProps } from '../../../navigation/customer-navigator/customer.navigator';
 
 type Props = CartAddressScreenProps & CustomerAddressScreenProps & ThemedComponentProps
 
@@ -87,7 +87,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
 
     handleSubmit() {
         const { isEditable, lat, long, name, mobileNo, street, city, shopId, userId, postOffice, policeStation, district, landMark, pinCode, state, country, latitude, longitude, userType } = this.state
-        
+
         if (name == null || name === '') {
             Alert.alert("Please enter name.");
         } else if (mobileNo == null || mobileNo === '') {
@@ -445,7 +445,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                             </TouchableOpacity>
                         </View>
                     </View> */}
-                <Content
+                <ScrollView
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -463,7 +463,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                             }
                             renderItem={this.renderAddress}
                         /> : null}
-                </Content>
+                </ScrollView>
 
                 {allAddress.length <= 0 && this.props.route.name == AppRoute.CART_ADDRESS ?
                     <View style={{ marginHorizontal: '10%' }}>

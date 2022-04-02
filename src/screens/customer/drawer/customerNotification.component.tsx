@@ -1,18 +1,18 @@
-import { Content } from "native-base";
-import React, { Component } from "react";
-import { RefreshControl, View, Text, Alert, AsyncStorage } from "react-native";
-import { Divider, ThemedComponentProps, List, ListItemElement, ListItem } from "@ui-kitten/components";
-import { SafeAreaLayout } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { BackIcon, PlusCircle, CancelIcon, FilterIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import Modal from "react-native-modal";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import Axios from "axios";
-import moment from "moment";
-import { AppConstants } from "../../../constants";
-import { AppRoute } from "../../../navigation/app-routes";
-import { CustomerNotificationScreenProps } from "../../../navigation/customer-navigator/customer.navigator";
+import { Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import Axios from 'axios';
+import moment from 'moment';
+import React, { Component } from 'react';
+import { AsyncStorage, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Modal from 'react-native-modal';
+
+import { BackIcon, CancelIcon, FilterIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants } from '../../../constants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { CustomerNotificationScreenProps } from '../../../navigation/customer-navigator/customer.navigator';
 
 export class CustomerNotificationScreen extends Component<CustomerNotificationScreenProps, ThemedComponentProps & any> {
     constructor(props) {
@@ -178,7 +178,7 @@ export class CustomerNotificationScreen extends Component<CustomerNotificationSc
                     </View>
                     <View style={Styles.notification_devider}></View>
                 </Modal>
-                <Content style={Styles.content}
+                <ScrollView style={Styles.content}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -193,7 +193,7 @@ export class CustomerNotificationScreen extends Component<CustomerNotificationSc
                         /> : null}
 
                     <View style={Styles.bottomSpace} />
-                </Content>
+                </ScrollView>
             </SafeAreaLayout>
         );
     }

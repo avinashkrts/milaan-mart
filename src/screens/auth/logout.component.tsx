@@ -1,31 +1,15 @@
-import React, { Component } from 'react';
-import { StyleSheet, Alert } from 'react-native';
-import {
-  Divider,
-  Layout,
-  Text,
-  Avatar,
-  Button,
-  Input
-} from 'react-native-ui-kitten';
-// import { ProfileScreenProps } from '../../navigation/home.navigator';
-import { Toolbar } from '../../components/toolbar.component';
-import {
-  SafeAreaLayout,
-  SafeAreaLayoutElement,
-  SaveAreaInset,
-} from '../../components/safe-area-layout.component';
-import { AppConstants } from '../../constants/AppConstants';
-import { Separator, Container, Content, View, Footer, FooterTab, Form, Picker, Icon } from 'native-base';
-import Axios from 'axios';
-import { LabelConstants } from '../../constants/LabelConstants';
-import { AsyncStorage } from 'react-native';
-import { AppRoute } from '../../navigation/app-routes';
-import { SignInScreen } from '.'
-import { LogOutScreenProp } from '../../navigation/customer-navigator/customer.navigator';
 import { StackActions } from '@react-navigation/core';
+import Axios from 'axios';
+import React, { Component } from 'react';
+import { Alert, View, AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
+import { SafeAreaLayoutElement } from '../../components/safe-area-layout.component';
+import { AppConstants } from '../../constants/AppConstants';
+import { AppRoute } from '../../navigation/app-routes';
+import { LogOutScreenProp } from '../../navigation/customer-navigator/customer.navigator';
+
+// import { ProfileScreenProps } from '../../navigation/home.navigator';
 type Mystate = {
 
 }

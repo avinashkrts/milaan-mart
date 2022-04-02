@@ -1,37 +1,17 @@
-import React, { Component } from 'react';
-import {
-    View,
-    TouchableOpacity,
-    ActivityIndicator,
-    Alert,
-    RefreshControl,
-    TextInput
-} from 'react-native';
-import {
-    List,
-    ListItem,
-    ListItemElement,
-    Text,
-    ThemedComponentProps,
-    Divider,
-    Avatar
-} from '@ui-kitten/components';
-import { Content } from 'native-base';
-import { AppRoute } from '../../../navigation/app-routes';
-import {
-    RupeeIcon,
-    BackIcon,
-    CancelIcon
-} from '../../../assets/icons';
-import { AppConstants } from '../../../constants/AppConstants';
-import { Toolbar } from '../../../components/toolbar.component';
-import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { Styles } from '../../../assets/styles'
-import { Color, LableText } from '../../../constants/LabelConstants';
+import { Avatar, Divider, List, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
 import Axios from 'axios';
-import Modal from "react-native-modal";
+import React, { Component } from 'react';
+import { ActivityIndicator, Alert, RefreshControl, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import Modal from 'react-native-modal';
+
+import { BackIcon, CancelIcon, RupeeIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants } from '../../../constants/AppConstants';
+import { Color, LableText } from '../../../constants/LabelConstants';
+import { AppRoute } from '../../../navigation/app-routes';
 import { CustomerOrderDetailScreenProps } from '../../../navigation/customer-navigator/order-navigation/order.navigator';
 
 type Props = CustomerOrderDetailScreenProps & ThemedComponentProps
@@ -242,7 +222,7 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                         <View style={Styles.cart_view_1}>
                             <View style={Styles.cart_view_1_1}>
                                 <View style={[Styles.cart_avatar_view, Styles.center]}>
-                                    <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productId + '_1_' + item.shopId + '_product.png' }} style={Styles.product_avatar} />
+                                    <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage }} style={Styles.product_avatar} />
                                 </View>
                             </View>
 
@@ -328,7 +308,7 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                 />
                 <Divider />
 
-                <Content style={Styles.cart_content} showsVerticalScrollIndicator={false}
+                <ScrollView style={Styles.cart_content} showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -433,7 +413,7 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                     </View>
 
                     <View style={{ height: 10, width: '100%' }} />
-                </Content>
+                </ScrollView>
 
 
                 {null != orderstatusData ? orderstatusData.map((orderStatus, oIndex) => {

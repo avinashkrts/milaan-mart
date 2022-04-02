@@ -1,17 +1,17 @@
-import React, { Component } from "react";
-import { View, Text, AsyncStorage, RefreshControl, Alert } from "react-native";
-import { Divider, styled, ThemedComponentProps } from "@ui-kitten/components";
-import { SafeAreaLayout } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { MenuIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { AppConstants, LabelConstants, LableText } from "../../../constants";
-import axios from "axios";
-import moment from "moment";
-import { Content } from "native-base";
-import { ScrollView } from "react-native-gesture-handler";
-import { AppRoute } from "../../../navigation/app-routes";
-import { BillBookScreenProps } from "../../../navigation/customer-navigator/bill-book.navigator";
+import { Divider, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
+import moment from 'moment';
+import React, { Component } from 'react';
+import { AsyncStorage, RefreshControl, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+
+import { MenuIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, LabelConstants } from '../../../constants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { BillBookScreenProps } from '../../../navigation/customer-navigator/bill-book.navigator';
 
 export class BillBookScreen extends Component<BillBookScreenProps, ThemedComponentProps & any> {
     constructor(props) {

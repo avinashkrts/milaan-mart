@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { View, Alert, Image, Text, } from 'react-native';
-import { OtpScreenProps } from '../../navigation/auth.navigator';
-import { AppRoute } from '../../navigation/app-routes';
-import { Placeholder, LableText } from '../../constants';
 import axios from 'axios';
-import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
-import { Content } from 'native-base';
+import React, { Component } from 'react';
+import { Alert, Image, ScrollView, Text, View } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import { Styles } from '../../assets/styles'
 import { scale } from 'react-native-size-matters';
+
+import { Styles } from '../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../components/safe-area-layout.component';
+import { LableText, Placeholder } from '../../constants';
+import { AppRoute } from '../../navigation/app-routes';
+import { OtpScreenProps } from '../../navigation/auth.navigator';
 
 interface State {
     email: string | undefined;
@@ -81,7 +81,7 @@ export class OtpScreen extends Component<OtpScreenProps, any & State & any> {
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP} >
-                < Content style={[Styles.content, { backgroundColor: '#ffffff' }]} >
+                < ScrollView style={[Styles.content, { backgroundColor: '#ffffff' }]} >
                     <View>
                         <Image
                             source={require('../../assets/logo.png')}
@@ -113,7 +113,7 @@ export class OtpScreen extends Component<OtpScreenProps, any & State & any> {
 
                     </View>
                     <View style={Styles.bottomSpace}></View>
-                </Content>
+                </ScrollView>
 
             </SafeAreaLayout >
         );

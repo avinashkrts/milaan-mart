@@ -1,14 +1,12 @@
-import React, { Component } from "react";
-import { View, Text, RefreshControl } from "react-native";
-import { Avatar, Divider, ThemedComponentProps } from "@ui-kitten/components";
-import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { BackIcon, MenuIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { LableText } from "../../../constants";
-import { Content } from "native-base";
-import { CustomerContactScreenProps } from "../../../navigation/customer-navigator/customer.navigator";
+import { Divider, ThemedComponentProps } from '@ui-kitten/components';
+import React, { Component } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+
+import { BackIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { CustomerContactScreenProps } from '../../../navigation/customer-navigator/customer.navigator';
 
 export class CustomerContactScreen extends Component<CustomerContactScreenProps, ThemedComponentProps & any> {
     constructor(props) {
@@ -38,7 +36,7 @@ export class CustomerContactScreen extends Component<CustomerContactScreenProps,
                     style={{ marginTop: -5, marginLeft: -5 }}
                 />
                 <Divider />
-                <Content style={Styles.content}>
+                <ScrollView style={Styles.content}>
 
                     <Divider />
                     <View style={Styles.about_main}>
@@ -186,7 +184,7 @@ export class CustomerContactScreen extends Component<CustomerContactScreenProps,
                             At Milaan IT Projects Private Limited we are committed towards ensuring that disputes between sellers and buyers are settled amicably by way of the above dispute resolution mechanisms and procedures. However, in the event that a buyer wishes to contact the seller, he/ she may proceed to do so by accessing the seller-related information made available by the sellers on their business listing page. Alternatively, the buyers may also reach out to customer support at 7294926271 or access mail us at customersupport@milaan.com.
                         </Text>
                     </View>                   
-                </Content>
+                </ScrollView>
 
             </SafeAreaLayout>
         );

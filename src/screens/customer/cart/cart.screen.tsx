@@ -1,62 +1,32 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from '@react-navigation/core';
+import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
 import React from 'react';
 import {
-    View,
-    TouchableOpacity,
     ActivityIndicator,
-    Alert, RefreshControl,
+    Alert,
     Dimensions,
+    Pressable,
+    RefreshControl,
     ScrollView,
     Text,
-    Pressable
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { AppRoute } from '../../../navigation/app-routes';
-import {
-    MinusIcon,
-    RupeeIcon,
-    PlusCircle,
-    BackIcon,
-    CancelIcon,
-    AddIcon,
-    RightArrowIcon
-} from '../../../assets/icons';
-import { AppConstants } from '../../../constants/AppConstants';
-import { Toolbar } from '../../../components/toolbar.component';
-import {
-    SafeAreaLayout,
-    SaveAreaInset,
-} from '../../../components/safe-area-layout.component';
-import { MenuIcon, ExperienceIcon, LocationIcon, PublicIcon, PencilIcon } from '../../../assets/icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import Share from 'react-native-share';
-import { pathToFileURL, fileURLToPath } from 'url';
-import Animated from 'react-native-reanimated';
-import { Styles } from '../../../assets/styles'
-import { Color, Padding } from '../../../constants/LabelConstants';
-import { StackActions } from '@react-navigation/core';
 import { scale } from 'react-native-size-matters';
-import { Brand } from '../../../redux/modules/brand.modules';
-// import { CartScreenProps } from '../../../navigation/cart-navigation/cart.navigator';
-import { Product } from '../../../redux/modules/product';
-import { User } from '../../../redux/modules/user.modules';
-import { Measurement } from '../../../redux/modules/measurement.modules';
-import { Varient } from '../../../redux/modules/varient.modules';
-import { Cart } from '../../../redux/modules/cart.modules';
-import { AppState } from '../../../redux/store';
-import { ThunkDispatch } from 'redux-thunk';
-import { AppActions } from '../../../redux/interfaces';
-import { changeProductData, setProductVariant } from '../../../redux/action/productActions';
-import { bindActionCreators } from 'redux';
-import { fetchUserById } from '../../../redux/action/userAction';
-import { fetchVarientByShopId } from '../../../redux/action/varientAction';
-import { fetchMeasurementByShopId } from '../../../redux/action/measurementAction';
-import { fetchCartByShopIdUserId } from '../../../redux/action/cartAction';
-import { fetchBrandByShopId } from '../../../redux/action/brandAction';
-import { connect, ConnectedProps } from 'react-redux';
-import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
-// import { CartNavigatorProp } from '../../../navigation/customer-navigator/customer.navigator';
-import { CartScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
 
+import { AddIcon, BackIcon, CancelIcon, MinusIcon, RightArrowIcon, RupeeIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants } from '../../../constants/AppConstants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { CartScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
+import { Brand } from '../../../redux/modules/brand.modules';
+
+// import { CartScreenProps } from '../../../navigation/cart-navigation/cart.navigator';
+// import { CartNavigatorProp } from '../../../navigation/customer-navigator/customer.navigator';
 interface CartPageProps {
 }
 
@@ -157,7 +127,8 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
             method: 'PUT',
             url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
           }).then((response) => {
-            this.getCart(user.userId)
+            this._onRefresh();
+            // this.getCart(user.userId)
           }, (error) => {
             Alert.alert("Server problem")
           })
@@ -225,7 +196,7 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                     <View style={Styles.cart_view_1}>
                         <View style={Styles.cart_view_1_1}>
                             <View style={[Styles.cart_avatar_view, Styles.center]}>
-                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productId + '_' + 1 + "_" + item.shopId + '_product.png' }} style={Styles.product_avatar} />
+                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage}} style={Styles.product_avatar} />
                             </View>
                         </View>
 
@@ -480,8 +451,13 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
 
                             <View style={Styles.price_detail_2}>
                                 <View style={Styles.price_detail_2_1}>
-                                    <Text style={Styles.cart_price_text_head}>Price ({null != productList ? productList.length : null} items)</Text>
-                                    <Text style={Styles.cart_price_text_head}><RupeeIcon fontSize={18} />{null != cartData.totalAmount ? (cartData.price).toFixed(2) : null}</Text>
+                                    <Text style={Styles.cart_price_text_head}>MRP ({null != productList ? productList.length : null} items)</Text>
+                                    <Text style={[Styles.cart_price_text_head, {textDecorationLine: 'line-through'}]}><RupeeIcon fontSize={18} />{null != cartData.mrp ? (cartData.mrp).toFixed(2) : null}</Text>
+                                </View>
+
+                                <View style={Styles.price_detail_2_1}>
+                                    <Text style={Styles.cart_price_text_head}>Price</Text>
+                                    <Text style={Styles.cart_price_text_head}><RupeeIcon fontSize={18} />{null != cartData.totalAmount ? (cartData.totalAmount).toFixed(2) : null}</Text>
                                 </View>
 
                                 <View style={Styles.price_detail_2_1}>

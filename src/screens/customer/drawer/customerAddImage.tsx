@@ -1,21 +1,30 @@
-import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage, ActivityIndicator, PermissionsAndroid } from "react-native";
-import { Avatar, Divider, ThemedComponentProps } from "@ui-kitten/components";
-import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { BackIcon, CancelIcon, MenuIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AppConstants, Color, LableText } from "../../../constants";
-import { CheckBox, Content, Picker } from "native-base";
-import Axios from "axios";
-import DatePicker from 'react-native-datepicker'
-import { AppRoute } from "../../../navigation/app-routes";
+import { StackActions } from '@react-navigation/core';
+import { Avatar, Divider, ThemedComponentProps } from '@ui-kitten/components';
+import React, { Component } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    AsyncStorage,
+    PermissionsAndroid,
+    RefreshControl,
+    ScrollView,
+    Text,
+    View,
+} from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { scale } from "react-native-size-matters";
-import Modal from "react-native-modal";
-import { AddCustomerImageScreenProps } from "../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator";
-import { StackActions } from "@react-navigation/core";
+import Modal from 'react-native-modal';
+import { scale } from 'react-native-size-matters';
+
+import { BackIcon, CancelIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, Color, LableText } from '../../../constants';
+import { AppRoute } from '../../../navigation/app-routes';
+import {
+    AddCustomerImageScreenProps,
+} from '../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator';
 
 const options = {
     quality: 0.7,
@@ -182,7 +191,7 @@ export class AddCustomerImageScreen extends Component<Props, any> {
                 />
                 <Divider />
 
-                <Content style={Styles.content}
+                <ScrollView style={Styles.content}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -255,7 +264,7 @@ export class AddCustomerImageScreen extends Component<Props, any> {
                     </Modal>
 
                     <View style={Styles.bottomSpace}></View>
-                </Content>
+                </ScrollView>
 
             </SafeAreaLayout>
         );

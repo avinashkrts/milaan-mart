@@ -1,25 +1,25 @@
-import React, { Component } from "react";
-import { View, Text, RefreshControl, AsyncStorage, Alert, StyleSheet, PermissionsAndroid, BackHandler } from "react-native";
-import { Avatar, List, Divider, ListItemElement, ThemedComponentProps } from "@ui-kitten/components";
-import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { CartIcon, MenuIcon, SearchIcon, WishIcon, CancelIcon } from "../../../assets/icons";
-import { FlatList, TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AppConstants, Color } from "../../../constants";
-import { Styles } from "../../../assets/styles";
-import { Content, Header, Item, ListItem } from "native-base";
-import axios from 'axios';
-import Animated from "react-native-reanimated";
-import { AppRoute } from "../../../navigation/app-routes";
-import Axios from "axios";
+import { StackActions } from '@react-navigation/native';
+import { Avatar, Divider, List, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import Axios from 'axios';
+import { Header, ListItem } from 'native-base';
+import React, { Component } from 'react';
+import { Alert, AsyncStorage, RefreshControl, Text, View } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import Modal from "react-native-modal";
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { FlatList, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { StackActions } from "@react-navigation/native";
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Modal from 'react-native-modal';
+import Animated from 'react-native-reanimated';
+import { scale } from 'react-native-size-matters';
+
+import { CancelIcon, CartIcon, MenuIcon, SearchIcon, WishIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, Color } from '../../../constants';
 import { LableText } from '../../../constants/LabelConstants';
-import { scale } from "react-native-size-matters";
-import { OffersScreenProps } from "../../../navigation/customer-navigator/offer-list.navigator";
+import { AppRoute } from '../../../navigation/app-routes';
+import { OffersScreenProps } from '../../../navigation/customer-navigator/offer-list.navigator';
 
 
 const HEADER_MAX_HEIGHT = 205;

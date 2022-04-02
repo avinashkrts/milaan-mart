@@ -1,3 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from '@react-navigation/native';
+import { Avatar, Divider, List, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
 import React, { PureComponent } from 'react';
 import {
   ActivityIndicator,
@@ -10,32 +14,26 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
-import { Avatar, Divider, List, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
-import { Toolbar } from '../../../components/toolbar.component';
-import {
-  SafeAreaLayout,
-  SaveAreaInset
-} from '../../../components/safe-area-layout.component';
-import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RupeeIcon, SearchIcon, WishIcon } from '../../../assets/icons';
-import { ProductListScreenProps } from '../../../navigation/customer-navigator/product-list.navigator';
-import { Brand } from '../../../redux/modules/brand.modules';
-import { Styles } from '../../../assets/styles';
-import { AppConstants, Color, LableText } from '../../../constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import Geolocation from 'react-native-geolocation-service';
-import { scale } from 'react-native-size-matters';
-import Modal from "react-native-modal";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Modal from 'react-native-modal';
+import { createFilter } from 'react-native-search-filter';
+import { scale } from 'react-native-size-matters';
+
+import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RupeeIcon, SearchIcon, WishIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, Color, LableText } from '../../../constants';
 import { AppRoute } from '../../../navigation/app-routes';
 import { CartNavigatorProp } from '../../../navigation/customer-navigator/customer.navigator';
-import { StackActions } from '@react-navigation/native';
-import { createFilter } from 'react-native-search-filter';
-import { Header } from 'native-base';
+import { ProductListScreenProps } from '../../../navigation/customer-navigator/product-list.navigator';
+import { Brand } from '../../../redux/modules/brand.modules';
 import { OfferData } from './offerData';
+
 const KEYS_TO_FILTERS = ['name'];
 
 interface ProductPageProps {
@@ -104,7 +102,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
   }
 
   async componentDidMount() {
-    this.initialData()
+    // this.initialData()
     this.props.navigation.addListener('focus', () => {
       this.setState({
         isCart: false,
@@ -345,7 +343,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
   getAllSubCategory() {
     axios({
       method: 'GET',
-      url: AppConstants.API_BASE_URL + '/api/subcategory/getall'
+      url: AppConstants.API_BASE_URL + '/api/subcategory/getallonline/byshopid/MILAAN63/1'
     }).then((response: any) => {
       if (null != response.data) {
         this.setState({
@@ -360,7 +358,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
   getAllBrand() {
     axios({
       method: 'GET',
-      url: AppConstants.API_BASE_URL + '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID,
+      url: AppConstants.API_BASE_URL + '/api/brand/getallonline/brand/1',
     }).then((response: any) => {
       if (null != response.data) {
         this.setState({
@@ -531,7 +529,6 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
   async handleAddToCart(productId, productName, itemList) {
     const { userData } = this.state;
     const logedIn = await AsyncStorage.getItem('logedIn');
-
     if (itemList.length > 0) {
       this.setState({
         temp_variant: itemList,
@@ -745,12 +742,12 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
 
   renderProduct = ({ item }: any): ListItemElement => (
     item.itemList != null && item.itemList.length > 0 ?
-      <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+      <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1), paddingVertical: -5 }}>
         <View style={Styles.product_list_main}>
           <View style={Styles.product_list_img}>
             <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
               <View style={[Styles.all_Item_Image_2, Styles.center]}>
-                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.id + '_' + 1 + "_" + item.shopId + '_product.png' }} style={Styles.product_avatar} />
+                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage }} style={Styles.product_avatar} />
               </View>
             </TouchableOpacity>
           </View>
@@ -759,22 +756,20 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               <View style={Styles.all_Item_Detail}>
                 <View style={{ backgroundColor: '#fff', paddingHorizontal: 0 }}>
                   <View style={{ flexDirection: 'row' }}>
-                    {null != this.state.allBrand ? this.state.allBrand.map((brand, index) => {
+                    {/* {null != this.state.allBrand ? this.state.allBrand.map((brand, index) => {
                       if (brand.id == item.brand) {
-                        return (
-                          <View style={{ width: '80%', flexWrap: 'wrap', flexDirection: 'row' }}>
-                            <Text style={{ color: '#000', marginTop: scale(5), fontSize: scale(14) }}>{item.name} {`\n`}{brand.name}</Text>
-                          </View>
-                        );
+                        return ( */}
+                    <View style={{ width: '80%', flexWrap: 'wrap', flexDirection: 'row' }}>
+                      <Text style={{ color: '#000', fontFamily: 'notoserif', fontWeight: '600', marginTop: scale(5), fontSize: scale(12) }}>{item.name}</Text>
+                    </View>
+                    {/* );
                       }
-                    }) : null}
+                    }) : null} */}
                     {/* {this.props.userData != null && this.props.userData.length > 0 ? */}
                     <View style={[Styles.product_2nd_wish_view]}>
                       <TouchableOpacity onPress={() => { this.handleWishList(item.id) }}>
                         <Text
-                          style={this.state.logedIn && this.state.user.wishList != null && this.state.user.wishList.includes(item.id) ?
-                            Styles.selected_wish_icon :
-                            Styles.wish_icon
+                          style={this.state.logedIn && this.state.user.wishList != null && this.state.user.wishList.split(',').some((wishData) => (wishData == item.id)) ? Styles.selected_wish_icon : Styles.wish_icon
                           }
                         >
                           <WishIcon />
@@ -788,43 +783,42 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                     if (brand.id == item.itemList[0].measurement) {
                       return (
                         <>
-                          <Text style={{ color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].unitQuantity} {brand.name}</Text>
+                          <Text style={{ fontFamily: 'notoserif', color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].unitQuantity} {brand.name}</Text>
                         </>
                       );
                     }
                   }) : null}
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginVertical: 5 }}>
-                    {item.itemList[0].customerMarginPercent <= 0 ? <Text style={Styles.old_price_text}><RupeeIcon fontSize={scale(14)} /> {item.itemList[0].mrp.toFixed(2)}</Text> : null}
-                  <Text style={{ color: '#000', fontSize: scale(12) }}><RupeeIcon fontSize={scale(14)} /> {item.itemList[0].unitSellingPrice}</Text>
-                    {item.itemList[0].customerMarginPercent <= 0 ?
-                        <Text style={Styles.offer_price_text}>
-                          {Math.round(item.itemList[0].customerSingleOffer)} % Off
-                        </Text>                     
-                      : null
-                    }
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                    <Text style={Styles.old_price_text}>MRP {item.itemList[0].mrp.toFixed(2)}</Text>
+                    <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{item.itemList[0].unitSellingPrice}/pc</Text>
+                    <Text style={[{ fontFamily: 'notoserif' }, Styles.offer_price_text]}>
+                      {Math.round(item.itemList[0].customerSingleOffer)} % Off
+                    </Text>
                     {/* {item.offerActiveInd ?
                       <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
                       : null
                     } */}
                   </View>
-                  {null != item.offerActiveInd ? item.offerActiveInd ?
+                  {item.itemList[0].bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.itemList[0].bundlePrice / item.itemList[0].bundleQuantity).toFixed(2)} / pc (Buy {item.itemList[0].bundleQuantity} or more)</Text> : null}
+                  {/* {null != item.offerActiveInd ? item.offerActiveInd ?
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-                      <Text style={{ color: Color.COLOR }}>{item.offerPercent} % off</Text>
-                      <Text style={{ color: Color.COLOR }}>{item.offerActiveInd && item.offerTo ? item.offerTo.substr(8, 2) + "/" + item.offerTo.substr(5, 2) + "/" + item.offerTo.substr(0, 4) : null}</Text>
+                      <Text style={{ fontFamily: 'notoserif', color: Color.COLOR }}>{item.offerPercent} % off</Text>
+                      <Text style={{ fontFamily: 'notoserif', color: Color.COLOR }}>{item.offerActiveInd && item.offerTo ? item.offerTo.substr(8, 2) + "/" + item.offerTo.substr(5, 2) + "/" + item.offerTo.substr(0, 4) : null}</Text>
                     </View> :
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-                      <Text style={{ color: Color.COLOR, marginTop: 2.5 }}></Text>
-                      <Text style={{ color: Color.COLOR }}></Text>
+                      <Text style={{ fontFamily: 'notoserif', color: Color.COLOR, marginTop: 2.5 }}></Text>
+                      <Text style={{ fontFamily: 'notoserif', color: Color.COLOR }}></Text>
                     </View> : null
-                  }
+                  } */}
                 </View>
-
-                <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.name, item.itemList) }}>
-                  <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
-                    <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
-                  </View>
-                </TouchableOpacity>
+                <View style={{ justifyContent: 'flex-end', width: '100%', flex: 1, flexDirection: 'row' }}>
+                  <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.name, item.itemList) }}>
+                    <View style={[{ backgroundColor: Color.COLOR, marginVertical: 5, alignSelf: 'center', paddingVertical: scale(5), borderRadius: 5, paddingHorizontal: scale(10) }, Styles.center]}>
+                      <Text style={{ fontFamily: 'notoserif', color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
                 {/* {item.stock ? item.stock > 0 ?
                                 <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.shopId) }}>
                                     <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
@@ -864,24 +858,21 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                     if (brand.id == item.measurement) {
                       return (
                         <View>
-                          <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
+                          <Text style={{ fontSize: scale(14), fontFamily: 'notoserif', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
                         </View>
                       );
                     }
                   }) : null}
                   <View style={{ flexDirection: 'row' }}>
-                    <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.unitSellingPrice.toFixed(2)}</Text>
-                    {item.customerMarginPercent > 0 ? <Text style={Styles.old_price_text}><RupeeIcon fontSize={scale(14)} /> {item.mrp.toFixed(2)}</Text> : null}
+                    <Text style={Styles.old_price_text}>MRP {item.mrp.toFixed(2)}</Text>
+                    <Text style={Styles.price_text}><RupeeIcon fontSize={scale(14)} />{item.unitSellingPrice.toFixed(2)}</Text>
                   </View>
-
-                  {item.customerMarginPercent > 0 ?
-                    <View>
-                      <Text style={Styles.offer_price_text}>
-                        {Math.round(item.customerSingleOffer)} % Off
-                      </Text>
-                    </View>
-                    : null
-                  }
+                  <View>
+                    <Text style={Styles.offer_price_text}>
+                      {Math.round(item.customerSingleOffer)} % Off
+                    </Text>
+                    {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)} / pc (Buy {item.bundleQuantity} or more)</Text> : null}
+                  </View>
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
 
@@ -957,18 +948,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   }
                 </View>
               </View>
-              {item.offersAvailable ?
-                <View>
-                  <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
-                </View> : null
-              }
             </View>
-            {
-              item.offersAvailable ?
-                <View>
-                  <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
-                </View> : null
-            }
           </View >
           :
           <ActivityIndicator size='large' color='green' />
@@ -993,7 +973,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           <View style={Styles.variant_modal}>
             <View style={Styles.varient_modalHeader}>
               <View style={{ width: '90%' }}>
-                <Text style={{ fontSize: scale(20), fontWeight: '400' }}>{productName}</Text>
+                <Text style={{ fontFamily: 'notoserif', fontSize: scale(14), fontWeight: '600' }}>{productName}</Text>
               </View>
               <TouchableOpacity>
                 <Text onPress={() => { this.setState({ variantVisible: false }); }}><CancelIcon fontSize={25} /></Text>
@@ -1108,7 +1088,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         <Divider />
         {/* </Header> */}
         <>
-          <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
+          <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
             <View style={{ flex: 1, flexDirection: 'column' }}>
               <View style={{ marginTop: 10 }}>
                 <FlatList
@@ -1129,9 +1109,9 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 </FlatList>
               </View>
             </View>
-          </Header>
+          </View>
           <Divider />
-          <Header style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
+          <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0 }}>
             <View style={{ backgroundColor: '#ffffff', height: 50, marginTop: 0, flex: 1, flexDirection: 'column' }}>
               <View style={{ marginTop: 10 }}>
                 <FlatList
@@ -1153,7 +1133,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 </FlatList>
               </View>
             </View>
-          </Header>
+          </View>
           <Divider />
 
         </>
@@ -1194,10 +1174,10 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         <View style={{ height: 10, width: '100%' }} />
 
         {isCart ?
-          <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(10) }]} onPress={() => { this.navigateToCart() }}>
-            <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 10 }]}>
+          <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(0) }]} onPress={() => { this.navigateToCart() }}>
+            <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 0 }]}>
               <Text style={Styles.bottom_view_cart_text}>View Cart </Text>
-              <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: -30 }]}>
+              <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: 0 }]}>
                 <Text style={{ fontSize: scale(13), color: Color.COLOR }}>{allCart != null && allCart != '' ? allCart[0].productList.length : 0}</Text>
               </View>
             </View>

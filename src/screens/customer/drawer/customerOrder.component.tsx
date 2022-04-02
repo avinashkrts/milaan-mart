@@ -1,22 +1,22 @@
-import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage, BackHandler, Pressable } from "react-native";
-import { Avatar, Divider, ThemedComponentProps, ListItem, ListItemElement, List } from "@ui-kitten/components";
-import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { BackIcon, MenuIcon, CancelIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AppConstants, Color, LableText } from "../../../constants";
-import { Content, Image } from "native-base";
-import Axios from "axios";
-import { AppRoute } from "../../../navigation/app-routes";
-import moment from "moment";
-import Modal from "react-native-modal";
-import { Contents } from "../../../constants/LabelConstants";
-import { StackActions } from "@react-navigation/core";
-import { scale } from "react-native-size-matters";
-import { CustomerOrderScreenProps } from "../../../navigation/customer-navigator/order-navigation/order.navigator";
-import { Notification } from "../../../components/notification";
+import { StackActions } from '@react-navigation/core';
+import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import Axios from 'axios';
+import moment from 'moment';
+import React, { Component } from 'react';
+import { Alert, AsyncStorage, BackHandler, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import Modal from 'react-native-modal';
+import { scale } from 'react-native-size-matters';
+
+import { BackIcon, CancelIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { Notification } from '../../../components/notification';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, Color, LableText } from '../../../constants';
+import { Contents } from '../../../constants/LabelConstants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { CustomerOrderScreenProps } from '../../../navigation/customer-navigator/order-navigation/order.navigator';
 
 type Props = CustomerOrderScreenProps & ThemedComponentProps
 
@@ -678,7 +678,7 @@ export class CustomerOrderScreen extends Component<Props, any> {
                     style={{ marginTop: -5, marginLeft: -5 }}
                 />
                 <Divider />
-                <Content style={Styles.content}
+                <ScrollView style={Styles.content}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -836,7 +836,7 @@ export class CustomerOrderScreen extends Component<Props, any> {
                      */}
 
                     <View style={Styles.bottomSpace}></View>
-                </Content>
+                </ScrollView>
 
             </SafeAreaLayout>
         );

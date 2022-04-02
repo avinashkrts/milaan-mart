@@ -1,17 +1,17 @@
-import React, { Component } from "react";
-import { View, Text, AsyncStorage, RefreshControl, Alert } from "react-native";
-import { Divider, ThemedComponentProps } from "@ui-kitten/components";
-import { SafeAreaLayout } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { BackIcon, MenuIcon, RupeeIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { AppConstants, LabelConstants } from "../../../constants";
-import axios from "axios";
-import moment from "moment";
-import { ScrollView } from "react-native-gesture-handler";
-import { AppRoute } from "../../../navigation/app-routes";
-import { scale } from "react-native-size-matters";
-import { CustomerWalletScreenProps } from "../../../navigation/customer-navigator/customer.navigator";
+import { Divider, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
+import React, { Component } from 'react';
+import { Alert, AsyncStorage, RefreshControl, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { scale } from 'react-native-size-matters';
+
+import { BackIcon, RupeeIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants } from '../../../constants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { CustomerWalletScreenProps } from '../../../navigation/customer-navigator/customer.navigator';
 
 export class CustomerWalletScreen extends Component<CustomerWalletScreenProps, ThemedComponentProps & any> {
     constructor(props) {

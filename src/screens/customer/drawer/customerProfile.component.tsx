@@ -1,17 +1,18 @@
-import React, { Component } from "react";
-import { View, Text, RefreshControl, Alert, AsyncStorage, NativeModules } from "react-native";
-import { Avatar, Divider, ThemedComponentProps } from "@ui-kitten/components";
-import { SafeAreaLayout, SaveAreaInset } from "../../../components/safe-area-layout.component";
-import { Toolbar } from "../../../components/toolbar.component";
-import { BackIcon, MenuIcon } from "../../../assets/icons";
-import { Styles } from "../../../assets/styles";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AppConstants, LableText } from "../../../constants";
-import { Content } from "native-base";
-import Axios from "axios";
-import { getFirstInstallTime } from "react-native-device-info";
-import { AppRoute } from "../../../navigation/app-routes";
-import { CustomerProfileScreenProps } from "../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator";
+import { Avatar, Divider, ThemedComponentProps } from '@ui-kitten/components';
+import Axios from 'axios';
+import React, { Component } from 'react';
+import { Alert, AsyncStorage, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+
+import { BackIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, LableText } from '../../../constants';
+import { AppRoute } from '../../../navigation/app-routes';
+import {
+    CustomerProfileScreenProps,
+} from '../../../navigation/customer-navigator/customer-profile/customerProfile.Navigator';
 
 export class CustomerProfileScreen extends Component<CustomerProfileScreenProps, ThemedComponentProps & any> {
     constructor(props) {
@@ -175,7 +176,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
                     style={{ marginTop: -5, marginLeft: -5 }}
                 />
                 <Divider />
-                <Content style={Styles.content}
+                <ScrollView style={Styles.content}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -413,7 +414,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
 
 
                     <View style={Styles.bottomSpace}></View>
-                </Content>
+                </ScrollView>
 
             </SafeAreaLayout>
         );

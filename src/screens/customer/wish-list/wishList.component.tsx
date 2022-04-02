@@ -1,49 +1,37 @@
+import { StackActions } from '@react-navigation/core';
+import { Avatar, Divider, List, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
+import Axios from 'axios';
 import React from 'react';
 import {
-    ListRenderItemInfo, View, StyleSheet, TouchableOpacity,
-    ActivityIndicator, Image, Alert, FlatList, ScrollView, RefreshControl, TextInput, Dimensions, Pressable
+    ActivityIndicator,
+    Alert,
+    AsyncStorage,
+    Dimensions,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import {
-    // Input,
-    Layout,
-    List,
-    ListElement,
-    ListItem,
-    ListItemElement,
-    Text,
-    ThemedComponentProps,
-    withStyles, TabBar,
-    styled, Divider, Avatar, Icon, Button
-} from '@ui-kitten/components';
-import { ScrollableTab, Tab, Item, Container, Content, Tabs, Header, TabHeading, Thumbnail, Input, Label, Footer, FooterTab, Col } from 'native-base';
-import { AppRoute } from '../../../navigation/app-routes';
-import { ProgressBar } from '../../../components/progress-bar.component';
-import { SearchIcon, MinusIcon, RupeeIcon, PlusCircle, BackIcon, CancelIcon, AddIcon, RightArrowIcon, WishIcon } from '../../../assets/icons';
-import { AppConstants } from '../../../constants/AppConstants';
+import Modal from 'react-native-modal';
+import { scale } from 'react-native-size-matters';
+
+import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RupeeIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
 import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants } from '../../../constants/AppConstants';
+import { Color } from '../../../constants/LabelConstants';
+import { AppRoute } from '../../../navigation/app-routes';
 import {
-    SafeAreaLayout,
-    SafeAreaLayoutElement,
-    SaveAreaInset,
-} from '../../../components/safe-area-layout.component';
-import { MenuIcon, ExperienceIcon, LocationIcon, PublicIcon, PencilIcon } from '../../../assets/icons';
-import { any } from 'prop-types';
-import { AsyncStorage } from 'react-native';
-import axios from 'axios';
-import Modal from "react-native-modal";
-import { truncate, open } from 'fs';
+    WishListScreenProps,
+    WishProductDetailScreenProps,
+} from '../../../navigation/customer-navigator/wish-list.navigator';
+
 // import VideoPlayer from 'react-native-video-player';
 // import { FlatList } from 'react-native-gesture-handler';
-import Share from 'react-native-share';
-import { pathToFileURL, fileURLToPath } from 'url';
 // import SwipeHiddenHeader from 'react-native-swipe-hidden-header';
-import Animated from 'react-native-reanimated';
-import { Styles } from '../../../assets/styles'
-import { Color } from '../../../constants/LabelConstants';
-import Axios from 'axios';
-import { WishListScreenProps } from '../../../navigation/customer-navigator/wish-list.navigator';
-import { scale } from 'react-native-size-matters';
-import { StackActions } from '@react-navigation/core';
 // import axios from 'axios';  
 // import Container from '@react-navigation/core/lib/typescript/NavigationContainer';
 
@@ -68,9 +56,10 @@ const PROFILE_IMAGE_MIN_HEIGHT = 40;
 var SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
+type Props = WishProductDetailScreenProps & WishListScreenProps & ThemedComponentProps
 
-export class WishListScreen extends React.Component<WishListScreenProps & ThemedComponentProps, MyState & any> {
-    constructor(props) {
+export class WishListScreen extends React.Component<Props, MyState & any> {
+    constructor(props: Props) {
         super(props)
         this.state = {
             productId: '',
@@ -91,7 +80,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
             productName: ''
         }
         this._onRefresh = this._onRefresh.bind(this);
-        this.navigationProductDetail = this.navigationProductDetail.bind(this);
+        this.navigateProductDetail = this.navigateProductDetail.bind(this);
     }
 
     _onRefresh() {
@@ -197,7 +186,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
     getAllBrand() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+            url: AppConstants.API_BASE_URL + '/api/brand/getallonline/brand/1',
         }).then((response: any) => {
             if (null != response.data) {
                 this.setState({
@@ -252,9 +241,10 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
         // this.props.navigation.navigate(AppRoute.ITEMLIST)
     }
 
-    navigationProductDetail() {
-        this.props.navigation.navigate(AppRoute.PRODUCT_DETAIL)
-    }
+    navigateProductDetail(id, shopId) {
+        const pushAction = StackActions.push(AppRoute.WISH_PRODUCT_DETAIL, { productId: String(id), shopId: String(shopId) });
+        this.props.navigation.dispatch(pushAction)
+      }
 
     continiueShopping() {
         this.props.navigation.navigate(AppRoute.ALLITEM)
@@ -361,12 +351,12 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
 
     renderProduct = ({ item }: any): ListItemElement => (
         item.itemList != null && item.itemList.length > 0 ?
-            <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
+            <ListItem style={{ paddingVertical: -5, borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1) }}>
                 <View style={Styles.product_list_main}>
                     <View style={Styles.product_list_img}>
                         <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
                             <View style={[Styles.all_Item_Image_2, Styles.center]}>
-                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.id + '_' + 1 + "_" + item.shopId + '_product.png' }} style={Styles.product_avatar} />
+                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage }} style={Styles.product_avatar} />
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -375,15 +365,15 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                             <View style={Styles.all_Item_Detail}>
                                 <View style={{ backgroundColor: '#fff', paddingHorizontal: 0 }}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        {null != this.state.allBrand ? this.state.allBrand.map((brand, index) => {
+                                        {/* {null != this.state.allBrand ? this.state.allBrand.map((brand, index) => {
                                             if (brand.id == item.brand) {
-                                                return (
+                                                return ( */}
                                                     <View style={{ width: '80%', flexWrap: 'wrap', flexDirection: 'row' }}>
-                                                        <Text style={{ color: '#000', marginTop: scale(5), fontSize: scale(14) }}>{item.name} {`\n`}{brand.name}</Text>
+                                                        <Text style={{ color: '#000', fontFamily: 'notoserif', fontWeight: '600', marginTop: scale(5), fontSize: scale(12) }}>{item.name}</Text>
                                                     </View>
-                                                );
+                                                {/* );
                                             }
-                                        }) : null}
+                                        }) : null} */}
                                         {/* {this.props.userData != null && this.props.userData.length > 0 ? */}
                                         <View style={[Styles.product_2nd_wish_view]}>
                                             <TouchableOpacity onPress={() => { this.handleDelete(item.id) }}>
@@ -397,19 +387,21 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                                         if (brand.id == item.itemList[0].measurement) {
                                             return (
                                                 <>
-                                                    <Text style={{ color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].unitQuantity} {brand.name}</Text>
+                                                    <Text style={{ fontFamily: 'notoserif', color: Color.COLOR_ITEM_NAME, marginTop: 5 }}>{item.itemList[0].unitQuantity} {brand.name}</Text>
                                                 </>
                                             );
                                         }
                                     }) : null}
-                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginVertical: 5 }}>
-                                        <Text style={{ color: '#000', fontSize: scale(14) }}>Rs. {item.itemList[0].sellingPrice}</Text>
-                                        {item.offerActiveInd ?
-                                            <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
-                                            : null
-                                        }
+                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                        <Text style={Styles.old_price_text}>MRP {item.itemList[0].mrp.toFixed(2)}</Text>
+                                        <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{item.itemList[0].unitSellingPrice}/pc</Text>
+
+                                        <Text style={[{ fontFamily: 'notoserif' }, Styles.offer_price_text]}>
+                                            {Math.round(item.itemList[0].customerSingleOffer)} % Off
+                                        </Text>
                                     </View>
-                                    {null != item.offerActiveInd ? item.offerActiveInd ?
+                                    {item.itemList[0].bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.itemList[0].bundlePrice / item.itemList[0].bundleQuantity).toFixed(2)} / pc (Buy {item.itemList[0].bundleQuantity} or more)</Text>: null}
+                                    {/* {null != item.offerActiveInd ? item.offerActiveInd ?
 
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                                             <Text style={{ color: Color.COLOR }}>{item.offerPercent} % off</Text>
@@ -419,14 +411,16 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                                             <Text style={{ color: Color.COLOR, marginTop: 2.5 }}></Text>
                                             <Text style={{ color: Color.COLOR }}></Text>
                                         </View> : null
-                                    }
+                                    } */}
                                 </View>
 
-                                <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.name, item.itemList) }}>
-                                    <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
-                                        <Text style={{ color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
-                                    </View>
-                                </TouchableOpacity>
+                                <View style={{ justifyContent: 'flex-end', width: '100%', flex: 1, flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.name, item.itemList) }}>
+                                        <View style={[{ backgroundColor: Color.COLOR, marginVertical: 5, alignSelf: 'center', paddingVertical: scale(5), borderRadius: 5, paddingHorizontal: scale(10) }, Styles.center]}>
+                                            <Text style={{ fontFamily: 'notoserif', color: Color.BUTTON_NAME_COLOR }}>Add to cart</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
                                 {/* {item.stock ? item.stock > 0 ?
                                     <TouchableOpacity onPress={() => { this.handleAddToCart(item.id, item.shopId) }}>
                                         <View style={[{ backgroundColor: Color.COLOR, marginVertical: 10, alignSelf: 'center', paddingVertical: 5, borderRadius: 5, width: '90%' }, Styles.center]}>
@@ -456,129 +450,115 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
     renderVariant = ({ item }: any): ListItemElement => {
         var count = 0;
         return (
-            <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
-                {item != null ?
-                    <View style={Styles.variant_main_view}>
-                        <View style={Styles.variant_view_1}>
-                            <View style={Styles.variant_price_view}>
-                                <View style={{ width: '55%', flexDirection: "column" }}>
-                                    {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
-                                        if (brand.id == item.measurement) {
-                                            return (
-                                                <View>
-                                                    <Text style={{ fontSize: scale(15), fontWeight: 'bold', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
-                                                </View>
-                                            );
-                                        }
-                                    }) : null}
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={Styles.price_text}><RupeeIcon fontSize={scale(18)} /> {item.unitSellingPrice.toFixed(2)}</Text>
-                                        {item.customerMarginPercent > 0 ? <Text style={Styles.old_price_text}><RupeeIcon fontSize={scale(14)} /> {item.mrp.toFixed(2)}</Text> : null}
-                                    </View>
-
-                                    {item.customerMarginPercent > 0 ?
-                                        <View>
-                                            <Text style={Styles.offer_price_text}>
-                                                {Math.round(item.customerSingleOffer)} % Off
-                                            </Text>
-                                        </View>
-                                        : null
-                                    }
-                                </View>
-                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-
-                                    {item.stock ? item.stock > 0 ?
-                                        this.state.logedIn ?
-                                            this.state.allCart != '' && this.state.allCart.length > 0 ?
-                                                this.state.allCart[0].productList != null && this.state.allCart[0].productList.length > 0 ?
-                                                    this.state.allCart[0].productList.map((data, index) => {
-                                                        if (data.productId == item.id) {
-                                                            if (count == 0) {
-                                                                count++
-                                                                return (
-                                                                    <>
-                                                                        <View style={Styles.cart_quantity_view}>
-                                                                            <Pressable onPress={() => { this.handleDecrease(item.id, data.cartId, data.productQuantity) }} style={Styles.cart_button}>
-                                                                                <Text style={Styles.cart_button_text}><MinusIcon /></Text>
-                                                                            </Pressable>
-
-                                                                            <View style={Styles.cart_quantity_text_view}>
-                                                                                <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
-                                                                            </View>
-
-                                                                            <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId, data.productQuantity, item.stock) }}>
-                                                                                <Text style={Styles.cart_button_text} ><AddIcon /></Text>
-                                                                            </Pressable>
-                                                                        </View>
-                                                                    </>
-                                                                )
-                                                            }
-                                                        } else if (count < 1 && index == this.state.allCart[0].productList.length - 1) {
-                                                            return (
-                                                                <View style={Styles.cart_quantity_view}>
-                                                                    <Pressable onPress={() => { this.addToCart(item.id) }}>
-                                                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                                                            <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
-                                                                        </View>
-                                                                    </Pressable>
-                                                                </View>
-                                                            )
-                                                        }
-                                                    }) :
-                                                    <View style={Styles.cart_quantity_view}>
-                                                        <Pressable onPress={() => { this.addToCart(item.id) }}>
-                                                            <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                                                <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
-                                                            </View>
-                                                        </Pressable>
-                                                    </View> :
-                                                <View style={Styles.cart_quantity_view}>
-                                                    <Pressable onPress={() => { this.addToCart(item.id) }}>
-                                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                                            <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
-                                                        </View>
-                                                    </Pressable>
-                                                </View> :
-                                            <View style={Styles.cart_quantity_view}>
-                                                <Pressable onPress={() => { this.addToCart(item.id) }}>
-                                                    <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
-                                                    </View>
-                                                </Pressable>
-                                            </View> :
-                                        <View style={Styles.cart_quantity_view}>
-                                            <Pressable onPress={() => { this.addToCart(item.id) }}>
-                                                <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                                    <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
-                                                </View>
-                                            </Pressable>
-                                        </View> :
-                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                            <Text style={{ color: 'white' }}>Out of Stock</Text>
-                                        </View>
-                                    }
-                                </View>
+          <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+            {item != null ?
+              <View style={Styles.variant_main_view}>
+                <View style={Styles.variant_view_1}>
+                  <View style={Styles.variant_price_view}>
+                    <View style={{ width: '55%', flexDirection: "column" }}>
+                      {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((brand, index) => {
+                        if (brand.id == item.measurement) {
+                          return (
+                            <View>
+                              <Text style={{ fontSize: scale(14), fontFamily: 'notoserif', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
                             </View>
-                            {item.offersAvailable ?
-                                <View>
-                                    <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
-                                </View> : null
-                            }
-                        </View>
-                        {
-                            item.offersAvailable ?
-                                <View>
-                                    <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
-                                </View> : null
+                          );
                         }
-                    </View >
-                    :
-                    <ActivityIndicator size='large' color='green' />
-                }
-
-            </ListItem>
+                      }) : null}
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text style={Styles.old_price_text}>MRP {item.mrp.toFixed(2)}</Text>
+                        <Text style={Styles.price_text}><RupeeIcon fontSize={scale(14)} />{item.unitSellingPrice.toFixed(2)}</Text>
+                      </View>
+                      <View>
+                        <Text style={Styles.offer_price_text}>
+                          {Math.round(item.customerSingleOffer)} % Off
+                        </Text>
+                        {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)} / pc (Buy {item.bundleQuantity} or more)</Text>: null}
+                      </View>
+                    </View>
+                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+    
+                      {item.stock ? item.stock > 0 ?
+                        this.state.logedIn ?
+                          this.state.allCart != '' && this.state.allCart.length > 0 ?
+                            this.state.allCart[0].productList != null && this.state.allCart[0].productList.length > 0 ?
+                              this.state.allCart[0].productList.map((data, index) => {
+                                if (data.productId == item.id) {
+                                  if (count == 0) {
+                                    count++
+                                    return (
+                                      <>
+                                        <View style={Styles.cart_quantity_view}>
+                                          <Pressable onPress={() => { this.handleDecrease(item.id, data.cartId, data.productQuantity) }} style={Styles.cart_button}>
+                                            <Text style={Styles.cart_button_text}><MinusIcon /></Text>
+                                          </Pressable>
+    
+                                          <View style={Styles.cart_quantity_text_view}>
+                                            <Text style={Styles.cart_quantity_text}>{data.productQuantity}</Text>
+                                          </View>
+    
+                                          <Pressable style={Styles.cart_button} onPress={() => { this.handleIncrease(item.id, data.cartId, data.productQuantity, item.stock) }}>
+                                            <Text style={Styles.cart_button_text} ><AddIcon /></Text>
+                                          </Pressable>
+                                        </View>
+                                      </>
+                                    )
+                                  }
+                                } else if (count < 1 && index == this.state.allCart[0].productList.length - 1) {
+                                  return (
+                                    <View style={Styles.cart_quantity_view}>
+                                      <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                          <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                        </View>
+                                      </Pressable>
+                                    </View>
+                                  )
+                                }
+                              }) :
+                              <View style={Styles.cart_quantity_view}>
+                                <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                  <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                  </View>
+                                </Pressable>
+                              </View> :
+                            <View style={Styles.cart_quantity_view}>
+                              <Pressable onPress={() => { this.addToCart(item.id) }}>
+                                <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                  <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                                </View>
+                              </Pressable>
+                            </View> :
+                          <View style={Styles.cart_quantity_view}>
+                            <Pressable onPress={() => { this.addToCart(item.id) }}>
+                              <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                              </View>
+                            </Pressable>
+                          </View> :
+                        <View style={Styles.cart_quantity_view}>
+                          <Pressable onPress={() => { this.addToCart(item.id) }}>
+                            <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
+                              <Text style={{ color: 'white', padding: scale(5) }} >Add To Cart</Text>
+                            </View>
+                          </Pressable>
+                        </View> :
+                        <View style={[Styles.cart_quantity_view, { paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }]}>
+                          <Text style={{ color: 'white' }}>Out of Stock</Text>
+                        </View>
+                      }
+                    </View>
+                  </View>                 
+                </View>               
+              </View >
+              :
+              <ActivityIndicator size='large' color='green' />
+            }
+    
+          </ListItem>
         )
-    }
+      }
 
     render() {
         const { allProduct, temp_variant, variantVisible, productName, single, shopName, allCategory, allMeasurement, wishList, allBrand, selectedBrand, selectedCategory } = this.state;
@@ -589,7 +569,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                 <Modal isVisible={variantVisible}>
                     <View style={Styles.variant_modal}>
                         <View style={Styles.varient_modalHeader}>
-                            <Text style={{ fontSize: scale(20), fontWeight: '400' }}>{productName}</Text>
+                            <Text style={{ fontFamily: 'notoserif', fontSize: scale(14), fontWeight: '600' }}>{productName}</Text>
                             <TouchableOpacity>
                                 <Text onPress={() => { this.setState({ variantVisible: false }); }}><CancelIcon fontSize={25} /></Text>
                             </TouchableOpacity>

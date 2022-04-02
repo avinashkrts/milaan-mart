@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
-import { Alert, View, Text, Image, TextInput, TouchableOpacity, PermissionsAndroid } from 'react-native';
-import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
-import { Content } from 'native-base';
-import { AppRoute } from '../../navigation/app-routes';
-import { EyeIcon, EyeOffIcon, } from '../../assets/icons';
-import axios from 'axios';
-import { Styles } from '../../assets/styles'
-import { AppConstants, Color, LableText, Placeholder } from '../../constants';
-import DeviceInfo from 'react-native-device-info';
-import { scale } from 'react-native-size-matters';
-import Geolocation from 'react-native-geolocation-service';
-import { StackActions } from '@react-navigation/routers';
-import { SignUpScreenProps } from '../../navigation/auth-navigation/auth.navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from '@react-navigation/routers';
+import axios from 'axios';
+import React, { Component } from 'react';
+import { Alert, Image, PermissionsAndroid, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
+import Geolocation from 'react-native-geolocation-service';
+import { scale } from 'react-native-size-matters';
+
+import { EyeIcon, EyeOffIcon } from '../../assets/icons';
+import { Styles } from '../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../components/safe-area-layout.component';
+import { AppConstants, Color, LableText, Placeholder } from '../../constants';
+import { AppRoute } from '../../navigation/app-routes';
+import { SignUpScreenProps } from '../../navigation/auth-navigation/auth.navigator';
 
 const data = [
   { text: 'Candidate' },
@@ -136,7 +136,7 @@ export class SignUpScreen extends Component<Props, State, any> {
       <SafeAreaLayout
         style={Styles.safeArea}
         insets={SaveAreaInset.TOP} >
-        < Content style={[Styles.content,{backgroundColor: '#ffffff'}]} >
+        < ScrollView style={[Styles.content,{backgroundColor: '#ffffff'}]} >
           <View>
             <Image
               source={require('../../assets/logo.png')}
@@ -206,7 +206,7 @@ export class SignUpScreen extends Component<Props, State, any> {
 
           </View>
           <View style={Styles.bottomSpace}></View>
-        </Content>
+        </ScrollView>
       </SafeAreaLayout >
     );
   }

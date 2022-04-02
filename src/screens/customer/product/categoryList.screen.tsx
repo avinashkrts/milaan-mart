@@ -1,35 +1,36 @@
-import React, { Component } from 'react';
-import { ActivityIndicator, Alert, BackHandler, Image, Pressable, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
-import { Toolbar } from '../../../components/toolbar.component';
-import {
-    SafeAreaLayout,
-    SaveAreaInset,
-} from '../../../components/safe-area-layout.component';
-import Modal from "react-native-modal";
-import { AddIcon, CancelIcon, MenuIcon, MinusIcon, PeopleIcon, RupeeIcon, WishIcon } from '../../../assets/icons';
-import { CategoryListScreenProps } from '../../../navigation/customer-navigator/shop-list.navigator';
-import { AppState } from '../../../redux/store';
-import { ThunkDispatch } from "redux-thunk";
-import { bindActionCreators } from "redux";
-import { connect, ConnectedProps } from "react-redux";
-import { AppRoute } from '../../../navigation/app-routes';
-import { LableText } from '../../../constants/LabelConstants';
-import { AppActions } from '../../../redux/interfaces';
-import { Brand } from '../../../redux/modules/brand.modules'
-import { fetchBrandByShopId } from '../../../redux/action/brandAction';
-import { AppConstants, Color } from '../../../constants';
-import { fetchVarientByShopId } from '../../../redux/action/varientAction';
-import { Varient } from '../../../redux/modules/varient.modules';
-import { Styles } from '../../../assets/styles';
-import { scale } from 'react-native-size-matters';
-import { Measurement } from '../../../redux/modules/measurement.modules';
-import { fetchMeasurementByShopId } from '../../../redux/action/measurementAction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions, StackActions } from '@react-navigation/core';
+import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
 import axios from 'axios';
+import React, { Component } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    BackHandler,
+    Image,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Modal from 'react-native-modal';
+import { scale } from 'react-native-size-matters';
+
+import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RupeeIcon, WishIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { CategoryCard } from '../../../components/categoryCard';
+import { DropDown, MyDropdown, Parent } from '../../../components/drop-down';
+import { Child, Item } from '../../../components/drop-item';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants, Color } from '../../../constants';
+import { LableText } from '../../../constants/LabelConstants';
+import { AppRoute } from '../../../navigation/app-routes';
+import { CategoryListScreenProps } from '../../../navigation/customer-navigator/shop-list.navigator';
 import { OfferData } from './offerData';
-import { Content } from 'native-base';
 
 type Props = CategoryListScreenProps & ThemedComponentProps
 
@@ -170,7 +171,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
 
     async componentDidMount() {
         this.handleBackButton();
-        this.initialData();
+        // this.initialData();
         this.props.navigation.addListener('blur', () => {
             if (this.backHandler) {
                 this.backHandler.remove();
@@ -230,7 +231,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
     getAllCategory() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/category/getcategoryforuserbyshopid/' + AppConstants.SHOP_ID,
+            url: AppConstants.API_BASE_URL + '/api/category/getallonline/1',
         }).then((response) => {
             if (null != response.data) {
                 this.setState({
@@ -248,7 +249,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
 
     _onRefresh() {
         this.setState({ refreshing: true });
-        this.componentDidMount().then(() => {
+        this.initialData().then(() => {
             this.setState({ refreshing: false });
         });
     }
@@ -322,7 +323,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
     getAllSubCategory() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/subcategory/getall'
+            url: AppConstants.API_BASE_URL + '/api/subcategory/getallonline/byshopid/MILAAN63/1'
         }).then((response: any) => {
             if (null != response.data) {
                 this.setState({
@@ -338,7 +339,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
     getAllBrand() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/brand/getbrandbyshopid/' + AppConstants.SHOP_ID,
+            url: AppConstants.API_BASE_URL + '/api/brand/getallonline/brand/1',
         }).then((response: any) => {
             if (null != response.data) {
                 this.setState({
@@ -806,7 +807,15 @@ export class CategoryListScreen extends Component<Props & any, any> {
                     onBackPress={this.props.navigation.toggleDrawer}
                 />
                 <Divider />
-                <Content
+
+                {/* <MyDropdown
+                    categoryClick={() => { }}
+                    name="asd"
+                >
+                    <Text>Avinash</Text>
+                </MyDropdown> */}               
+
+                <ScrollView
                     style={Styles.content}
                     refreshControl={
                         <RefreshControl
@@ -831,19 +840,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             {null != allCategory ?
                                 allCategory.map((item, index) => {
                                     return (
-                                        <Pressable key={'cat' + index} style={Styles.category_card1} onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
-                                            <View style={[Styles.cat_card_img, Styles.center]}>
-                                                <Image
-                                                    resizeMethod='auto'
-                                                    resizeMode='stretch'
-                                                    source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + item.id + "_" + item.shopId + '_category.png' }}
-                                                    style={Styles.cat_card_avatar1}
-                                                />
-                                            </View>
-                                            <View style={Styles.cat_card_title_view}>
-                                                <Text style={Styles.cat_card_title} > {item.name} </Text>
-                                            </View>
-                                        </Pressable>
+                                        <CategoryCard
+                                            categoryClick={(id, shopId) => this.navigateProductDetail(id, shopId)}
+                                            index={index}
+                                            data={item}
+                                        />
                                     )
                                 })
                                 // <>
@@ -860,25 +861,20 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                 : null}
                         </View>
                     </View>
-                </Content>
+                </ScrollView>
                 {isCart ?
-                    <>
-                        {isEnd ?
-                            <ActivityIndicator size="large" /> :
-                            null}
-                        <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(10) }]} onPress={() => { this.navigateToCart() }}>
-                            <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 10 }]}>
-                                <Text style={Styles.bottom_view_cart_text}>View Cart </Text>
-                                <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: -30 }]}>
-                                    <Text style={{ fontSize: scale(13), color: Color.COLOR }}>{allCart != null && allCart != '' ? allCart[0].productList.length : 0}</Text>
-                                </View>
+                    <Pressable style={[Styles.bottom_tab_bar, { flexDirection: 'row', paddingTop: scale(0) }]} onPress={() => { this.navigateToCart() }}>
+                        <View style={[Styles.center, { flexDirection: 'row', width: '50%', paddingTop: 0 }]}>
+                            <Text style={Styles.bottom_view_cart_text}>View Cart </Text>
+                            <View style={[Styles.center, { backgroundColor: Color.BUTTON_NAME_COLOR, width: scale(30), height: scale(30), borderRadius: 20, marginTop: 0 }]}>
+                                <Text style={{ fontSize: scale(13), color: Color.COLOR }}>{allCart != null && allCart != '' ? allCart[0].productList.length : 0}</Text>
                             </View>
-                            <View style={{ height: '100%', width: scale(1), backgroundColor: Color.BUTTON_NAME_COLOR }} />
-                            <View style={[Styles.center, { width: '50%' }]}>
-                                <Text style={{ fontSize: scale(15), color: Color.BUTTON_NAME_COLOR }}>Rs. {allCart != null && allCart != '' ? allCart[0].payableAmount : 0}</Text>
-                            </View>
-                        </Pressable>
-                    </>
+                        </View>
+                        <View style={{ height: '100%', width: scale(1), backgroundColor: Color.BUTTON_NAME_COLOR }} />
+                        <View style={[Styles.center, { width: '50%' }]}>
+                            <Text style={{ fontSize: scale(15), color: Color.BUTTON_NAME_COLOR }}>Rs. {allCart != null && allCart != '' ? allCart[0].payableAmount : 0}</Text>
+                        </View>
+                    </Pressable>
                     : null
                 }
             </SafeAreaLayout>

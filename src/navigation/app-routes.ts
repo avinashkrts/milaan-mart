@@ -7,6 +7,7 @@ export enum AppRoute {
     CATEGORY_LIST = "CATEGORY_LIST",
     PRODUCT_LIST = "PRODUCT_LIST",
     CUSTOMER_PRODUCT_LIST = "Customer_Product_List",
+    CUSTOMER_PRODUCT_DETAIL = "Customer_Product_Detail",
     CUSTOMER_SHOP_LIST = "Customer_Shop_List",
     CUSTOMER_CATEGORY_LIST = "CUSTOMER_CATEGORY_LIST",
     CUSTOMER_CART = "CUSTOMER_CART",
@@ -25,6 +26,7 @@ export enum AppRoute {
     ADD_CUSTOMER_IMAGE = "ADD_CUSTOMER_IMAGE",
     CUSTOMER_ORDER = "CUSTOMER_ORDER",
     CUSTOMER_ORDER_DETAIL = "CUSTOMER_ORDER_DETAIL",
+    WISH_PRODUCT_DETAIL = "WISH_PRODUCT_DETAIL",
     
     /*----------------------------- Auth Navigator Constants -----------------------------*/
     AUTH = "Auth",

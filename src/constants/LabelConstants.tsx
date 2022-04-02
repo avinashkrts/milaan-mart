@@ -2,7 +2,8 @@ import { AsyncStorage } from "react-native";
 
 /*------------------------------------------------------------COLOR CODE------------------------------------------------------------*/
 export class Color {
-    public static readonly COLOR = '#0074d3';
+    // public static readonly COLOR = '#0074d3';
+    public static readonly COLOR = '#ff6363';
     public static readonly BUTTON_NAME_COLOR = '#fff';
     public static readonly COLOR_CUSTOMER = '#501B1D';
     public static readonly COLOR_ITEM_NAME = '#777777';
@@ -15,6 +16,11 @@ export class Color {
     public static readonly BLACK = '#000000';
     public static readonly CARD_BORDER = '#d2f7ef';
     public static readonly CARD_BACKGROUND = '#ebf7f5';
+    public static readonly DROP_DOWN_BACKGROUND = '#9dc4f2';
+    public static readonly DESCRIPTION_BACKGROUND = '#94fffa';
+    public static readonly DESCRIPTION_OPTION_BACKGROUND = '#9dc4f2';
+
+    public static readonly OFFER = '#285c36';
 }
 
 /*------------------------------------------------------------PADDING CODE------------------------------------------------------------*/
@@ -106,7 +112,7 @@ export class LableText {
     public static readonly TRANSACTION_HISTORY = 'Transaction History';
     public static readonly CHECK_HISTORY = 'Check History';
     public static readonly PAYMENT = 'Payment';
-    public static readonly CART = 'Cart';
+    public static readonly CART = 'Add To Cart';
     public static readonly BUY = 'Buy';
     public static readonly SKIP = 'Skip';
     public static readonly MOBILE = 'Mobile Number.';

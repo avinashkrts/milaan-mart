@@ -1,42 +1,31 @@
+import { Picker } from '@react-native-picker/picker';
+import { CommonActions, StackActions } from '@react-navigation/core';
+import { Avatar, Divider, ListItem, ListItemElement, Text, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
+import moment from 'moment';
+import { Radio } from 'native-base';
 import React from 'react';
 import {
-    View,
-    TouchableOpacity,
     ActivityIndicator,
     Alert,
+    AsyncStorage,
+    Dimensions,
     RefreshControl,
-    Dimensions
+    ScrollView,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import {
-    ListItem,
-    ListItemElement,
-    Text,
-    ThemedComponentProps,
-    Divider,
-    Avatar
-} from '@ui-kitten/components';
-import {
-    Radio,
-    Content
-} from 'native-base';
-import { AppRoute } from '../../../navigation/app-routes';
-import { MinusIcon, RupeeIcon, BackIcon, CancelIcon, AddIcon } from '../../../assets/icons';
-import { AppConstants } from '../../../constants/AppConstants';
-import { Toolbar } from '../../../components/toolbar.component';
-import {
-    SafeAreaLayout,
-    SaveAreaInset,
-} from '../../../components/safe-area-layout.component';
-import { AsyncStorage } from 'react-native';
-import axios from 'axios';
-import { Styles } from '../../../assets/styles';
-import { Color, Contents } from '../../../constants/LabelConstants';
 import DatePicker from 'react-native-datepicker';
-import { CustomerCartScreenProps } from '../../../navigation/customer-navigator/customerHome.navigator';;
 import RazorpayCheckout from 'react-native-razorpay';
-import moment from 'moment';
 import { scale } from 'react-native-size-matters';
-import { StackActions, CommonActions } from '@react-navigation/core';
+
+import { AddIcon, BackIcon, CancelIcon, MinusIcon, RupeeIcon } from '../../../assets/icons';
+import { Styles } from '../../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
+import { Toolbar } from '../../../components/toolbar.component';
+import { AppConstants } from '../../../constants/AppConstants';
+import { Color, Contents } from '../../../constants/LabelConstants';
+import { AppRoute } from '../../../navigation/app-routes';
 import { PaymentScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
 
 type MyState = {
@@ -68,7 +57,9 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         this.state = {
             addressData: [],
             totalAmt: '',
+            selectedSlot: '',
             cartId: '',
+            selectedPayment: '',
             selfPick: false,
             cashDelivery: true,
             payOnline: false,
@@ -93,6 +84,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             cartData: [],
             adminData: [],
             insideShop: false,
+            selectedDelivery: '',
             orderPlacing: false
         }
         this.backFunction = this.backFunction.bind(this)
@@ -236,7 +228,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         addressId: response.data.id
                     })
                 } else {
-                this.props.navigation.navigate(AppRoute.CART_ADDRESS)
+                    this.props.navigation.navigate(AppRoute.CART_ADDRESS)
                 }
             }, (error) => {
                 // Alert.alert("Please add your address.")
@@ -258,14 +250,12 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         const { homeId, selfId } = this.state;
         if (type === 'HOME') {
             this.setState({
-                homeDelivery: true,
-                selfPick: false,
+                selectedDelivery: type,
                 orderType: homeId
             })
         } else if (type === 'SELF') {
             this.setState({
-                homeDelivery: false,
-                selfPick: true,
+                selectedDelivery: type,
                 orderType: selfId
             })
         }
@@ -275,14 +265,12 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         const { cashId, onlineId } = this.state;
         if (type === 'CASH') {
             this.setState({
-                cashDelivery: true,
-                payOnline: false,
+                selectedPayment: type,
                 paymentType: cashId
             })
         } else if (type === 'PAYON') {
             this.setState({
-                cashDelivery: false,
-                payOnline: true,
+                selectedPayment: type,
                 paymentType: onlineId
             })
         }
@@ -507,7 +495,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
     )
 
     render() {
-        const { cartData, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
+        const { cartData, paymentType,selectedSlot, selectedDelivery, selectedPayment, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
@@ -519,7 +507,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     style={{ marginTop: -5, marginLeft: -5 }}
                 />
                 <Divider />
-                <Content style={[Styles.cart_content, { backgroundColor: '#fff' }]} showsVerticalScrollIndicator={false}
+                <ScrollView style={[Styles.cart_content, { backgroundColor: '#fff' }]} showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.refreshing}
@@ -585,7 +573,20 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         <View style={[Styles.center]}>
                             <View style={[Styles.payment_box_view]}>
                                 <Text style={Styles.payment_selection_header}>How do you want this order?</Text>
-                                <View style={Styles.payment_selection_view}>
+
+                                <View style={{ borderColor: Color.COLOR, borderWidth: 1, borderStyle: 'solid', }}>
+                                    <Picker
+                                        mode="dropdown"
+                                        style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
+                                        selectedValue={selectedDelivery}
+                                        onValueChange={(value) => { this.handleOrderType(value) }}
+                                    >
+                                        <Picker.Item key="PICK1" label="Home Delivery" value="HOME" />
+                                        <Picker.Item key="PICK2" label="Self Pickup" value="SELF" />
+                                    </Picker>
+                                </View>
+
+                                {/* <View style={Styles.payment_selection_view}>
                                     <View style={{ flexDirection: 'row', marginRight: scale(20) }}>
                                         <Radio selected={homeDelivery} selectedColor='#501B1D' onPress={() => { this.handleOrderType('HOME') }} />
                                         <Text style={Styles.payment_selection_text}>Home Delivery</Text>
@@ -595,7 +596,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         <Radio selected={selfPick} selectedColor='#501B1D' onPress={() => { this.handleOrderType('SELF') }} />
                                         <Text style={Styles.payment_selection_text}>Self Pickup</Text>
                                     </View>
-                                </View>
+                                </View> */}
                             </View>
                         </View> :
                         null}
@@ -603,16 +604,16 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     <View style={[Styles.center]}>
                         <View style={[Styles.payment_box_view]}>
                             <Text style={Styles.payment_selection_header}>How do you want to pay?</Text>
-                            <View style={Styles.payment_selection_view}>
-                                <View style={{ flexDirection: 'row', marginRight: scale(20) }}>
-                                    <Radio selected={cashDelivery} selectedColor='#501B1D' onPress={() => { this.handlePaymentType('CASH') }} />
-                                    <Text style={Styles.payment_selection_text}>Cash</Text>
-                                </View>
-
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Radio selected={payOnline} selectedColor='#501B1D' onPress={() => { this.handlePaymentType('PAYON') }} />
-                                    <Text style={Styles.payment_selection_text}>Pay Online</Text>
-                                </View>
+                            <View style={{ borderColor: Color.COLOR, borderWidth: 1, borderStyle: 'solid', }}>
+                                <Picker
+                                    mode="dropdown"
+                                    style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
+                                    selectedValue={selectedPayment}
+                                    onValueChange={(value) => { this.handlePaymentType(value) }}
+                                >
+                                    <Picker.Item key="PAY1" label="Cash" value="CASH" />
+                                    <Picker.Item key="PAY2" label="Pay Online" value="PAYON" />
+                                </Picker>
                             </View>
                         </View>
                     </View>
@@ -620,6 +621,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         <View style={[Styles.center]}>
                             <View style={[Styles.payment_box_view]}>
                                 <Text style={Styles.payment_selection_header}>Delivery Slot</Text>
+
                                 <View style={Styles.payment_selection_view}>
                                     <DatePicker
                                         style={{ width: '100%' }}
@@ -645,13 +647,28 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         onDateChange={(date) => { this.setState({ slotDate: date }) }}
                                     />
                                 </View>
+
+                                <View style={{marginTop: scale(20), borderColor: Color.COLOR, borderWidth: 1, borderStyle: 'solid', }}>
+                                    <Picker
+                                        mode="dropdown"
+                                        style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
+                                        selectedValue={selectedSlot}
+                                        onValueChange={(value) => { this.setState({ selectedSlot: value }) }}
+                                    >
+                                        <Picker.Item key="DELI1" label="7AM to 10AM" value="7_10_AM" />
+                                        <Picker.Item key="DELI2" label="12AM to 3PM" value="12_3_PM" />
+                                        <Picker.Item key="DELI3" label="3PM to 6PM" value="3_6_PM" />
+                                        <Picker.Item key="DELI4" label="6PM to 9PM" value="6_9_PM" />
+                                        <Picker.Item key="DELI5" label="Within one hour" value="1_HRS" />
+                                    </Picker>
+                                </View>
                             </View>
                         </View> : null}
 
                     {/* <List data={productList}
                         renderItem={this.renderCart}
                     /> */}
-                </Content>
+                </ScrollView>
                 {orderPlacing ?
                     <View>
                         <View style={[Styles.cart_bottom_box_button, Styles.center]} >

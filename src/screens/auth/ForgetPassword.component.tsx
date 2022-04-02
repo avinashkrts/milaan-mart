@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
-import { View, Alert, Image, Text, } from 'react-native';
-import { ForgetPasswordScreenProps } from '../../navigation/auth.navigator';
-import { AppRoute } from '../../navigation/app-routes';
-import { Placeholder, LableText, AppConstants } from '../../constants';
-import { AsyncStorage } from 'react-native';
 import axios from 'axios';
-import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
-import { Content } from 'native-base';
+import React, { Component } from 'react';
+import { Alert, AsyncStorage, Image, ScrollView, Text, View } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import { Styles } from '../../assets/styles'
 import { scale } from 'react-native-size-matters';
+
+import { Styles } from '../../assets/styles';
+import { SafeAreaLayout, SaveAreaInset } from '../../components/safe-area-layout.component';
+import { AppConstants, LableText, Placeholder } from '../../constants';
+import { AppRoute } from '../../navigation/app-routes';
+import { ForgetPasswordScreenProps } from '../../navigation/auth.navigator';
 
 interface State {
     email: string | undefined;
@@ -93,7 +92,7 @@ export class ForgetPasswordScreen extends Component<ForgetPasswordScreenProps, a
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP} >
-                < Content style={[Styles.content, { backgroundColor: '#e6e6e6' }]} >
+                < ScrollView style={[Styles.content, { backgroundColor: '#e6e6e6' }]} >
                     <View>
                         <Image
                             source={require('../../assets/logo.png')}
@@ -125,7 +124,7 @@ export class ForgetPasswordScreen extends Component<ForgetPasswordScreenProps, a
                         </TouchableOpacity>
                     </View>
                     <View style={Styles.bottomSpace}></View>
-                </Content>
+                </ScrollView>
 
             </SafeAreaLayout >
         );
