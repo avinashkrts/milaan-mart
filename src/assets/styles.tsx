@@ -211,7 +211,7 @@ export const Styles = ScaledSheet.create({
 
   /*---------------------------------------------This Style is for All Category Page--------------------------------------------------------- */
   category_card: {
-    width: '220@s',
+    width: '100%',
     height: '120@s',
     borderColor: Color.SILVER,
     borderWidth: 1,
@@ -224,7 +224,7 @@ export const Styles = ScaledSheet.create({
 
   cat_card_avatar: {
     height: '118@s',
-    width: '218@s',
+    width: '100%',
     borderRadius: 5
   },
 
@@ -256,13 +256,13 @@ export const Styles = ScaledSheet.create({
     paddingVertical: '10@s',
     paddingHorizontal: '5@s',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
 
   cat_card_title: {
-   color: Color.BLACK,
-   textAlign: 'center',
-   fontSize: '11@s'
+    color: Color.BLACK,
+    textAlign: 'center',
+    fontSize: '11@s'
   },
 
   /*---------------------------------------------This Style is for All Item Page--------------------------------------------------------- */
@@ -297,8 +297,60 @@ export const Styles = ScaledSheet.create({
 
   product_nav_button_selected: {
     backgroundColor: Color.COLOR,
+    marginHorizontal: '3@s',
     padding: '1@s',
-    borderRadius: '20@s'
+    borderRadius: '3@s'
+  },
+
+  selectedTriangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderTopWidth: '10@s',
+    borderRightWidth: '5@s',
+    borderBottomWidth: 0,
+    borderLeftWidth: '5@s',
+    borderTopColor: '#db3246',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: 'transparent'
+  },
+
+
+  product_nav_button_selected0: {
+    backgroundColor: '#c7e6fc',
+    marginHorizontal: '3@s',
+    padding: '1@s',
+    borderRadius: '3@s'
+  },
+
+  product_nav_button_selected1: {
+    backgroundColor: '#ebd7fc',
+    marginHorizontal: '3@s',
+    padding: '1@s',
+    borderRadius: '3@s'
+  },
+
+  product_nav_button_selected2: {
+    backgroundColor: '#f4fce3',
+    marginHorizontal: '3@s',
+    padding: '1@s',
+    borderRadius: '3@s'
+  },
+
+  product_nav_button_selected3: {
+    backgroundColor: '#fce3e3',
+    marginHorizontal: '3@s',
+    padding: '1@s',
+    borderRadius: '3@s'
+  },
+
+  product_nav_button_selected4: {
+    backgroundColor: '#e3fce8',
+    marginHorizontal: '3@s',
+    padding: '1@s',
+    borderRadius: '3@s'
   },
 
   product_nav_button: {
@@ -308,18 +360,18 @@ export const Styles = ScaledSheet.create({
   },
 
   product_nav_button_selected_text: {
-    color: Color.BUTTON_NAME_COLOR,
+    color: 'white',
     paddingVertical: '5@s',
     paddingHorizontal: '10@s',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     fontSize: '12@s'
   },
 
   product_nav_button_text: {
-    color: Color.COLOR,
+    color: 'black',
     fontSize: '12@s',
     paddingVertical: '5@s',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     paddingHorizontal: '10@s'
   },
 
@@ -570,7 +622,7 @@ export const Styles = ScaledSheet.create({
     paddingVertical: 10,
   },
   /*---------------------------------------------DROP DOWN Style--------------------------------------------------------- */
-  dropdown_text:{
+  dropdown_text: {
     color: 'black',
     fontSize: '14@s',
     paddingVertical: '8@s',
@@ -579,18 +631,18 @@ export const Styles = ScaledSheet.create({
     fontWeight: '600',
     borderBottomWidth: '1@s',
     backgroundColor: '#cde1f7'
-},
+  },
 
-dropdown_selected_text:{
-  color: 'white',
-  fontSize: '14@s',
-  paddingVertical: '8@s',
-  paddingHorizontal: '5@s',
-  borderBottomColor: 'black',
-  fontWeight: '600',
-  borderBottomWidth: '1@s',
-  backgroundColor: Color.COLOR
-},
+  dropdown_selected_text: {
+    color: 'white',
+    fontSize: '14@s',
+    paddingVertical: '8@s',
+    paddingHorizontal: '5@s',
+    borderBottomColor: 'black',
+    fontWeight: '600',
+    borderBottomWidth: '1@s',
+    backgroundColor: Color.COLOR
+  },
 
   /*---------------------------------------------This Style is for Cart--------------------------------------------------------- */
 
@@ -2237,4 +2289,17 @@ dropdown_selected_text:{
     height: 80
   },
 
+  /*---------------------------------------------Trangle button selection-------------------------------------------------------------- */
+
+  talkBubble: {
+    backgroundColor: "transparent",
+    alignItems: 'center'
+  },
+  talkBubbleSquare: {
+    width: 80,
+    height: 30,
+    backgroundColor: "red",
+    borderRadius: '3@s',
+  },
+ 
 })

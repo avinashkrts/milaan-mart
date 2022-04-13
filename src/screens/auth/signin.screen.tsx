@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { Component } from "react";
-import { Alert, Image, ScrollView, Text, TextInput, PermissionsAndroid, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TextInput, PermissionsAndroid, TouchableOpacity, View, BackHandler } from "react-native";
 import { scale } from "react-native-size-matters";
 import { EyeIcon, EyeOffIcon } from "../../assets/icons";
 import { Styles } from "../../assets/styles";
@@ -23,12 +23,13 @@ interface State {
 }
 
 export class SignInScreen extends Component<SignInScreenProps & any, State & any> {
+    backHandler: any;
     constructor(props: any) {
         super(props);
 
         this.state = {
-            emailId: '1111111111',
-            pwd: '11111111',
+            emailId: '',
+            pwd: '',
             passwordVisible: true,
             allUserType: [],
             deviceId: '',
@@ -47,9 +48,57 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
         this.navigateSignUp = this.navigateSignUp.bind(this);
     }
 
+    backAction = () => {
+        Alert.alert("Alert!", LableText.CUS_HOME_PAGE, [
+            {
+                text: "Cancel",
+                onPress: () => null,
+                style: "cancel"
+            },
+            {
+                text: "YES", onPress: () => {
+                    BackHandler.exitApp()
+                }
+
+            }
+        ]);
+        return true;
+    };
+
+    componentWillUnmount() {
+        if (this.backHandler) {
+            this.backHandler.remove();
+        }
+    }
+
+    UNSAFE_componentWillMount() {
+        this.props.navigation.addListener('focus', () => {
+            this.backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                this.backAction
+            );
+        })
+    }
+
+    handleBackButton() {
+        this.props.navigation.addListener('focus', () => {
+            this.backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                this.backAction
+            );
+        })
+    }
+
     async componentDidMount() {
         let deviceId = DeviceInfo.getUniqueId();
         OneSignal.setAppId("43e3395b-0019-492b-b999-4321444f25ad");
+
+        this.props.navigation.addListener('blur', () => {
+            if (this.backHandler) {
+                this.backHandler.remove();
+            }
+        })
+
         try {
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -148,7 +197,7 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                     shopId: AppConstants.SHOP_ID
                 },
             }).then((response) => {
-                // console.log('Res', response.data)
+                console.log('Res', response.data)
                 if (response.data) {
                     // console.log('ssssss', response.data);
                     // console.log('Resdddd', response.data)
@@ -161,20 +210,28 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                         if (response.data.token && response.data.token.length > 30) {
                             // console.log('Resdddd', response.data)
                             // if (response.data.shopId === 'MILAAN63') {
-                                // console.log('Resdddd', response.data)        
-                                if (response.data.userType == admin) {
-                                    AsyncStorage.setItem("logedIn", JSON.stringify(true))
-                                    AsyncStorage.setItem("userId", JSON.stringify(response.data.adminId))
-                                    AsyncStorage.setItem('userDetail', JSON.stringify(response.data), () => {
-                                        this.navigateHome();
-                                    })
-                                } else if (response.data.userType == customer) {
+                            // console.log('Resdddd', response.data)        
+                            if (response.data.userType == admin) {
+                                AsyncStorage.setItem("logedIn", JSON.stringify(true))
+                                AsyncStorage.setItem("userId", JSON.stringify(response.data.adminId))
+                                AsyncStorage.setItem('userDetail', JSON.stringify(response.data), () => {
+                                    this.navigateHome();
+                                })
+                            } else if (response.data.userType == customer) {
+                                if (response.data.isActive) {
                                     AsyncStorage.setItem("logedIn", JSON.stringify(true))
                                     AsyncStorage.setItem("userId", JSON.stringify(response.data.userId))
                                     AsyncStorage.setItem('userDetail', JSON.stringify(response.data), () => {
                                         this.navigateCustomerHome();
                                     })
+                                } else {
+                                    AsyncStorage.setItem('emailForOtp', JSON.stringify(emailId), () => {
+                                        Alert.alert("Your Email-ID verification is pending, Please verify.")
+                                        const pushAction = StackActions.push(AppRoute.OTP);
+                                        this.props.navigation.dispatch(pushAction);
+                                    })
                                 }
+                            }
                             // } else {
                             //     Alert.alert("Please enter a valid email ID and password.")
                             // }
@@ -266,9 +323,9 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                             </TouchableOpacity>
                         </View>
 
-                        {/* <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.FORGET_PASSWORD) }}>
+                        <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.FORGET_PWD) }}>
                             <Text style={Styles.forgotPassword}>{LableText.FORGOT_PASSWORD}</Text>
-                        </TouchableOpacity> */}
+                        </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => { this.props.navigation.navigate(AppRoute.SIGN_UP) }}>
                             <Text style={Styles.dontHaveAccount}>{LableText.DONT_HAVE_ACCOUNT}</Text>

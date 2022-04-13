@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
 import { Alert, Image, ScrollView, Text, View } from 'react-native';
@@ -6,9 +7,9 @@ import { scale } from 'react-native-size-matters';
 
 import { Styles } from '../../assets/styles';
 import { SafeAreaLayout, SaveAreaInset } from '../../components/safe-area-layout.component';
-import { LableText, Placeholder } from '../../constants';
+import { AppConstants, LableText, Placeholder } from '../../constants';
 import { AppRoute } from '../../navigation/app-routes';
-import { OtpScreenProps } from '../../navigation/auth.navigator';
+import { OtpScreenProps } from '../../navigation/auth-navigation/auth.navigator';
 
 interface State {
     email: string | undefined;
@@ -16,8 +17,10 @@ interface State {
     token: string | undefined;
 }
 
-export class OtpScreen extends Component<OtpScreenProps, any & State & any> {
-    constructor(props) {
+type Props = OtpScreenProps & any
+
+export class OtpScreen extends Component<Props, State & any> {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -34,21 +37,29 @@ export class OtpScreen extends Component<OtpScreenProps, any & State & any> {
         this.navigateSignIn = this.navigateSignIn.bind(this);
     }
 
-    onFormSubmit() {
+    async onFormSubmit() {
         const { mobileNo, otp } = this.state
-        this.navigateSignIn();
-        axios({
-            method: 'get',
-            url: 'http://192.168.0.106:8091/api/user/validatebyotp/' + mobileNo + '/' + otp,
-        }).then((response) => {
-            if (response.data.status === "false") {
-                Alert.alert(response.data.description);
-            } else {
-                this.props.navigation.navigate(AppRoute.OTP);
-            }
-        }, (error) => {
-            console.log(error);
-        });
+
+        const email = await AsyncStorage.getItem('emailForOtp')
+        const email1 = JSON.parse(email)
+        // console.log('Data', otp, email)
+        if (otp === '' || otp == null) {
+            Alert.alert("Please enter OTP.")
+        } else {
+            axios({
+                method: 'get',
+                url: AppConstants.API_BASE_URL + '/api/user/get/otp/varification/' + otp + '/' + email1,
+            }).then((response) => {
+                if (response.data == null) {
+                    Alert.alert('Please enter valid OTP');
+                } else {
+                    Alert.alert("OTP Vefrified, Please login with your credentials.")
+                    this.props.navigation.navigate(AppRoute.SIGN_IN);
+                }
+            }, (error) => {
+                console.log(error);
+            });
+        }
     }
 
     navigateHome() {

@@ -58,7 +58,8 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
             selectedCartId: '',
             insideShop: false,
             content: {},
-            allMeasurement: []
+            allMeasurement: [],
+            check: true
         }
         this._onRefresh = this._onRefresh.bind(this);
         this.navigationProductDetail = this.navigationProductDetail.bind(this);
@@ -77,7 +78,7 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
 
         if (null != logedIn && logedIn === 'true') {
             // Alert.alert("" + userData.userId) 
-            this.getMeasurement()          
+            this.getMeasurement()
             axios({
                 method: 'GET',
                 url: AppConstants.API_BASE_URL + '/api/cart/get/cartby/shopid/userid/' + AppConstants.SHOP_ID + '/' + userData.userId
@@ -86,7 +87,8 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                     this.setState({
                         cartData: response.data[0],
                         cartId: response.data[0].cartId,
-                        productList: response.data[0].productList
+                        productList: response.data[0].productList,
+                        check: true
                     })
                 }
             }, (error) => {
@@ -118,36 +120,45 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
     }
 
     handleIncrease(productId, cartId, quantity, stock) {
-        const { user } = this.state
-            
-        if (quantity >= stock) {
-          Alert.alert(`Only ${stock} product left.`)
-        } else {
-          axios({
-            method: 'PUT',
-            url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
-          }).then((response) => {
-            this._onRefresh();
-            // this.getCart(user.userId)
-          }, (error) => {
-            Alert.alert("Server problem")
-          })
+        const { user, check } = this.state
+        if (check) {
+            this.setState({ check: false })
+            if (quantity >= stock) {
+                this.setState({ check: true })
+                Alert.alert(`Only ${stock} product left.`)
+            } else {
+                axios({
+                    method: 'PUT',
+                    url: AppConstants.API_BASE_URL + '/api/cart/cartincrease/' + cartId + '/' + productId
+                }).then((response) => {
+                    this._onRefresh();
+                    // this.getCart(user.userId)
+                }, (error) => {
+                    this.setState({ check: true })
+                    Alert.alert("Server problem")
+                })
+            }
         }
-      }
+    }
 
     handleDecrease(productId, cartId, quantity) {
-        // const { cartId } = this.state;
-        if (quantity <= 1) {
-            Alert.alert("You have already selected minimum quantity.")
-        } else {
-            axios({
-                method: 'PUT',
-                url: AppConstants.API_BASE_URL + '/api/cart/cartdecrease/' + cartId + '/' + productId
-            }).then((response) => {
-                this._onRefresh();
-            }, (error) => {
-                Alert.alert("Server problem")
-            })
+        const { check } = this.state;
+        if (check) {
+            this.setState({ check: false })
+            if (quantity <= 1) {
+                this.setState({ check: true })
+                Alert.alert("You have already selected minimum quantity.")
+            } else {
+                axios({
+                    method: 'PUT',
+                    url: AppConstants.API_BASE_URL + '/api/cart/cartdecrease/' + cartId + '/' + productId
+                }).then((response) => {
+                    this._onRefresh();
+                }, (error) => {
+                    this.setState({ check: true })
+                    Alert.alert("Server problem")
+                })
+            }
         }
     }
 
@@ -196,7 +207,7 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                     <View style={Styles.cart_view_1}>
                         <View style={Styles.cart_view_1_1}>
                             <View style={[Styles.cart_avatar_view, Styles.center]}>
-                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage}} style={Styles.product_avatar} />
+                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage }} style={Styles.product_avatar} />
                             </View>
                         </View>
 
@@ -210,14 +221,14 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                                 </TouchableOpacity>
                             </View>
                             {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((data, index) => {
-                                    if (data.id == item.measurement) {
-                                        return (
-                                            <View style={{ flexDirection: 'row', width: '95%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                                                <Text style={Styles.price_text}>{item.packSize}{data.name}</Text>
-                                            </View>
-                                        )
-                                    }
-                                }) : null}
+                                if (data.id == item.measurement) {
+                                    return (
+                                        <View style={{ flexDirection: 'row', width: '95%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                            <Text style={Styles.price_text}>{item.packSize}{data.name}</Text>
+                                        </View>
+                                    )
+                                }
+                            }) : null}
                             <View style={Styles.cart_price_view}>
 
                                 <View style={{ flexDirection: 'row', width: '55%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
@@ -451,8 +462,8 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
 
                             <View style={Styles.price_detail_2}>
                                 <View style={Styles.price_detail_2_1}>
-                                    <Text style={Styles.cart_price_text_head}>MRP ({null != productList ? productList.length : null} items)</Text>
-                                    <Text style={[Styles.cart_price_text_head, {textDecorationLine: 'line-through'}]}><RupeeIcon fontSize={18} />{null != cartData.mrp ? (cartData.mrp).toFixed(2) : null}</Text>
+                                    <Text style={Styles.cart_price_text_head}>Total ({null != productList ? productList.length : null} items)</Text>
+                                    <Text style={[Styles.cart_price_text_head, { textDecorationLine: 'line-through' }]}><RupeeIcon fontSize={18} />{null != cartData.mrp ? (cartData.mrp).toFixed(2) : null}</Text>
                                 </View>
 
                                 <View style={Styles.price_detail_2_1}>

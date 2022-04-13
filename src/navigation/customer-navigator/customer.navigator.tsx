@@ -11,7 +11,7 @@ import {
   DrawerContentComponentProps,
   DrawerNavigationProp,
 } from '@react-navigation/drawer';
-import { AddressIcon, HelpIcon, HomeIcon, InfoIcon, LayoutIcon, LogoutIcon, MyOrderIcon, ProfileIcon, WalletIcon, WishIcon } from '../../assets/icons';
+import { AddressIcon, CartIcon, DrawerHome, HelpIcon, HomeIcon, InfoIcon, LayoutIcon, Logout, LogoutIcon, MyOrderIcon, NotificationIcon, ProfileIcon, StockListIcon, WalletIcon, WishIcon } from '../../assets/icons';
 import { CustomerTabBar } from '../navigator-components/customer-tab-bar';
 import { CustomerDrawer } from '../navigator-components/customer-home-drawer';
 import { ProductListNavigator } from './product-list.navigator';
@@ -171,7 +171,7 @@ export const CustomerNavigator = (): React.ReactElement => (
     <Drawer.Screen
       name={AppRoute.HOME}
       component={CustomerBottomNavigator}
-      options={{ title: logedIn() ? 'Home' : 'Home', drawerIcon: HomeIcon }}
+      options={{ title: logedIn() ? 'Home' : 'Home', drawerIcon: DrawerHome }}
     />
 
     <Drawer.Screen
@@ -189,7 +189,7 @@ export const CustomerNavigator = (): React.ReactElement => (
     <Drawer.Screen
       name={AppRoute.CUSTOMER_NOTIFICATION}
       component={CustomerNotificationScreen}
-      options={{ title: 'Notification', drawerIcon: AddressIcon }}
+      options={{ title: 'Notification', drawerIcon: NotificationIcon }}
     />
 
     <Drawer.Screen
@@ -201,7 +201,7 @@ export const CustomerNavigator = (): React.ReactElement => (
     <Drawer.Screen
       name={AppRoute.CART}
       component={CartNavigator}
-      options={{ title: 'My Cart', drawerIcon: InfoIcon }}
+      options={{ title: 'My Cart', drawerIcon: CartIcon }}
     />
 
     <Drawer.Screen
@@ -219,7 +219,7 @@ export const CustomerNavigator = (): React.ReactElement => (
     <Drawer.Screen
       name={AppRoute.LOG_OUT}
       component={LogoutScreen}
-      options={{ title: login === "true" ? 'Logout' : 'Login', drawerIcon: LogoutIcon }}
+      options={{ title: login === "true" ? 'Logout' : 'Login', drawerIcon: Logout }}
     />
 
   </Drawer.Navigator>

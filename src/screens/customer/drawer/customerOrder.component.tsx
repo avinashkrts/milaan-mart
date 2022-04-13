@@ -568,7 +568,9 @@ export class CustomerOrderScreen extends Component<Props, any> {
                                                                 <Text style={{ marginVertical: 5, fontWeight: 'bold', fontSize: 16 }}>Rs. {item.deliveryCharge}</Text>
                                                                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Delivery boy detail</Text>
                                                                 <Text style={{ marginVertical: 5 }}>{item.dBoyName}, {item.dBoyNumber}</Text>
-                                                                <Text style={{ marginVertical: 5 }}>Expected Time for delivery: <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{moment(item.deliveryDate).format('DD-MM-YYYY')}</Text> up to <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{moment(item.deliveryDate).format('hh:mm a')}</Text></Text>
+                                                                <Text style={{ marginVertical: 5 }}>Expected Time for delivery: <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{moment(item.deliveryDate).format('DD-MM-YYYY')}</Text> up to
+                                                                    <Text style={{ fontWeight: 'bold', fontSize: 16 }}> {item.deliveryTime === "8_10_AM" ? "8AM to 10AM" : item.deliveryTime === "1_3_PM" ? "1PM to 3PM" : item.deliveryTime === "5_7_PM" ? "5PM to 7PM" : "Within two hour"}</Text>
+                                                                </Text>
                                                             </View>
                                                         </>
                                                     )

@@ -16,12 +16,14 @@ interface State {
     token: string | undefined;
 }
 
-export class ForgetPasswordScreen extends Component<ForgetPasswordScreenProps, any & State & any> {
-    constructor(props) {
+type Props = ForgetPasswordScreenProps & any
+
+export class ForgetPasswordScreen extends Component<Props, State & any> {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
-            mobileNo: 'admin214573@milaan.com',
+            mobileNo: '',
         }
 
         this.onFormSubmit = this.onFormSubmit.bind(this);
@@ -38,23 +40,24 @@ export class ForgetPasswordScreen extends Component<ForgetPasswordScreenProps, a
     onFormSubmit() {
         const { mobileNo } = this.state
         console.log(mobileNo)
-        if (mobileNo === '' || mobileNo == null) {
-            Alert.alert('Please Enter Mobile Number');
-        } else if (!mobileNo.includes("@") ? (mobileNo.length < 10 || mobileNo.length > 10) : !mobileNo.includes("@milaan.com")) {
-            Alert.alert('Please Enter Correct Mobile Number');
+        if (mobileNo === '' || mobileNo == null ) {
+            Alert.alert('Please Enter Email ID');
+        } else if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mobileNo))) {
+            Alert.alert('Please Enter Correct Email ID');
         } else {
             axios({
                 method: 'GET',
-                url: AppConstants.API_BASE_URL + '/api/user/sendotp/' + mobileNo,
+                url: AppConstants.API_BASE_URL + '/api/user/forget/otp/' + mobileNo,
             }).then((response) => {
                 console.log(response.data)
                 if (response.data.status === "false") {
                     Alert.alert(response.data.description);
                 } else {
-                    AsyncStorage.setItem('mobileForOtp', JSON.stringify(mobileNo), () => {
-                        this.props.navigation.navigate(AppRoute.OTP);
-                    })
-                    this.props.navigation.navigate(AppRoute.OTP);
+                    Alert.alert("Your password has been sent to your Email-ID")
+                    // AsyncStorage.setItem('mobileForOtp', JSON.stringify(mobileNo), () => {
+                    //     this.props.navigation.navigate(AppRoute.OTP);
+                    // })
+                    this.props.navigation.navigate(AppRoute.SIGN_IN);
                 }
             }, (error) => {
                 console.log(error);
@@ -92,7 +95,7 @@ export class ForgetPasswordScreen extends Component<ForgetPasswordScreenProps, a
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP} >
-                < ScrollView style={[Styles.content, { backgroundColor: '#e6e6e6' }]} >
+                < ScrollView style={[Styles.content, { backgroundColor: '##ffffff' }]} >
                     <View>
                         <Image
                             source={require('../../assets/logo.png')}
@@ -106,7 +109,8 @@ export class ForgetPasswordScreen extends Component<ForgetPasswordScreenProps, a
                         <View style={Styles.inputTextView}>
                             <TextInput
                                 style={Styles.inputText}
-                                placeholder={Placeholder.PHONE}
+                                placeholder={Placeholder.EMAIL}
+                                keyboardType='email-address'
                                 value={mobileNo}
                                 onChangeText={(value) => { this.setState({ mobileNo: value }) }}
 

@@ -44,6 +44,10 @@ export const NotificationIcon = (style: any): AntDesign => (
   <MaterialCommunityIcons size={20} color={'silver'} name='bell' />
 );
 
+export const Logout = (style: any): AntDesign => (
+  <MaterialCommunityIcons size={20} color={'silver'} name='logout' />
+);
+
 export const CameraIcon = (style: any): AntDesign => (
   <Entypo size={22} name='camera' />
 );
@@ -131,12 +135,20 @@ export const DailyMessageIcon = (style: any): AntDesign => (
 );
 
 export const CartIcon = (style: any): AntDesign => (
-  <MaterialIcons size={24} color={'#501B1D'} name='shopping-cart' />
+  <MaterialIcons size={scale(18)} color={'silver'} name='shopping-cart' />
 );
 
 
+// export const ProfileIcon = (style: any): IconElement => (
+//   <Icon {...style} height={scale(25)} width={scale(25)} name='person-outline' />
+// );
+
 export const ProfileIcon = (style: any): IconElement => (
-  <Icon {...style} height={scale(25)} width={scale(25)} name='person-outline' />
+  <Ionicons size={scale(16)} color={'silver'} name='person-outline' />
+);
+
+export const DrawerHome = (style: any): IconElement => (
+  <MaterialIcons size={scale(16)} color={'silver'} name='home' />
 );
 
 export const AddressIcon = (style: any): AntDesign => (

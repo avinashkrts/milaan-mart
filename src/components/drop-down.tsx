@@ -1,5 +1,5 @@
-import React, { CSSProperties, useState } from 'react';
-import { Alert, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import React, { useImperativeHandle, useRef, useState } from 'react';
+import { Alert, Pressable, ScrollView, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { scale, ScaledSheet } from 'react-native-size-matters';
 import { RightArrowIcon } from '../assets/icons';
 import Modal from 'react-native-modal';
@@ -12,12 +12,27 @@ type Props = {
     placeholder?: String,
     selectedValue?: String | Number,
     onChange?: Function
+    ref?: any
 }
 
 export function DropDown(props: Props) {
+
+    useImperativeHandle(props.ref, () => ({
+        reset: () => {
+            reset();
+        },
+        openDropdown: () => {
+            openDropdown();
+        },
+        closeDropdown: () => {
+            closeDropdown();
+        },
+    }));
+
     const { children, onChange, selectedValue, style, placeholder } = props
     const [selected, setSelected] = useState(selectedValue);
     const [open, setOpen] = useState(false);
+    const DropdownButton = useRef();
 
     function doSomething(value: Number | String, label: Number | String) {
         setSelected(label);
@@ -25,7 +40,28 @@ export function DropDown(props: Props) {
         setOpen(false)
     }
 
-
+    const openDropdown = () => {
+        // DropdownButton.current.measure((fx, fy, w, h, px, py) => {
+        //     console.log('position y => ', py, '\nheight', h, '\nposition x => ', px)
+        //     if (height - 18 < py + h + dropdownHEIGHT) {
+        //         setDropdownPX(px);
+        //         setDropdownPY(py - 2 - dropdownHEIGHT);
+        //     } else {
+        //         setDropdownPX(px);
+        //         setDropdownPY(py + h + 2);
+        //     }
+        //     setDropdownWIDTH(dropdownStyle?.width || w);
+        //     setOpen(true);
+        // });
+    };
+    const closeDropdown = () => {
+        setOpen(false);
+    };
+    const reset = () => {
+        // setSelectedItem(null);
+        // setIndex(-1);
+        setOpen(false);
+    };
     const childrenWithProps = React.Children.map(children, child => {
 
         if (React.isValidElement(child)) {
@@ -49,9 +85,9 @@ export function DropDown(props: Props) {
                 </View>
             </Pressable>
             {open ?
-                <View style={Styles.optionView} >
+                <ScrollView style={Styles.optionView} >
                     {childrenWithProps}
-                </View>
+                </ScrollView>
                 : null}
         </View>
     )

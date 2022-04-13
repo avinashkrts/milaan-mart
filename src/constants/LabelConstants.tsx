@@ -3,7 +3,7 @@ import { AsyncStorage } from "react-native";
 /*------------------------------------------------------------COLOR CODE------------------------------------------------------------*/
 export class Color {
     // public static readonly COLOR = '#0074d3';
-    public static readonly COLOR = '#ff6363';
+    public static readonly COLOR = '#db3246';
     public static readonly BUTTON_NAME_COLOR = '#fff';
     public static readonly COLOR_CUSTOMER = '#501B1D';
     public static readonly COLOR_ITEM_NAME = '#777777';
@@ -189,6 +189,7 @@ export class Placeholder {
 
     public static readonly PHONE = 'Phone';
     public static readonly PHONE_EMAIL = 'Phone/Admin ID';
+    public static readonly EMAIL = 'Email ID';
     public static readonly PASSWORD = 'Password';
     public static readonly FIRSTNAME = 'First Name';
     public static readonly LASTNAME = 'Last Name';

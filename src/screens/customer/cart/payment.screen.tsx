@@ -12,15 +12,19 @@ import {
     Dimensions,
     RefreshControl,
     ScrollView,
+    StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
 import DatePicker from 'react-native-datepicker';
 import RazorpayCheckout from 'react-native-razorpay';
+import SelectDropdown from 'react-native-select-dropdown';
 import { scale } from 'react-native-size-matters';
 
-import { AddIcon, BackIcon, CancelIcon, MinusIcon, RupeeIcon } from '../../../assets/icons';
+import { AddIcon, BackIcon, CancelIcon, MinusIcon, RightArrowIcon, RupeeIcon } from '../../../assets/icons';
 import { Styles } from '../../../assets/styles';
+import { DropDown } from '../../../components/drop-down';
+import { Item } from '../../../components/drop-item';
 import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
 import { Toolbar } from '../../../components/toolbar.component';
 import { AppConstants } from '../../../constants/AppConstants';
@@ -115,7 +119,8 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             orderPlacing: false
         })
         if (null != logedIn && logedIn === 'true') {
-            // Alert.alert("" + userData.userId, cartId)   
+            // Alert.alert("" + userData.userId, cartId) 
+              
 
             axios({
                 method: 'GET',
@@ -207,6 +212,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             }, (error) => {
                 Alert.alert("Server problem")
             })
+            this.getAddress();
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
         }
@@ -241,7 +247,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
     _onRefresh() {
         this.setState({ refreshing: true });
-        this.componentDidMount().then(() => {
+        this.getAddress().then(() => {
             this.setState({ refreshing: false });
         });
     }
@@ -278,8 +284,8 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
 
     handlePlaceOrder() {
-        const { orderType, insideShop, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
-        console.log('data', orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId, addressId);
+        const { orderType, insideShop, selectedSlot, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
+        console.log('data', selectedSlot, orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId, addressId);
         this.setState({
             orderPlacing: true
         })
@@ -295,7 +301,8 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         orderType: orderType,
                         addressId: addressId,
                         slotDate: slotDate,
-                        insideShop: insideShop
+                        insideShop: insideShop,
+                        slotTime: selectedSlot
                     }
                 }).then((response) => {
                     if (response.data) {
@@ -322,7 +329,8 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         orderType: orderType,
                         addressId: addressId,
                         slotDate: slotDate,
-                        insideShop: insideShop
+                        insideShop: insideShop,
+                        slotTime: selectedSlot
                     }
                 }).then((response) => {
                     if (response.data) {
@@ -495,7 +503,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
     )
 
     render() {
-        const { cartData, paymentType,selectedSlot, selectedDelivery, selectedPayment, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
+        const { cartData, paymentType, selectedSlot, selectedDelivery, selectedPayment, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
@@ -648,19 +656,70 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                     />
                                 </View>
 
-                                <View style={{marginTop: scale(20), borderColor: Color.COLOR, borderWidth: 1, borderStyle: 'solid', }}>
+                                <View style={{ marginTop: scale(20), borderColor: Color.COLOR, borderWidth: 1, borderStyle: 'solid', }}>
+
+                                    {/* <SelectDropdown
+                                        data={["Egypt", "Canada", "Australia", "Ireland"]}
+                                        onSelect={(selectedItem, index) => {
+                                            console.log(selectedItem, index)
+                                        }}
+                                        buttonStyle={{ width: '100%' }}
+                                    /> */}
+
+                                    {/* <SelectDropdown
+                                        data={["Egypt", "Canada", "Australia", "Ireland"]}
+                                        // defaultValueByIndex={1}
+                                        // defaultValue={'Egypt'}
+                                        onSelect={(selectedItem, index) => {
+                                            console.log(selectedItem, index);
+                                        }}
+                                        defaultButtonText={'Select country'}
+                                        buttonTextAfterSelection={(selectedItem, index) => {
+                                            return selectedItem;
+                                        }}
+                                        rowTextForSelection={(item, index) => {
+                                            return item;
+                                        }}
+                                        buttonStyle={styles.dropdown1BtnStyle}
+                                        buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                                        renderDropdownIcon={isOpened => {
+                                            return <Text style={styles.icon} ><RightArrowIcon fontSize={scale(18)} /></Text>;
+                                        }}
+                                        dropdownIconPosition={'right'}
+                                        dropdownStyle={styles.dropdown1DropdownStyle}
+                                        rowStyle={styles.dropdown1RowStyle}
+                                        rowTextStyle={styles.dropdown1RowTxtStyle}
+                                    /> */}
+
                                     <Picker
                                         mode="dropdown"
                                         style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
                                         selectedValue={selectedSlot}
+                                        itemStyle={{}}
                                         onValueChange={(value) => { this.setState({ selectedSlot: value }) }}
                                     >
-                                        <Picker.Item key="DELI1" label="7AM to 10AM" value="7_10_AM" />
-                                        <Picker.Item key="DELI2" label="12AM to 3PM" value="12_3_PM" />
-                                        <Picker.Item key="DELI3" label="3PM to 6PM" value="3_6_PM" />
-                                        <Picker.Item key="DELI4" label="6PM to 9PM" value="6_9_PM" />
-                                        <Picker.Item key="DELI5" label="Within one hour" value="1_HRS" />
+                                        <Picker.Item style={{ backgroundColor: 'red' }} key="DELI1" label="8AM to 10AM" value="8_10_AM" />
+                                        <Picker.Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
+                                        <Picker.Item key="DELI3" label="5PM to 7PM" value="5_7_PM" />
+                                        {moment(slotDate).diff(minDate, 'days') == 0 ?
+                                            <Picker.Item key="DELI5" label="Within two hour" value="2_HRS" /> : null
+                                        }
                                     </Picker>
+
+                                    {/* <DropDown
+                                        // mode="dropdown"
+                                        // style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
+                                        selectedValue={selectedSlot}
+                                        // itemStyle={{}}
+                                        onChange={(value) => { this.setState({ selectedSlot: value }) }}
+                                    >
+                                        <Item style={{ backgroundColor: 'red' }} key="DELI1" label="8AM to 10AM" value="8_10_AM" />
+                                        <Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
+                                        <Item key="DELI3" label="5PM to 7PM" value="5_7_PM" />
+                                        {moment(slotDate).diff(minDate, 'days') == 0 ?
+                                            <Item key="DELI5" label="Within two hour" value="2_HRS" /> : null
+                                        }
+                                    </DropDown> */}
                                 </View>
                             </View>
                         </View> : null}
@@ -686,3 +745,135 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    shadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    header: {
+        flexDirection: 'row',
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F6F6F6',
+    },
+    headerTitle: { color: '#000', fontWeight: 'bold', fontSize: 16 },
+    saveAreaViewContainer: { flex: 1, backgroundColor: '#FFF' },
+    viewContainer: { flex: 1, backgroundColor: '#FFF' },
+    scrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: '10%',
+        paddingBottom: '20%',
+    },
+
+    dropdown1BtnStyle: {
+        width: '100%',
+        height: 50,
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#444',
+    },
+
+    icon: {
+        transform: [{ rotate: '90deg' }],
+        color: 'black',
+        fontWeight: '400'
+    },
+
+    dropdown1BtnTxtStyle: { color: '#444', textAlign: 'left' },
+    dropdown1DropdownStyle: { backgroundColor: '#EFEFEF' },
+    dropdown1RowStyle: {
+        backgroundColor: Color.DESCRIPTION_OPTION_BACKGROUND,
+        borderBottomColor: '#000000'
+    },
+    dropdown1RowTxtStyle: { color: 'black', textAlign: 'left' },
+
+    dropdown2BtnStyle: {
+        width: '80%',
+        height: 50,
+        backgroundColor: '#444',
+        borderRadius: 8,
+    },
+    dropdown2BtnTxtStyle: {
+        color: '#FFF',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    dropdown2DropdownStyle: {
+        backgroundColor: '#444',
+        borderBottomLeftRadius: 12,
+        borderBottomRightRadius: 12,
+    },
+    dropdown2RowStyle: { backgroundColor: '#444', borderBottomColor: '#C5C5C5' },
+    dropdown2RowTxtStyle: {
+        color: '#FFF',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+
+    dropdown3BtnStyle: {
+        width: '80%',
+        height: 50,
+        backgroundColor: '#FFF',
+        paddingHorizontal: 0,
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: '#444',
+    },
+    dropdown3BtnChildStyle: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 18,
+    },
+    dropdown3BtnImage: { width: 45, height: 45, resizeMode: 'cover' },
+    dropdown3BtnTxt: {
+        color: '#444',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 24,
+        marginHorizontal: 12,
+    },
+    dropdown3DropdownStyle: { backgroundColor: 'slategray' },
+    dropdown3RowStyle: {
+        backgroundColor: 'slategray',
+        borderBottomColor: '#444',
+        height: 50,
+    },
+    dropdown3RowChildStyle: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        paddingHorizontal: 18,
+    },
+    dropdownRowImage: { width: 45, height: 45, resizeMode: 'cover' },
+    dropdown3RowTxt: {
+        color: '#F1F1F1',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 24,
+        marginHorizontal: 12,
+    },
+
+    dropdown4BtnStyle: {
+        width: '50%',
+        height: 50,
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#444',
+    },
+    dropdown4BtnTxtStyle: { color: '#444', textAlign: 'left' },
+    dropdown4DropdownStyle: { backgroundColor: '#EFEFEF' },
+    dropdown4RowStyle: { backgroundColor: '#EFEFEF', borderBottomColor: '#C5C5C5' },
+    dropdown4RowTxtStyle: { color: '#444', textAlign: 'left' },
+});

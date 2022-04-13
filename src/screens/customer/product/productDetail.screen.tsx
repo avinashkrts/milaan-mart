@@ -4,7 +4,7 @@ import axios from 'axios';
 import Axios from 'axios';
 import React from 'react';
 import { Alert, AsyncStorage, Pressable, RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
-import ImageSlider from 'react-native-image-slider';
+import { SliderBox } from "react-native-image-slider-box";
 import { scale } from 'react-native-size-matters';
 
 import { BackIcon, RightArrowIcon, RupeeIcon } from '../../../assets/icons';
@@ -434,7 +434,10 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                             <View style={[Styles.product_view, Styles.center]}>
                                 <View style={[Styles.product_image]}>
                                     {allImages != null && allImages != [] ?
-                                        <ImageSlider images={allImages} />
+                                       <SliderBox
+                                       autoplay
+                                       circleLoop
+                                       images={allImages} />
                                         : null
                                     }
                                 </View>

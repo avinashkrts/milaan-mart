@@ -22,7 +22,7 @@ const data = [
 type State = {}
 
 type Props = SignUpScreenProps & any
-export class SignUpScreen extends Component<Props, State, any> {
+export class SignUpScreen extends Component<Props, State & any> {
   constructor(props: Props) {
     super(props);
 
@@ -30,6 +30,7 @@ export class SignUpScreen extends Component<Props, State, any> {
       firstName: '',
       lastName: '',
       mobileNo: '',
+      emailId: '',
       pwd: '',
       userType: '2',
       passwordVisible: true,
@@ -85,13 +86,15 @@ export class SignUpScreen extends Component<Props, State, any> {
   }
 
   onFormSubmit() {
-    const { firstName, lastName, userType, pwd, mobileNo } = this.state
+    const { firstName, lastName,emailId, userType, pwd, mobileNo } = this.state
     if (firstName === " " || firstName.length == 0) {
       Alert.alert("Enter First Name");
     } else if (lastName === "" || lastName.length == 0) {
       Alert.alert("Enter Last Name");
     } else if (mobileNo === "" || mobileNo.length == 0 || mobileNo.length < 10 || mobileNo.length > 10) {
       Alert.alert("Enter a valid Mobile Number");
+    } else if (emailId === "" || emailId.length == 0 || !(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailId))) {
+      Alert.alert("Enter a valid Email ID");
     } else if (pwd === "" || pwd.length == 0 || pwd.length < 8) {
       Alert.alert("Password length must be more than 8 digits");
     } else {
@@ -102,6 +105,7 @@ export class SignUpScreen extends Component<Props, State, any> {
           firstName: firstName,
           lastName: lastName,
           mobileNo: mobileNo,
+          emailId: emailId,
           pwd: pwd,
           userType: userType,
           shopId: AppConstants.SHOP_ID
@@ -110,9 +114,9 @@ export class SignUpScreen extends Component<Props, State, any> {
         if (response.data.status === "false") {
           Alert.alert(response.data.description);
         } else {
-          AsyncStorage.setItem('phoneForOtp', JSON.stringify(mobileNo), () => {
+          AsyncStorage.setItem('emailForOtp', JSON.stringify(emailId), () => {
             Alert.alert('User account created successfully, login with your credential.');
-            const pushAction = StackActions.push(AppRoute.SIGN_IN);
+            const pushAction = StackActions.push(AppRoute.OTP);
             this.props.navigation.dispatch(pushAction);
           })
         }
@@ -131,7 +135,7 @@ export class SignUpScreen extends Component<Props, State, any> {
   };
 
   render() {
-    const { firstName,passwordVisible, lastName, mobileNo, pwd } = this.state;
+    const { firstName,passwordVisible,emailId, lastName, mobileNo, pwd } = this.state;
     return (
       <SafeAreaLayout
         style={Styles.safeArea}
@@ -172,6 +176,16 @@ export class SignUpScreen extends Component<Props, State, any> {
                 placeholder={Placeholder.PHONE}
                 value={mobileNo}
                 onChangeText={(value) => { this.setState({ mobileNo: value }) }}
+              />
+            </View>
+
+            <View style={Styles.inputTextView}>
+              <TextInput
+                style={Styles.inputText}
+                keyboardType='email-address'
+                placeholder={Placeholder.EMAIL}
+                value={emailId}
+                onChangeText={(value) => { this.setState({ emailId: value }) }}
               />
             </View>
 
