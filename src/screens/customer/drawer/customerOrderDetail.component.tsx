@@ -217,7 +217,7 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
 
     renderCart = ({ item, index }: any): ListItemElement => {
         return (
-            <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+            <ListItem style={{ borderBottomColor: 'rgba(0,0,0,1)', borderBottomWidth: 1 }}>
                 {item != null ?
                     <View style={Styles.cart_main_view}>
                         <View style={Styles.cart_view_1}>
@@ -230,9 +230,6 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                             <View style={Styles.cart_view_1_2}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={Styles.cart_name_text}>{item.productName}</Text>
-                                    {/* <TouchableOpacity  onPress={() => { this.handleDelete(item.id) }}>
-                                    <Text style={Styles.cart_name_text}><CancelIcon fontSize={25} /></Text>
-                                </TouchableOpacity> */}
                                 </View>
                                 {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((data, index) => {
                                     if (data.id == item.measurement) {
@@ -246,34 +243,22 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
 
                                 <View style={Styles.cart_price_view}>
                                     <View style={{ flexDirection: 'row', width: '55%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                        <Text style={Styles.old_price_text}>MRP <RupeeIcon /> {item.mrp.toFixed(2)}</Text>
                                         <Text style={Styles.price_text}><RupeeIcon /> {item.price.toFixed(2)}</Text>
-                                        <Text style={Styles.offer_price_text}>{item.offersAvailable && item.oldPrice ? item.oldPrice.toFixed(2) : null}</Text>
                                     </View>
 
                                     <View style={[Styles.cart_quantity_view, Styles.center]}>
-                                        {/* <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleDecrease(item.productId, item.productQuantity) }}>
-                                        <Text style={Styles.cart_button_text}><MinusIcon /></Text>
-                                    </TouchableOpacity> */}
-
                                         <View style={[Styles.cart_quantity_text_view]}>
                                             <Text style={[{ color: Color.BUTTON_NAME_COLOR }, Styles.cart_quantity_text]}>{item.productQuantity}</Text>
                                         </View>
-
-                                        {/* <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleIncrease(item.productId) }}>
-                                        <Text style={Styles.cart_button_text}><AddIcon /></Text>
-                                    </TouchableOpacity> */}
                                     </View>
-                                </View>
-
-                                <View>
-                                    <Text style={Styles.cart_offer_text}>{item.offersAvailable && item.offer ? item.offer : null} {item.offersAvailable && item.offer ? '% off' : null}</Text>
                                 </View>
                             </View>
                         </View>
 
-                        <View>
+                        {/* <View>
                             <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable ? item.offersAvailable : null} {item.offersAvailable ? 'offers available' : null}</Text>
-                        </View>
+                        </View> */}
                     </View>
                     :
                     <ActivityIndicator size='large' color='green' />}

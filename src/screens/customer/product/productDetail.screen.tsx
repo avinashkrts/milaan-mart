@@ -16,6 +16,7 @@ import { Toolbar } from '../../../components/toolbar.component';
 import { AppConstants } from '../../../constants/AppConstants';
 import { Color, LableText } from '../../../constants/LabelConstants';
 import { AppRoute } from '../../../navigation/app-routes';
+import { CategoryProductDetailScreenProps } from '../../../navigation/customer-navigator/category-list.navigator';
 import { ProductDetailScreenProps } from '../../../navigation/customer-navigator/product-list.navigator';
 import { WishProductDetailScreenProps } from '../../../navigation/customer-navigator/wish-list.navigator';
 
@@ -35,7 +36,7 @@ const HEADER_MIN_HEIGHT = 70;
 const PROFILE_IMAGE_MAX_HEIGHT = 80;
 const PROFILE_IMAGE_MIN_HEIGHT = 40;
 
-type Props = ProductDetailScreenProps & ThemedComponentProps & any & WishProductDetailScreenProps
+type Props = ProductDetailScreenProps & CategoryProductDetailScreenProps & ThemedComponentProps & any & WishProductDetailScreenProps
 
 export class ProductDetailScreen extends React.Component<Props, any> {
     constructor(props: Props) {
@@ -503,11 +504,11 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                                                         <Text style={Styles.old_price_text}>MRP {data.mrp.toFixed(2)}</Text>
                                                         <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{data.unitSellingPrice}/pc</Text>
-                                                        <Text style={[{ fontFamily: 'notoserif' }, Styles.offer_price_text]}>
-                                                            {Math.round(data.customerSingleOffer)} % Off
+                                                        <Text style={[{ fontFamily: 'notoserif', color: Color.OFFER, fontWeight: 'bold' }, Styles.offer_price_text]}>
+                                                            {Math.round(data.customerBundleOffer)}% off
                                                         </Text>
                                                     </View>
-                                                    {data.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(data.bundlePrice / data.bundleQuantity).toFixed(2)} / pc (Buy {data.bundleQuantity} or more)</Text> : null}
+                                                    {data.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(data.bundlePrice / data.bundleQuantity).toFixed(2)}/pc (Buy {data.bundleQuantity} or more)</Text> : null}
 
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                                                         {allProduct.offerActiveInd ?

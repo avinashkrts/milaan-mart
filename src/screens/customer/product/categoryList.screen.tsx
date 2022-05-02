@@ -25,18 +25,17 @@ import { scale } from 'react-native-size-matters';
 import { AddIcon, CancelIcon, MenuIcon, MinusIcon, RightArrowIcon, RupeeIcon, SearchIcon, WishIcon } from '../../../assets/icons';
 import { Styles } from '../../../assets/styles';
 import { CategoryCard } from '../../../components/categoryCard';
-import { DropDown, MyDropdown, Parent } from '../../../components/drop-down';
-import { Child, Item } from '../../../components/drop-item';
 import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
 import { Toolbar } from '../../../components/toolbar.component';
 import { AppConstants, Color } from '../../../constants';
 import { LableText } from '../../../constants/LabelConstants';
 import { AppRoute } from '../../../navigation/app-routes';
-import { CategoryListScreenProps } from '../../../navigation/customer-navigator/shop-list.navigator';
-import { OfferData } from './offerData';
+import { OfferData, FilterType } from './offerData';
 import { createFilter } from 'react-native-search-filter';
+import { TopButton, TopButtonSelected } from '../../../components/topButton';
+import { CategoryProductDetailScreenProps, CategoryListScreenProps } from '../../../navigation/customer-navigator/category-list.navigator';
 
-type Props = CategoryListScreenProps & ThemedComponentProps
+type Props = CategoryListScreenProps & ThemedComponentProps & CategoryProductDetailScreenProps
 const KEYS_TO_FILTERS = ['name'];
 export class CategoryListScreen extends Component<Props & any, any> {
     backHandler: any;
@@ -47,6 +46,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             allBrand: [],
             refreshing: false,
             productWithVariant: [],
+            allProductWithVariant: [],
             tempProductWithVariant: [],
             offers: OfferData,
             searchTerm: '',
@@ -77,6 +77,9 @@ export class CategoryListScreen extends Component<Props & any, any> {
             subCategory: [],
             allImages: [],
             searched: false,
+            slectedFilter: 1,
+            searchData: [],
+            allSearchData: [],
             allData: [
                 {
                     url: '/api/lookup/getallmeasurementtype',
@@ -95,12 +98,13 @@ export class CategoryListScreen extends Component<Props & any, any> {
         this.initialData = this.initialData.bind(this);
         this.renderProduct = this.renderProduct.bind(this);
         this.renderVariant = this.renderVariant.bind(this);
+        this.navigateProductDetail1 = this.navigateProductDetail1.bind(this);
     }
 
     getProduct() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/true',
+            url: AppConstants.API_BASE_URL + '/api/item/get/onlinecategory/' + 1 + '/true',
         }).then((response) => {
             if (null != response.data) {
                 axios({
@@ -123,7 +127,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                 data.push(data1[0])
                             }
                             this.setState({
-                                productWithVariant: data
+                                productWithVariant: data,
+                                allProductWithVariant: data
                             })
                         }
                     }
@@ -200,27 +205,28 @@ export class CategoryListScreen extends Component<Props & any, any> {
         let categoryId = await AsyncStorage.getItem('categoryId');
         let offerId = await AsyncStorage.getItem('offerId');
         let userData = JSON.parse(userDetail);
-        var image = []
+        var image: any = [];
         const logedIn = await AsyncStorage.getItem('logedIn');
-        const shopIdAsync = await AsyncStorage.getItem('shopId')
-        const shopName = await AsyncStorage.getItem('shopName')
+        const shopIdAsync = await AsyncStorage.getItem('shopId');
+        const shopName = await AsyncStorage.getItem('shopName');
         this.state.offers.map((data, i) => {
             image.push(AppConstants.IMAGE_BASE_URL + '/offer/' + data.image)
         })
         this.setState({
             userData: userData,
             allImages: image,
-            searched: false
+            searched: false,
+            searchTerm: ''
         })
-        this.getProduct()
-        this.getAllCategory()
+
+        this.getProduct();
+        this.getAllCategory();
         this.getMeasurement();
 
         if (null != logedIn && logedIn === 'true') {
             this.getCart(userData.userId)
             this.getUser(userData.userId)
         }
-
 
         this.getAllSubCategory();
         this.getAllBrand();
@@ -405,6 +411,12 @@ export class CategoryListScreen extends Component<Props & any, any> {
         this.props.navigation.dispatch(resetAction)
     }
 
+    navigateProductDetail1(id, shopId) {
+        // this.props.navigation.navigate(AppRoute.CUSTOMER_CATEGORY_PRODUCT_DETAIL, { productId: String(id), shopId: String(shopId) });
+        const pushAction = StackActions.push(AppRoute.CUSTOMER_CATEGORY_PRODUCT_DETAIL, { productId: String(id), shopId: String(shopId) });
+        this.props.navigation.dispatch(pushAction)
+      }
+
     navigateToCart() {
         // Alert.alert("")
         const pushAction = StackActions.push(AppRoute.CART);
@@ -565,11 +577,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
             <ListItem style={{ borderBottomColor: 'rgba(200, 200, 200, 1)', borderBottomWidth: scale(1), paddingVertical: -5 }}>
                 <View style={Styles.product_list_main}>
                     <View style={Styles.product_list_img}>
-                        <TouchableOpacity onPress={() => { this.navigateProductDetail(item.id, item.shopId) }}>
+                        <Pressable onPress={() => { this.navigateProductDetail1(item.id, item.shopId) }}>
                             <View style={[Styles.all_Item_Image_2, Styles.center]}>
                                 <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage }} style={Styles.product_avatar} />
                             </View>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
                     <View style={Styles.product_list_detail}>
                         <View style={Styles.all_Item_List1}>
@@ -612,14 +624,16 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                         <Text style={Styles.old_price_text}>MRP {item.itemList[0].mrp.toFixed(2)}</Text>
                                         <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{item.itemList[0].unitSellingPrice}/pc</Text>
                                         <Text style={[{ fontFamily: 'notoserif' }, Styles.offer_price_text]}>
-                                            {Math.round(item.itemList[0].customerSingleOffer)} % Off
+                                            {Math.round(item.itemList[0].customerSingleOffer)}% off
                                         </Text>
                                         {/* {item.offerActiveInd ?
                           <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
                           : null
                         } */}
                                     </View>
-                                    {item.itemList[0].bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.itemList[0].bundlePrice / item.itemList[0].bundleQuantity).toFixed(2)} / pc (Buy {item.itemList[0].bundleQuantity} or more)</Text> : null}
+                                    {item.itemList[0].bundleQuantity > 1 ?
+                                        <Text style={{ fontSize: scale(12), color: Color.OFFER }} >
+                                            <RupeeIcon fontSize={scale(14)} />{(item.itemList[0].bundlePrice / item.itemList[0].bundleQuantity).toFixed(2)}/pc (Buy {item.itemList[0].bundleQuantity} or more)</Text> : null}
                                     {/* {null != item.offerActiveInd ? item.offerActiveInd ?
     
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
@@ -669,7 +683,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
         var count = 0;
         const { allCart } = this.state
         return (
-            <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+            <ListItem style={{ borderBottomColor: 'rgba(0,0,0,1)', borderBottomWidth: 1 }}>
                 {item != null ?
                     <View style={Styles.variant_main_view}>
                         <View style={Styles.variant_view_1}>
@@ -681,7 +695,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                         if (brand.id == item.measurement) {
                                             return (
                                                 <View>
-                                                    <Text style={{ fontSize: scale(14), fontFamily: 'notoserif', marginTop: 5 }}>{item.unitQuantity} {brand.name}</Text>
+                                                    <Text style={{ fontSize: scale(14), fontFamily: 'notoserif' }}>{item.unitQuantity} {brand.name}</Text>
                                                 </View>
                                             );
                                         }
@@ -692,9 +706,9 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                     </View>
                                     <View>
                                         <Text style={Styles.offer_price_text}>
-                                            {Math.round(item.customerSingleOffer)} % Off
+                                            {Math.round(item.customerSingleOffer)}% off
                                         </Text>
-                                        {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)} / pc (Buy {item.bundleQuantity} or more)</Text> : null}
+                                        {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)}/pc (Buy {item.bundleQuantity} or more)</Text> : null}
                                     </View>
                                 </View>
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -782,47 +796,321 @@ export class CategoryListScreen extends Component<Props & any, any> {
     }
 
     searchUpdated(term) {
-        const { allProductWithVariant, searchTerm } = this.state
-        this.setState({ searchTerm: term })
-        if (term != '' && term != null) {
-            this.setState({
-                searchTerm: term,
-                searchVisible1: true,
-                searched: true,
-                isProduct: true
-            })
-        } else {
-            this.setState({
-                productWithVariant: allProductWithVariant,
-                searchVisible1: false,
-                searched: false,
-                isProduct: false
-            })
-        }
+        this.setState({
+            searchTerm: term,
+            searchVisible1: false,
+            searched: false,
+            isProduct: false
+        })
     }
 
     productSearch(filteredProduct) {
-        this.setState({
-            allProduct: filteredProduct,
-            searchVisible1: false
-        })
-        Keyboard.dismiss();
+        const { allProductWithVariant, searchTerm } = this.state
+        var filteredProduct1 = []
+        filteredProduct1 = allProductWithVariant ? allProductWithVariant.length > 0 ? allProductWithVariant.filter(createFilter(filteredProduct, KEYS_TO_FILTERS)) : null : null
+        if (filteredProduct1 != null) {
+            if (filteredProduct1.length > 0) {
+                if (searchTerm != '' && searchTerm != null) {
+                    this.setState({
+                        productWithVariant: []
+                    })
+                    this.getAllFilteredProduct(filteredProduct1)
+                    Keyboard.dismiss();
+                } else {
+                    Alert.alert("Please type product name to search")
+                }
+            } else {
+                Alert.alert("No product found.")
+                this.setState({
+                    searchTerm: ''
+                })
+                this._onRefresh()
+            }
+        }
     }
 
-    search(index) {
-        var product = [index]
+    async getAllFilteredProduct(product) {
+        var tempProd: any = []
+        await product.map((data) => {
+            tempProd.push(data)
+        });
         this.setState({
-            productWithVariant: product,
+            productWithVariant: tempProd
+        })
+        // tempProd.push(product[0])
+        if (tempProd.length > 0) {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/item/getitem/online/' + product[0].subCategoryId + '/true',
+            }).then((response) => {
+                if (null != response.data) {
+                    axios({
+                        method: 'GET',
+                        url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                    }).then((response1) => {
+                        if (null != response1.data) {
+                            if (response.data && response.data != null && response1.data && response1.data != null) {
+                                var data = []
+                                for (var i = 0; i < response.data.length; i++) {
+                                    var data1 = []
+                                    var data2 = []
+                                    data1.push(response.data[i])
+                                    for (var j = 0; j < response1.data.length; j++) {
+                                        if (response.data[i].id == response1.data[j].productId) {
+                                            data2.push(response1.data[j])
+                                        }
+                                    }
+                                    data1[0].itemList = data2
+                                    tempProd.push(data1[0])
+                                }
+                                this.setState({
+                                    productWithVariant: tempProd,
+                                })
+                                // console.log('222', data)
+
+                                // tempProd.concat(data)
+                            }
+                        }
+                    }, (error) => {
+                        Alert.alert("Server error!.")
+                    });
+                }
+            }, (error) => {
+                Alert.alert("Server error!.")
+            });
+
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/item/get/onlinecategory/' + product[0].category + '/true'
+            }).then((response) => {
+                if (null != response.data) {
+                    axios({
+                        method: 'GET',
+                        url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                    }).then((response1) => {
+                        if (null != response1.data) {
+                            if (response.data && response.data != null && response1.data && response1.data != null) {
+                                var data = []
+                                for (var i = 0; i < response.data.length; i++) {
+                                    var data1 = []
+                                    var data2 = []
+                                    data1.push(response.data[i])
+                                    for (var j = 0; j < response1.data.length; j++) {
+                                        if (response.data[i].id == response1.data[j].productId) {
+                                            data2.push(response1.data[j])
+                                        }
+                                    }
+                                    data1[0].itemList = data2
+                                    tempProd.push(data1[0])
+                                    // console.log('wwww', data)
+                                }
+
+                                // console.log('wwww', data)
+                                // tempProd.concat(data)
+                                this.setState({
+                                    productWithVariant: tempProd,
+                                    searchVisible1: false,
+                                    isProduct: true,
+                                    searched: true,
+                                })
+                            }
+                        }
+                    }, (error) => {
+                        Alert.alert("Server error!.")
+                    });
+                }
+            }, (error) => {
+                Alert.alert("Server error!.")
+            });
+        }
+        // console.log("data", tempProd)
+        // this.setState({
+        //     productWithVariant: tempProd,
+        // })
+    }
+
+    search(search) {
+        const { allProductWithVariant } = this.state
+        var product: Object = []
+        if (search.type === "PRODUCT") {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/item/getitem/online/' + search.subCategoryId + '/true',
+            }).then((response) => {
+                if (null != response.data) {
+                    axios({
+                        method: 'GET',
+                        url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                    }).then((response1) => {
+                        if (null != response1.data) {
+                            if (response.data && response.data != null && response1.data && response1.data != null) {
+                                var data = []
+                                for (var i = 0; i < response.data.length; i++) {
+                                    var data1 = []
+                                    var data2 = []
+                                    data1.push(response.data[i])
+                                    for (var j = 0; j < response1.data.length; j++) {
+                                        if (response.data[i].id == response1.data[j].productId) {
+                                            data2.push(response1.data[j])
+                                        }
+                                    }
+                                    data1[0].itemList = data2
+                                    data.push(data1[0])
+                                }
+                                this.setState({
+                                    productWithVariant: data,
+                                })
+                            }
+                        }
+                    }, (error) => {
+                        Alert.alert("Server error!.")
+                    });
+                }
+            }, (error) => {
+                Alert.alert("Server error!.")
+            });
+
+        } else if (search.type === "BRAND") {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/item/getitem/online/' + search.subCategoryId + '/true',
+            }).then((response) => {
+                if (null != response.data) {
+                    axios({
+                        method: 'GET',
+                        url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                    }).then((response1) => {
+                        if (null != response1.data) {
+                            if (response.data && response.data != null && response1.data && response1.data != null) {
+                                var data = []
+                                for (var i = 0; i < response.data.length; i++) {
+                                    var data1 = []
+                                    var data2 = []
+                                    data1.push(response.data[i])
+                                    for (var j = 0; j < response1.data.length; j++) {
+                                        if (response.data[i].id == response1.data[j].productId) {
+                                            data2.push(response1.data[j])
+                                        }
+                                    }
+                                    data1[0].itemList = data2
+                                    data.push(data1[0])
+                                }
+                                this.setState({
+                                    productWithVariant: data,
+                                })
+                            }
+                        }
+                    }, (error) => {
+                        Alert.alert("Server error!.")
+                    });
+                }
+            }, (error) => {
+                Alert.alert("Server error!.")
+            });
+        } else if (search.type === "CATEGORY") {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/item/get/onlinecategory/' + search.typeId + '/true'
+            }).then((response) => {
+                if (null != response.data) {
+                    axios({
+                        method: 'GET',
+                        url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                    }).then((response1) => {
+                        if (null != response1.data) {
+                            if (response.data && response.data != null && response1.data && response1.data != null) {
+                                var data = []
+                                for (var i = 0; i < response.data.length; i++) {
+                                    var data1 = []
+                                    var data2 = []
+                                    data1.push(response.data[i])
+                                    for (var j = 0; j < response1.data.length; j++) {
+                                        if (response.data[i].id == response1.data[j].productId) {
+                                            data2.push(response1.data[j])
+                                        }
+                                    }
+                                    data1[0].itemList = data2
+                                    data.push(data1[0])
+                                }
+                                this.setState({
+                                    productWithVariant: data,
+                                })
+                            }
+                        }
+                    }, (error) => {
+                        Alert.alert("Server error!.")
+                    });
+                }
+            }, (error) => {
+                Alert.alert("Server error!.")
+            });
+        } else if (search.type === "SUBCAT") {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/item/getitem/online/' + search.typeId + '/true',
+            }).then((response) => {
+                if (null != response.data) {
+                    axios({
+                        method: 'GET',
+                        url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                    }).then((response1) => {
+                        if (null != response1.data) {
+                            if (response.data && response.data != null && response1.data && response1.data != null) {
+                                var data = []
+                                for (var i = 0; i < response.data.length; i++) {
+                                    var data1 = []
+                                    var data2 = []
+                                    data1.push(response.data[i])
+                                    for (var j = 0; j < response1.data.length; j++) {
+                                        if (response.data[i].id == response1.data[j].productId) {
+                                            data2.push(response1.data[j])
+                                        }
+                                    }
+                                    data1[0].itemList = data2
+                                    data.push(data1[0])
+                                }
+                                this.setState({
+                                    productWithVariant: data,
+                                })
+                            }
+                        }
+                    }, (error) => {
+                        Alert.alert("Server error!.")
+                    });
+                }
+            }, (error) => {
+                Alert.alert("Server error!.")
+            });
+        }
+
+        this.setState({
             searchVisible1: false,
-            searchTerm: index.name,
+            searchTerm: search.searchKey,
             searched: true
         })
     }
 
+    handleFilterType(type) {
+        switch (type) {
+            case "PROD":
+                this.setState({ slectedFilter: 1 })
+                break;
+            case "CAT":
+                this.setState({ slectedFilter: 2 })
+                break;
+            case "SCAT":
+                this.setState({ slectedFilter: 3 })
+                break;
+            case "BRND":
+                this.setState({ slectedFilter: 4 })
+                break;
+        }
+    }
+
     render() {
-        const { isEnd, searched, productWithVariant, isProduct, offers, allImages, temp_variant, productName, variantVisible,
+        const { isEnd, searched, searchData, slectedFilter, productWithVariant, isProduct, offers, allImages, temp_variant, productName, variantVisible,
             isCart, refreshing, searchVisible1, searchTerm, allCategory, allCart } = this.state;
-        var filteredProduct = productWithVariant ? productWithVariant.length > 0 ? productWithVariant.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
+        var filteredProduct = searchData ? searchData.length > 0 ? searchData.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
         return (
             <SafeAreaLayout
                 style={styles.safeArea}
@@ -873,34 +1161,50 @@ export class CategoryListScreen extends Component<Props & any, any> {
                 </MyDropdown> */}
                 <View style={[Styles.searchBox, { marginBottom: 0 }]}>
                     <TextInput
+                        key={'search'}
                         placeholder="Search"
                         style={[Styles.searchInput_new]}
                         value={searchTerm}
                         onChangeText={(term) => { this.searchUpdated(term) }}
-                        onFocus={() => { this.setState({ searchVisible1: true }) }}
+                        onFocus={() => { this.setState({ searchVisible1: false }) }}
                     />
 
                     <View style={[{ width: '10%' }, Styles.center]}>
                     </View>
                     <View style={[{ width: '10%' }, Styles.center]}>
-                        <TouchableOpacity onPress={() => { this.productSearch(filteredProduct) }}>
+                        <TouchableOpacity onPress={() => { this.productSearch(searchTerm) }}>
                             <Text style={Styles.searchIcon}><SearchIcon /></Text>
                         </TouchableOpacity>
                     </View>
                 </View>
+
                 {searchVisible1 && searchTerm != '' && searchTerm != null ?
                     <>
-                        <ScrollView>
-                            {searchTerm != '' && searchTerm != null ? filteredProduct.map((product, i) => {
+                        {/* <View style={{ width: '100%', paddingHorizontal: scale(5), justifyContent: 'space-between', flexDirection: 'row' }}>
+                            {FilterType.map((type, index) => {
+                                if (slectedFilter == type.id) {
+                                    return (
+                                        <TopButtonSelected onPress={() => {this.handleFilterType(type.title)}} title={type.name} />
+                                    )
+                                } else {
+                                    return (
+                                        <TopButton onPress={() => {this.handleFilterType(type.title)}} title={type.name} />
+                                    )
+                                }
+                            })}
+                        </View> */}
+                        {/* <ScrollView>
+                            {searchTerm != '' && searchTerm != null && filteredProduct ? filteredProduct.map((product, i) => {
                                 return (
-                                    <TouchableOpacity onPress={() => { this.search(product) }} key={product.id} style={styles.emailItem}>
+                                    <Pressable onPress={() => { this.search(product) }} key={product.id} style={styles.emailItem}>
                                         <View>
-                                            <Text>{product.name}</Text>
+                                            <Text>{product.searchKey}</Text>
+                                            <Text style={{ color: 'black', fontSize: scale(11) }}>Search by {product.type === "SUBCAT" ? "SUB CATEGORY" : product.type}</Text>
                                         </View>
-                                    </TouchableOpacity>
+                                    </Pressable>
                                 )
                             }) : null}
-                        </ScrollView>
+                        </ScrollView> */}
                     </> :
 
                     <ScrollView
@@ -918,7 +1222,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                 <View style={{ height: scale(130) }}>
                                     <View style={[Styles.product_image]}>
                                         <SliderBox
-                                            ImageComponentStyle={{ height: '100%', width: '100%' }}
+                                            ImageComponentStyle={{ height: '100%', width: '97%', borderRadius: 10, borderWidth: 1, borderColor: 'silver' }}
                                             autoplay
                                             circleLoop
                                             images={allImages}
@@ -935,7 +1239,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             /> : null} */}
                             </View> : null}
 
-                        <View style={{ borderTopWidth: scale(1), borderTopColor: Color.SILVER, paddingTop: scale(10) }}>
+                        <View >
                             {!searched ?
                                 <>
                                     <Text style={{ fontSize: scale(15), color: '#000', fontWeight: '600' }}>Shop By Category</Text>

@@ -19,6 +19,7 @@ export class Color {
     public static readonly DROP_DOWN_BACKGROUND = '#9dc4f2';
     public static readonly DESCRIPTION_BACKGROUND = '#94fffa';
     public static readonly DESCRIPTION_OPTION_BACKGROUND = '#9dc4f2';
+    public static readonly CART_HEADER_BACKGROUND = '#ededed';
 
     public static readonly OFFER = '#285c36';
 }

@@ -54,11 +54,11 @@ import com.android.build.OutputFile
  *   // where to put the JS bundle asset in release mode
  *   jsBundleDirRelease: "$buildDir/intermediates/assets/release",
  *
- *   // where to put drawable resources / React Native assets, e.g. the ones you use via
+ *   // where to put drawable-xxhdpi resources / React Native assets, e.g. the ones you use via
  *   // require('./image.png')), in debug mode
  *   resourcesDirDebug: "$buildDir/intermediates/res/merged/debug",
  *
- *   // where to put drawable resources / React Native assets, e.g. the ones you use via
+ *   // where to put drawable-xxhdpi resources / React Native assets, e.g. the ones you use via
  *   // require('./image.png')), in release mode
  *   resourcesDirRelease: "$buildDir/intermediates/res/merged/release",
  *
@@ -135,8 +135,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 7
-        versionName "7.0"
+        versionCode 9
+        versionName "9.0"
     }
 
     dexOptions {

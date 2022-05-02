@@ -115,7 +115,7 @@ export class SignUpScreen extends Component<Props, State & any> {
           Alert.alert(response.data.description);
         } else {
           AsyncStorage.setItem('emailForOtp', JSON.stringify(emailId), () => {
-            Alert.alert('User account created successfully, login with your credential.');
+            Alert.alert('Message', 'User account created successfully, Please check, Promotions and spam also on your provided email-ID .');
             const pushAction = StackActions.push(AppRoute.OTP);
             this.props.navigation.dispatch(pushAction);
           })

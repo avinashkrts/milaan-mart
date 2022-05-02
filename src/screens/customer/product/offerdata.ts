@@ -24,4 +24,28 @@ export const OfferData = [
         image: "4_" + AppConstants.SHOP_ID + "_offer.png",
         name: 'ADITIONAL_DISCOUNT',
         label: "Aditional Discount"
-    }]
+    }
+]
+
+export const FilterType = [
+    {
+        id: 1,
+        name: 'Product',
+        title: 'PROD'
+    },
+    {
+        id: 2,
+        name: 'Category',
+        title: 'CAT'
+    },
+    {
+        id: 3,
+        name: 'Sub Category',
+        title: 'SCAT'
+    },
+    {
+        id: 4,
+        name: 'Brand',
+        title: 'BRND'
+    }
+]

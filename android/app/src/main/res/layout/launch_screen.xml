@@ -17,7 +17,7 @@
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="177dp"-->
 <!--        android:layout_gravity="center"-->
-<!--        android:indeterminateDrawable="@drawable/background_splash"-->
+<!--        android:indeterminateDrawable="@drawable-xxhdpi/background_splash"-->
 <!--        />-->
 
 </LinearLayout>

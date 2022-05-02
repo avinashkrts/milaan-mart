@@ -4,7 +4,7 @@ import { createStackNavigator, StackNavigationProp } from '@react-navigation/sta
 import { CategoryListTabNavigatorProp, ShopListTabNavigatorProp } from '../customer-navigator/customer.navigator';
 import { AppRoute } from '../app-routes';
 import { ShopListScreen } from '../../screens/customer/shop';
-import { CategoryListScreen } from '../../screens/customer/product';
+import { CategoryListScreen, ProductDetailScreen } from '../../screens/customer/product';
 
 type ShopListNavigatorParams = {
   [AppRoute.CUSTOMER_SHOP_LIST]: undefined;
@@ -24,6 +24,8 @@ export interface CategoryListScreenProps {
     StackNavigationProp<ShopListNavigatorParams, AppRoute.CUSTOMER_CATEGORY_LIST>>;
   route: RouteProp<ShopListNavigatorParams, AppRoute.CUSTOMER_CATEGORY_LIST>;
 }
+
+
 
 const Stack = createStackNavigator<ShopListNavigatorParams>();
 

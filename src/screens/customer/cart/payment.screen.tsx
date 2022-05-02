@@ -272,12 +272,16 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         if (type === 'CASH') {
             this.setState({
                 selectedPayment: type,
-                paymentType: cashId
+                paymentType: cashId,
+                payOnline: false,
+                cashDelivery: true
             })
         } else if (type === 'PAYON') {
             this.setState({
                 selectedPayment: type,
-                paymentType: onlineId
+                paymentType: onlineId,
+                payOnline: true,
+                cashDelivery: false
             })
         }
     }
@@ -291,6 +295,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         })
         if (addressData != null) {
             if (payOnline) {
+                // Alert.alert('online')
 
                 axios({
                     method: 'PUT',
@@ -320,6 +325,8 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     Alert.alert("Please select your address.")
                 })
             } else if (cashDelivery) {
+                // Alert.alert('offline')
+
                 axios({
                     method: 'PUT',
                     url: AppConstants.API_BASE_URL + '/api/cart/placeorder',

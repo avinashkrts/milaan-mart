@@ -18,8 +18,10 @@ import { scale } from 'react-native-size-matters';
 
 import { AddIcon, BackIcon, CancelIcon, MinusIcon, RightArrowIcon, RupeeIcon } from '../../../assets/icons';
 import { Styles } from '../../../assets/styles';
+import { CartProduct } from '../../../components/cartProduct';
 import { SafeAreaLayout, SaveAreaInset } from '../../../components/safe-area-layout.component';
 import { Toolbar } from '../../../components/toolbar.component';
+import { Color } from '../../../constants';
 import { AppConstants } from '../../../constants/AppConstants';
 import { AppRoute } from '../../../navigation/app-routes';
 import { CartScreenProps } from '../../../navigation/customer-navigator/cart-navigation/cart.navigator';
@@ -201,82 +203,19 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
     }
 
     renderCart = ({ item }: any): ListItemElement => (
-        <ListItem style={{ borderBottomColor: 'rgba(2,15,20,0.10)', borderBottomWidth: 1 }}>
+        <ListItem style={{ borderBottomColor: Color.BORDER, borderBottomWidth: 1 }}>
             {item != null ?
-                <View style={Styles.cart_main_view}>
-                    <View style={Styles.cart_view_1}>
-                        <View style={Styles.cart_view_1_1}>
-                            <View style={[Styles.cart_avatar_view, Styles.center]}>
-                                <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/product/' + item.productImage }} style={Styles.product_avatar} />
-                            </View>
-                        </View>
-
-                        <View style={Styles.cart_view_1_2}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={Styles.cart_name_text_view}>
-                                    <Text style={Styles.cart_name_text}>{item.productName}</Text>
-                                </View>
-                                <TouchableOpacity onPress={() => { this.handleDelete(item.id) }}>
-                                    <Text style={Styles.cart_name_text}><CancelIcon fontSize={scale(25)} /></Text>
-                                </TouchableOpacity>
-                            </View>
-                            {this.state.allMeasurement.length > 0 ? this.state.allMeasurement.map((data, index) => {
-                                if (data.id == item.measurement) {
-                                    return (
-                                        <View style={{ flexDirection: 'row', width: '95%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                                            <Text style={Styles.price_text}>{item.packSize}{data.name}</Text>
-                                        </View>
-                                    )
-                                }
-                            }) : null}
-                            <View style={Styles.cart_price_view}>
-
-                                <View style={{ flexDirection: 'row', width: '55%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                                    <Text style={Styles.price_text}><RupeeIcon /> {item.price.toFixed(2)}</Text>
-                                    {/* {item.offersAvailable ?
-                                        <Text style={Styles.offer_price_text}>{item.oldPrice.toFixed(2)}</Text> : null
-                                    } */}
-                                </View>
-
-                                <View style={Styles.cart_quantity_view}>
-                                    {item.currentStock ? item.currentStock >= item.productQuantity ?
-                                        <>
-                                            <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleDecrease(item.productId, item.cartId, item.productQuantity) }}>
-                                                <Text style={Styles.cart_button_text}><MinusIcon /></Text>
-                                            </TouchableOpacity>
-
-                                            <View style={Styles.cart_quantity_text_view}>
-                                                <Text style={Styles.cart_quantity_text}>{item.productQuantity}</Text>
-                                            </View>
-
-                                            <TouchableOpacity style={Styles.cart_button} onPress={() => { this.handleIncrease(item.productId, item.cartId, item.productQuantity, item.currentStock) }}>
-                                                <Text style={Styles.cart_button_text}><AddIcon /></Text>
-                                            </TouchableOpacity>
-                                        </> :
-                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                            <Text style={{ color: 'white' }}>Out of Stock</Text>
-                                        </View> :
-                                        <View style={{ paddingHorizontal: scale(2), alignItems: 'center', justifyContent: 'center' }}>
-                                            <Text style={{ color: 'white' }}>Out of Stock</Text>
-                                        </View>}
-                                </View>
-                            </View>
-                            {/* {item.offersAvailable ?
-                                <View>
-                                    <Text style={Styles.cart_offer_text}>{item.offer}% off</Text>
-                                </View> : null
-                            } */}
-                        </View>
-                    </View>
-                    {/* {item.offersAvailable ?
-                        <View>
-                            <Text style={[Styles.cart_offer_text, { marginLeft: 10 }]}>{item.offersAvailable} offers available</Text>
-                        </View> : null
-                    } */}
+            <View style={{ paddingBottom: scale(20)}}>
+                <CartProduct
+                    handleDelete={(id) => { this.handleDelete(id) }}
+                    measurement={this.state.allMeasurement.length > 0 ? this.state.allMeasurement.find((data, index) => data.id == item.measurement).name : null}
+                    handleIncrease={(productId, cartId, productQuantity) => { this.handleIncrease(productId, cartId, productQuantity, item.currentStock) }}
+                    handleDecrease={(productId, cartId, productQuantity) => { this.handleDecrease(productId, cartId, productQuantity) }}
+                    item={item}
+                />
                 </View>
                 :
                 <ActivityIndicator size='large' color='green' />}
-
         </ListItem>
     )
 
@@ -478,7 +417,7 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
 
                                 <View style={Styles.price_detail_2_1}>
                                     <Text style={Styles.cart_price_text_head}>GST Amount</Text>
-                                    <Text style={Styles.cart_price_text_data}><RupeeIcon fontSize={18} />{null != cartData.gstAmount ? (cartData.gstAmount).toFixed(2) : null}</Text>
+                                    <Text style={Styles.cart_price_text_head}><RupeeIcon fontSize={18} />{null != cartData.gstAmount ? (cartData.gstAmount).toFixed(2) : null}</Text>
                                 </View>
 
                                 {/* <View style={Styles.price_detail_2_1}>

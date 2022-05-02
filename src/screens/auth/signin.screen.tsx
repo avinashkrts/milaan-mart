@@ -197,7 +197,7 @@ export class SignInScreen extends Component<SignInScreenProps & any, State & any
                     shopId: AppConstants.SHOP_ID
                 },
             }).then((response) => {
-                console.log('Res', response.data)
+                console.log('All response', response.data)
                 if (response.data) {
                     // console.log('ssssss', response.data);
                     // console.log('Resdddd', response.data)

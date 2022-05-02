@@ -219,9 +219,9 @@ export class CustomerOrderScreen extends Component<Props, any> {
                     </Modal>
 
                     <View style={Styles.order_row}>
-                        <TouchableOpacity style={{ width: '100%' }} onPress={() => { this.handleCartSubmit(item.cartId) }}>
+                        {/* <TouchableOpacity style={{ width: '100%' }} onPress={() => { this.handleCartSubmit(item.cartId) }}>
                             <Avatar source={{ uri: AppConstants.IMAGE_BASE_URL + '/shop/' + item.adminId + '_1_' + item.shopId + '_shop.png' }} style={Styles.order_cart} />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <View style={[Styles.order_column, { width: '65%' }]}>
                             <View style={{ flexWrap: 'wrap', flexDirection: 'row', width: '100%' }}>
                                 <Text style={Styles.order_text}>{item.shopName}</Text>

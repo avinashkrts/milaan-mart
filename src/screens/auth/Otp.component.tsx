@@ -7,7 +7,7 @@ import { scale } from 'react-native-size-matters';
 
 import { Styles } from '../../assets/styles';
 import { SafeAreaLayout, SaveAreaInset } from '../../components/safe-area-layout.component';
-import { AppConstants, LableText, Placeholder } from '../../constants';
+import { AppConstants, Color, LableText, Placeholder } from '../../constants';
 import { AppRoute } from '../../navigation/app-routes';
 import { OtpScreenProps } from '../../navigation/auth-navigation/auth.navigator';
 
@@ -86,6 +86,20 @@ export class OtpScreen extends Component<Props, State & any> {
         this.setState({ passwordVisible: !this.state.passwordVisible })
     };
 
+    async resend() {
+        const email = await AsyncStorage.getItem('emailForOtp')
+        const email1 = JSON.parse(email)
+        axios({
+            method: 'get',
+            url: AppConstants.API_BASE_URL + '/api/user/resend/otp/' + email1,
+        }).then((response) => {
+            if (response.data != null) {
+                Alert.alert('Message', 'OTP has been successfuly resend to user email ID, Please check, Promotions and spam also.');
+            } 
+        }, (error) => {
+            console.log(error);
+        });
+    }
     render() {
         const { otp } = this.state;
         return (
@@ -112,6 +126,10 @@ export class OtpScreen extends Component<Props, State & any> {
                             />
                         </View>
 
+                        <View style={{padding: 10}}>
+                            <Text style={{textAlign: 'center', color: Color.COLOR, fontSize: scale(14)}} >Please check, inbox, Promotions and spam also in your email.</Text>
+                        </View>
+
                         <View style={{ marginHorizontal: '10%' }}>
                             <TouchableOpacity style={[Styles.buttonBox, Styles.center]} onPress={() => { this.onFormSubmit() }}>
                                 <Text style={Styles.buttonName}>{LableText.SUBMIT}</Text>
@@ -119,7 +137,7 @@ export class OtpScreen extends Component<Props, State & any> {
                         </View>
 
                         <TouchableOpacity>
-                            <Text style={Styles.forgotPassword}>{LableText.RESEND_OTP}</Text>
+                            <Text style={Styles.forgotPassword} onPress={() => { this.resend() }}>{LableText.RESEND_OTP}</Text>
                         </TouchableOpacity>
 
                     </View>
