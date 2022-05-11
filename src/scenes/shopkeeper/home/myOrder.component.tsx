@@ -49,7 +49,7 @@ export class MyOrderScreen extends Component<MyOrderScreenProps, ThemedComponent
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             Axios({
@@ -63,7 +63,7 @@ export class MyOrderScreen extends Component<MyOrderScreenProps, ThemedComponent
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }
@@ -83,7 +83,7 @@ export class MyOrderScreen extends Component<MyOrderScreenProps, ThemedComponent
                         this._onRefresh();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             case 'REJECT':
@@ -103,7 +103,7 @@ export class MyOrderScreen extends Component<MyOrderScreenProps, ThemedComponent
                         this.toggleModal();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             default:

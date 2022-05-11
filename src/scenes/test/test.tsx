@@ -56,7 +56,7 @@ export class TestScreen extends Component<TestProductScreenProps, ThemedComponen
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }

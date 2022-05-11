@@ -73,7 +73,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
             this.setState({
                 userData: userData,
@@ -124,7 +124,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                 this.props.navigation.dispatch(CommonActions.goBack());
                 this.onRefresh()
             }, (error) => {
-                Alert.alert("Server error!");
+                Alert.alert("Wait for a moment.");
             })
         }
     }
@@ -201,7 +201,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                 this.toggleModal();
                 this.onRefresh()
             }, (error) => {
-                Alert.alert("Server error!");
+                Alert.alert("Wait for a moment.");
             })
         }
     }
@@ -217,7 +217,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                 this.onRefresh();
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -346,7 +346,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
         //             location: 'Current Location'
         //         })
         //     }, (error) => {
-        //         Alert.alert("Server error.")
+        //         Alert.alert("Wait for a moment..")
         //     });
         // }, (erroe) => {
 

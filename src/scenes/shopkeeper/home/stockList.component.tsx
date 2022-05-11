@@ -69,7 +69,7 @@ export class StockListScreen extends Component<StockListScreenProps, ThemedCompo
                 tempAllProduct: response.data,
             })
         }, (error) => {
-            Alert.alert('server error!')
+            Alert.alert('Wait for a moment.')
         })
     }
 

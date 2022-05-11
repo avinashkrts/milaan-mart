@@ -50,7 +50,7 @@ export class RechargeScreen extends Component<RechargeScreenProps, ThemedCompone
                 })
             }
         }, (error) => {
-            // Alert.alert("Server error!.")
+            // Alert.alert("Wait for a moment.")
         });
 
         Axios({
@@ -63,7 +63,7 @@ export class RechargeScreen extends Component<RechargeScreenProps, ThemedCompone
                 })
             }
         }, (error) => {
-            // Alert.alert("Server error!.")
+            // Alert.alert("Wait for a moment.")
         });
 
         Axios(AppConstants.API_BASE_URL + "/api/lookup/getalllookup")
@@ -178,7 +178,7 @@ export class RechargeScreen extends Component<RechargeScreenProps, ThemedCompone
                             Alert.alert("Recharse done.")
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 } else {
                     // console.log('Recharge Data', userData.adminId, planId, userData.shopId, walletPayment);
@@ -199,7 +199,7 @@ export class RechargeScreen extends Component<RechargeScreenProps, ThemedCompone
                             Alert.alert("Recharse done.")
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             } else {
@@ -247,7 +247,7 @@ export class RechargeScreen extends Component<RechargeScreenProps, ThemedCompone
                     Alert.alert("Recharge done.")
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         })
     }

@@ -103,7 +103,7 @@ export class BrandListScreen extends React.Component<BrandListScreenProps & Them
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -138,7 +138,7 @@ export class BrandListScreen extends React.Component<BrandListScreenProps & Them
                 this._onRefresh();
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 

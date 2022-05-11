@@ -362,7 +362,7 @@ export class ProductDetailScreen extends React.Component<ProductDetailScreenProp
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -402,7 +402,7 @@ export class ProductDetailScreen extends React.Component<ProductDetailScreenProp
                 this.props.navigation.goBack()
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 

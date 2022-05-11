@@ -184,7 +184,7 @@ export class AddEmployeeScreen extends React.Component<AddEmployeeScreenProps & 
             //         }
             //     }
             // }, (error) => {
-            //     Alert.alert("Server error!.")
+            //     Alert.alert("Wait for a moment.")
             // });
             Alert.alert("This page will be added soon")
         }

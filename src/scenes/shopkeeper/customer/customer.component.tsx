@@ -106,7 +106,7 @@ export class CustomerScreen extends React.Component<CustomerScreenProps & Themed
     //             })
     //         }
     //     }, (error) => {
-    //         Alert.alert("Server error!.")
+    //         Alert.alert("Wait for a moment.")
     //     });
     // }
 

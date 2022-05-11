@@ -60,7 +60,7 @@ export class CustomerWalletScreen extends Component<CustomerWalletScreenProps, T
                         })
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
 
                 axios({
@@ -73,7 +73,7 @@ export class CustomerWalletScreen extends Component<CustomerWalletScreenProps, T
                         })
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
             }
             axios(AppConstants.API_BASE_URL + "/api/lookup/getalllookup")

@@ -129,7 +129,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
             })
             this.onRefresh()
         }, (error) => {
-            Alert.alert("Server error!");
+            Alert.alert("Wait for a moment.");
         })
 
         Axios({
@@ -148,7 +148,7 @@ export class CustomerProfileScreen extends Component<CustomerProfileScreenProps,
             })
             this.onRefresh()
         }, (error) => {
-            Alert.alert("Server error!");
+            Alert.alert("Wait for a moment.");
         })
 
     }

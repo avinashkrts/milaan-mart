@@ -155,7 +155,7 @@ export class ItemListScreen extends React.Component<ItemListScreenProps & Themed
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -168,7 +168,7 @@ export class ItemListScreen extends React.Component<ItemListScreenProps & Themed
         }).then((response) => {
             this.setState({ allProduct: response.data })
         }, (error) => {
-            Alert.alert("Server error.")
+            Alert.alert("Wait for a moment..")
         });
     }
 

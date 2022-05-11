@@ -53,7 +53,7 @@ export class LogoutScreen extends Component<Props, Mystate & any> {
           this.props.navigation.dispatch(pushAction)
         });
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     } else {
       AsyncStorage.setItem('logedIn', JSON.stringify(''))

@@ -135,7 +135,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
 
                 // this.props.ChangeProductData(response.data)
             }, (error) => {
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
         } catch (err) {
             console.warn(err);
@@ -162,7 +162,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
         }
 
@@ -191,7 +191,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -226,7 +226,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -281,7 +281,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -301,7 +301,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                 })
                 this.onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -334,7 +334,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                     location: data.structured_formatting.main_text
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
 
         }, (error) => {
@@ -372,7 +372,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                     location: LableText.USE_CURRENT_LOCATION
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }, (erroe) => {
 
@@ -393,7 +393,7 @@ export class CustomerAllShopScreen extends Component<CustomerAllShopScreenProps,
                 search: ''
             })
         }, (error) => {
-            Alert.alert("Server error.")
+            Alert.alert("Wait for a moment..")
         });
     }
 

@@ -143,7 +143,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
 
             axios({
@@ -154,7 +154,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                 this.setState({ allProduct: response.data })
             }, (error) => {
                 this.setState({ allProduct: null })
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
         }
 
@@ -185,7 +185,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -214,14 +214,14 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
                             this._onRefresh();
                             Alert.alert("Product added to cart.")
                         }, (error) => {
-                            Alert.alert("Server error.")
+                            Alert.alert("Wait for a moment..")
                         });
                     } else {
                         Alert.alert("Product allready exists in your cart.")
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
 
 
@@ -254,7 +254,7 @@ export class WishListScreen extends React.Component<WishListScreenProps & Themed
             }).then((response) => {
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);

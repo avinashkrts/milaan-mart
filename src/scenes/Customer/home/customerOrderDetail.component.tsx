@@ -106,7 +106,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
                     }
 
                 }, (error) => {
-                    Alert.alert("Server problem")
+                    Alert.alert("Wait for a moment.")
                 })
                 var totalItem = 0;
                 response.data.productList.map((data, i) => {
@@ -119,7 +119,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
                 })
 
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
 
             Axios({
@@ -143,7 +143,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
 
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             Axios({
@@ -157,7 +157,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -186,7 +186,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
                         this._onRefresh();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             case 'REJECT':
@@ -205,7 +205,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
                         this.toggleModal();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             case 'PACK':
@@ -218,7 +218,7 @@ export class CustomerOrderDetailScreen extends Component<CustomerOrderDetailScre
                         this._onRefresh();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             default:

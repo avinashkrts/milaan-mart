@@ -220,7 +220,7 @@ export class AddCustomerScreen extends React.Component<AddCustomerScreenProps & 
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
 

@@ -14,7 +14,7 @@ export const CategoryImageButton: FC<Props> = (props: Props) => {
                     <Image
                         resizeMethod='auto'
                         resizeMode='stretch'
-                        source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + data.id + "_" + 'MILAAN63' + '_category.png' }}
+                        source={{ uri: AppConstants.IMAGE_BASE_URL + '/category/' + (data.id == 0 ?  + data.id + "_" + 'MILAAN63' + '_category.png' : data.avatar) }}
                         style={ data.name != "All" ? Styles.img : Styles.img_all}
                     />
                 </View>

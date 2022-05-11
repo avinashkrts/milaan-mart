@@ -76,7 +76,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
             axios({
                 method: 'GET',
@@ -89,7 +89,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
             axios({
                 method: 'GET',
@@ -102,7 +102,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });      
 
         let userDetail = await AsyncStorage.getItem('userDetail');
@@ -125,7 +125,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
 
@@ -142,7 +142,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -176,7 +176,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         axios({
@@ -189,7 +189,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedCategory: id })
     }
@@ -207,7 +207,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedBrand: id })
     }
@@ -240,7 +240,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -260,7 +260,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                 })
                 this.onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -276,7 +276,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
             }).then((response) => {
                 this.setState({ allProduct: response.data })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
     }
@@ -305,7 +305,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     location: data.structured_formatting.main_text
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
 
         }, (error) => {
@@ -342,7 +342,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                     location: LableText.USE_CURRENT_LOCATION
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }, (erroe) => {
 
@@ -363,7 +363,7 @@ export class OffersScreen extends Component<OffersScreenProps, ThemedComponentPr
                 search: ''
             })
         }, (error) => {
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 

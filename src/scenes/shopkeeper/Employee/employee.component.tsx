@@ -107,7 +107,7 @@ export class EmployeeScreen extends React.Component<EmployeeScreenProps & Themed
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         Axios({
@@ -120,7 +120,7 @@ export class EmployeeScreen extends React.Component<EmployeeScreenProps & Themed
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -163,7 +163,7 @@ export class EmployeeScreen extends React.Component<EmployeeScreenProps & Themed
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             })
@@ -195,7 +195,7 @@ export class EmployeeScreen extends React.Component<EmployeeScreenProps & Themed
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             })

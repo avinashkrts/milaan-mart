@@ -16,6 +16,6 @@ export const Notification = (userId, userType, content, alert) => {
             Alert.alert("" + alert)
         }
     }, (error) => {
-        Alert.alert("Server problem")
+        Alert.alert("Wait for a moment.")
     })
 }

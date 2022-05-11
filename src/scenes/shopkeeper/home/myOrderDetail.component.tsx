@@ -138,7 +138,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                     }
 
                 }, (error) => {
-                    Alert.alert("Server problem")
+                    Alert.alert("Wait for a moment.")
                 })
                 this.setState({
                     cartData: response.data,
@@ -149,7 +149,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                     productList: response.data.productList
                 })
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
 
             Axios({
@@ -173,7 +173,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
 
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             Axios({
@@ -199,7 +199,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             Axios({
@@ -221,7 +221,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -250,7 +250,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                         this._onRefresh();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             case 'REJECT':
@@ -270,7 +270,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                         this._onRefresh();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             case 'PACK':
@@ -284,7 +284,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                         this._onRefresh();
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
                 break;
             case 'SHIPPED':
@@ -314,7 +314,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                                 this._onRefresh();
                             }
                         }, (error) => {
-                            Alert.alert("Server error!.")
+                            Alert.alert("Wait for a moment.")
                         });
                     }
                 } else if (byCourier) {
@@ -341,7 +341,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                                 this._onRefresh();
                             }
                         }, (error) => {
-                            Alert.alert("Server error!.")
+                            Alert.alert("Wait for a moment.")
                         });
                     }
                 } else if (cartData.orderType == selfPick) {
@@ -360,7 +360,7 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                             this._onRefresh();
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 } else {
                     Alert.alert('Please select mode of delivery.')
@@ -575,12 +575,12 @@ export class MyOrderDetailScreen extends Component<MyOrderDetailScreenProps, The
                     //     }
 
                     // }, (error) => {
-                    //     Alert.alert("Server problem")
+                    //     Alert.alert("Wait for a moment.")
                     // })
 
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
 

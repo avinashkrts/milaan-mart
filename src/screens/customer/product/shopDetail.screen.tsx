@@ -343,7 +343,7 @@
 //                     wishList: response.data.wishList
 //                 })
 //             }, (error) => {
-//                 Alert.alert("Server error.")
+//                 Alert.alert("Wait for a moment..")
 //             });
 //         }
 
@@ -425,7 +425,7 @@
 //                     }
 //                 }
 //             }, (error) => {
-//                 Alert.alert("Server error.")
+//                 Alert.alert("Wait for a moment..")
 //             });
 //         } else {
 //             this.props.navigation.navigate(AppRoute.AUTH);
@@ -449,7 +449,7 @@
 //                 })
 //                 this._onRefresh();
 //             }, (error) => {
-//                 Alert.alert("Server error.")
+//                 Alert.alert("Wait for a moment..")
 //             });
 //         } else {
 //             this.props.navigation.navigate(AppRoute.AUTH);

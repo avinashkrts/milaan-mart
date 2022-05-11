@@ -179,12 +179,12 @@ export class PaymentScreen extends React.Component<PaymentScreenProps & Customer
                         }
 
                     }, (error) => {
-                        Alert.alert("Server problem")
+                        Alert.alert("Wait for a moment.")
                     })
                 }
 
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
 
             axios({
@@ -245,7 +245,7 @@ export class PaymentScreen extends React.Component<PaymentScreenProps & Customer
                     })
                 }
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -433,7 +433,7 @@ export class PaymentScreen extends React.Component<PaymentScreenProps & Customer
             this.props.navigation.dispatch(pushAction);
             // this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_PRODUCT, { id: this.backFunction.bind(this) })
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
     }
 

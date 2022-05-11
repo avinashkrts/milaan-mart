@@ -83,7 +83,7 @@ export class CustomerOrderScreen extends Component<Props, any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             Axios({
@@ -99,7 +99,7 @@ export class CustomerOrderScreen extends Component<Props, any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -177,12 +177,12 @@ export class CustomerOrderScreen extends Component<Props, any> {
                         }
 
                     }, (error) => {
-                        Alert.alert("Server problem")
+                        Alert.alert("Wait for a moment.")
                     })
 
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }

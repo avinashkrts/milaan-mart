@@ -48,7 +48,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
             productWithVariant: [],
             allProductWithVariant: [],
             tempProductWithVariant: [],
-            offers: OfferData,
+            offers: [],
+            banners: [],
             searchTerm: '',
             isEnd: false,
             searchVisible1: '',
@@ -99,6 +100,47 @@ export class CategoryListScreen extends Component<Props & any, any> {
         this.renderProduct = this.renderProduct.bind(this);
         this.renderVariant = this.renderVariant.bind(this);
         this.navigateProductDetail1 = this.navigateProductDetail1.bind(this);
+        this.getAllProduct = this.getAllProduct.bind(this);
+        this.getAllOffer = this.getAllOffer.bind(this);
+    }
+
+    getAllProduct() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/item/getall/productonline/byshopid/' + AppConstants.SHOP_ID + '/1',
+        }).then((response) => {
+            if (null != response.data) {
+                axios({
+                    method: 'GET',
+                    url: AppConstants.API_BASE_URL + '/api/itemlist/getall/variant/onlinebyshopid/' + AppConstants.SHOP_ID + '/true',
+                }).then((response1) => {
+                    if (null != response1.data) {
+                        if (response.data && response.data != null && response1.data && response1.data != null) {
+                            var data = []
+                            for (var i = 0; i < response.data.length; i++) {
+                                var data1 = []
+                                var data2 = []
+                                data1.push(response.data[i])
+                                for (var j = 0; j < response1.data.length; j++) {
+                                    if (response.data[i].id == response1.data[j].productId) {
+                                        data2.push(response1.data[j])
+                                    }
+                                }
+                                data1[0].itemList = data2
+                                data.push(data1[0])
+                            }
+                            this.setState({
+                                allProductWithVariant: data
+                            })
+                        }
+                    }
+                }, (error) => {
+                    Alert.alert("Wait for a moment.")
+                });
+            }
+        }, (error) => {
+            Alert.alert("Wait for a moment.")
+        });
     }
 
     getProduct() {
@@ -127,17 +169,16 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                 data.push(data1[0])
                             }
                             this.setState({
-                                productWithVariant: data,
-                                allProductWithVariant: data
+                                productWithVariant: data
                             })
                         }
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -205,16 +246,12 @@ export class CategoryListScreen extends Component<Props & any, any> {
         let categoryId = await AsyncStorage.getItem('categoryId');
         let offerId = await AsyncStorage.getItem('offerId');
         let userData = JSON.parse(userDetail);
-        var image: any = [];
         const logedIn = await AsyncStorage.getItem('logedIn');
         const shopIdAsync = await AsyncStorage.getItem('shopId');
         const shopName = await AsyncStorage.getItem('shopName');
-        this.state.offers.map((data, i) => {
-            image.push(AppConstants.IMAGE_BASE_URL + '/offer/' + data.image)
-        })
+
         this.setState({
             userData: userData,
-            allImages: image,
             searched: false,
             searchTerm: ''
         })
@@ -222,7 +259,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
         this.getProduct();
         this.getAllCategory();
         this.getMeasurement();
-
+        this.getAllProduct();
+        this.getAllOffer();
         if (null != logedIn && logedIn === 'true') {
             this.getCart(userData.userId)
             this.getUser(userData.userId)
@@ -233,7 +271,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
     }
 
     loadData() {
-        console.log("qqq")
+        // console.log("qqq")
         this.setState({
             isEnd: true
         })
@@ -249,18 +287,46 @@ export class CategoryListScreen extends Component<Props & any, any> {
         })
     }
 
+    getAllOffer() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/discount/getall',
+        }).then((response) => {
+            if (null != response.data) {
+                // console.log(response.data, "All Offers")
+                var image: any = [];
+                var banners: any = [];
+                response.data.map((data, i) => {
+                    if (data.offerType === "OFFER") {
+                        image.push(AppConstants.IMAGE_BASE_URL + '/offer/' + data.image)
+                    } else if (data.offerType === "BANNER") {
+                        banners.push(data)
+                    }
+                })
+                this.setState({
+                    offers: response.data,
+                    allImages: image,
+                    banners: banners
+                })
+            }
+        }, (error) => {
+            Alert.alert("Wait for a moment.")
+        });
+    }
+
     getAllCategory() {
         axios({
             method: 'GET',
             url: AppConstants.API_BASE_URL + '/api/category/getallonline/1',
         }).then((response) => {
             if (null != response.data) {
+                var data = response.data
                 this.setState({
-                    allCategory: response.data
+                    allCategory: data
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -288,7 +354,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -317,7 +383,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                 }
             }, (error) => {
                 // console.log(error)
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
         } else {
             const pushAction = StackActions.push(AppRoute.AUTH)
@@ -337,7 +403,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -353,7 +419,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -369,7 +435,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -415,7 +481,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
         // this.props.navigation.navigate(AppRoute.CUSTOMER_CATEGORY_PRODUCT_DETAIL, { productId: String(id), shopId: String(shopId) });
         const pushAction = StackActions.push(AppRoute.CUSTOMER_CATEGORY_PRODUCT_DETAIL, { productId: String(id), shopId: String(shopId) });
         this.props.navigation.dispatch(pushAction)
-      }
+    }
 
     navigateToCart() {
         // Alert.alert("")
@@ -453,7 +519,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -469,7 +535,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             }).then((response) => {
                 this.getCart(user.userId)
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         }
     }
@@ -485,7 +551,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
             }).then((response) => {
                 this.getCart(user.userId)
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         }
     }
@@ -564,7 +630,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                     isSelectedWish: !isSelectedWish
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -623,9 +689,10 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                                         <Text style={Styles.old_price_text}>MRP {item.itemList[0].mrp.toFixed(2)}</Text>
                                         <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{item.itemList[0].unitSellingPrice}/pc</Text>
-                                        <Text style={[{ fontFamily: 'notoserif' }, Styles.offer_price_text]}>
-                                            {Math.round(item.itemList[0].customerSingleOffer)}% off
-                                        </Text>
+                                        {item.itemList[0].customerBundleOffer > 0 || item.itemList[0].customerSingleOffer > 0 ?
+                                            <Text style={[{ fontFamily: 'notoserif' }, Styles.offer_price_text]}>
+                                                {Math.round(item.itemList[0].customerBundleOffer > 0 ? item.itemList[0].customerBundleOffer : item.itemList[0].customerSingleOffer > 0 ? item.itemList[0].customerSingleOffer : null)}% off
+                                            </Text> : null}
                                         {/* {item.offerActiveInd ?
                           <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
                           : null
@@ -705,9 +772,10 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                         <Text style={Styles.price_text}><RupeeIcon fontSize={scale(14)} />{item.unitSellingPrice.toFixed(2)}</Text>
                                     </View>
                                     <View>
-                                        <Text style={Styles.offer_price_text}>
-                                            {Math.round(item.customerSingleOffer)}% off
-                                        </Text>
+                                        {item.customerBundleOffer > 0 || item.customerSingleOffer ?
+                                            <Text style={[Styles.offer_price_text]}>
+                                                {Math.round(item.customerBundleOffer > 0 ? item.customerBundleOffer : item.customerSingleOffer > 0 ? item.customerSingleOffer : null)}% off
+                                            </Text> : null}
                                         {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)}/pc (Buy {item.bundleQuantity} or more)</Text> : null}
                                     </View>
                                 </View>
@@ -872,11 +940,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             axios({
@@ -916,11 +984,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
         // console.log("data", tempProd)
@@ -963,11 +1031,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
         } else if (search.type === "BRAND") {
@@ -1001,11 +1069,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else if (search.type === "CATEGORY") {
             axios({
@@ -1038,11 +1106,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else if (search.type === "SUBCAT") {
             axios({
@@ -1075,11 +1143,11 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             }
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
 
@@ -1108,7 +1176,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
     }
 
     render() {
-        const { isEnd, searched, searchData, slectedFilter, productWithVariant, isProduct, offers, allImages, temp_variant, productName, variantVisible,
+        const { isEnd, searched, searchData, slectedFilter, banners, productWithVariant, isProduct, offers, allImages, temp_variant, productName, variantVisible,
             isCart, refreshing, searchVisible1, searchTerm, allCategory, allCart } = this.state;
         var filteredProduct = searchData ? searchData.length > 0 ? searchData.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
         return (
@@ -1216,7 +1284,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             />
                         }
                     >
-                        {!searched ?
+                        {!searched && allImages != [] ?
                             <View style={{ marginTop: scale(10) }}>
                                 <Text style={{ fontSize: scale(15), color: '#000', fontWeight: 'bold' }}>All Offers</Text>
                                 <View style={{ height: scale(130) }}>
@@ -1271,59 +1339,27 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                     keyExtractor={item => item.id}
                                 />
                                 : null}
-                            {!searched ?
+                            {!searched && banners ?
                                 <>
-                                    <View style={{ marginTop: scale(10), paddingHorizontal: scale(5) }}>
-                                        <View style={Styles.category_card}>
-                                            {/* <Pressable onPress={() => { this.navigateProductOffer(item.id) }}> */}
-                                            <View style={[Styles.cat_card_img, Styles.center]}>
-                                                <Image
-                                                    resizeMethod='auto'
-                                                    resizeMode='stretch'
-                                                    source={{ uri: AppConstants.IMAGE_BASE_URL + '/offer/' + offers[0].image }}
-                                                    style={Styles.cat_card_avatar}
-                                                />
-                                            </View>
-                                            {/* </Pressable> */}
-                                            <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
-                                                {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
-                                            </View>
-                                        </View>
-                                    </View>
-
-                                    <View style={{ marginTop: scale(10), paddingHorizontal: scale(5) }}>
-                                        <View style={Styles.category_card}>
-                                            {/* <Pressable onPress={() => { this.navigateProductOffer(item.id) }}> */}
-                                            <View style={[Styles.cat_card_img, Styles.center]}>
-                                                <Image
-                                                    resizeMethod='auto'
-                                                    resizeMode='stretch'
-                                                    source={{ uri: AppConstants.IMAGE_BASE_URL + '/offer/' + offers[1].image }}
-                                                    style={Styles.cat_card_avatar}
-                                                />
-                                            </View>
-                                            {/* </Pressable> */}
-                                            <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
-                                                {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
+                                    {banners.map((data, i) => (
+                                        <View style={{ marginTop: scale(10), paddingHorizontal: scale(5) }}>
+                                            <View style={Styles.category_card}>
+                                                {/* <Pressable onPress={() => { this.navigateProductOffer(item.id) }}> */}
+                                                <View style={[Styles.cat_card_img, Styles.center]}>
+                                                    <Image
+                                                        resizeMethod='auto'
+                                                        resizeMode='stretch'
+                                                        source={{ uri: AppConstants.IMAGE_BASE_URL + '/offer/' + data.image }}
+                                                        style={Styles.cat_card_avatar}
+                                                    />
+                                                </View>
+                                                {/* </Pressable> */}
+                                                <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
+                                                    {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-
-                                    <View style={{ marginVertical: scale(5), paddingHorizontal: scale(5) }}>
-                                        <View style={Styles.category_card}>
-                                            <View style={[Styles.cat_card_img, Styles.center]}>
-                                                <Image
-                                                    resizeMethod='auto'
-                                                    resizeMode='stretch'
-                                                    source={{ uri: AppConstants.IMAGE_BASE_URL + '/offer/' + offers[2].image }}
-                                                    style={Styles.cat_card_avatar}
-                                                />
-                                            </View>
-                                            <View style={{ position: 'absolute', width: '100%', alignItems: 'center' }}>
-                                                {/* <Text style={{ fontSize: scale(15), fontWeight: '600', color: '#000' }}>{item.name}</Text> */}
-                                            </View>
-                                        </View>
-                                    </View>
+                                    ))}
                                 </> : null}
                         </View>
                     </ScrollView>}

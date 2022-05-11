@@ -140,7 +140,7 @@ export class AddBrandScreen extends React.Component<AddBrandScreenProps & Themed
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });           
         }
     }
@@ -182,7 +182,7 @@ export class AddBrandScreen extends React.Component<AddBrandScreenProps & Themed
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }

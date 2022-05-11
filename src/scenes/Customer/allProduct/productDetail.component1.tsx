@@ -344,7 +344,7 @@ export class CustProductDetailScreen1 extends React.Component<SearchProductDetai
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
 
@@ -428,7 +428,7 @@ export class CustProductDetailScreen1 extends React.Component<SearchProductDetai
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -452,7 +452,7 @@ export class CustProductDetailScreen1 extends React.Component<SearchProductDetai
                 })
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);

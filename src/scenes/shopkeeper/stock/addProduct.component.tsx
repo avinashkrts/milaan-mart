@@ -158,7 +158,7 @@ export class AddProductScreen extends Component<AddProductScreenProps, ThemedCom
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }

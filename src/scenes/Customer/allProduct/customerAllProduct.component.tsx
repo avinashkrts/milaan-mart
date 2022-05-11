@@ -80,7 +80,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
 
@@ -94,7 +94,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         allData.map((data, index) => {
@@ -128,7 +128,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -154,7 +154,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         axios({
@@ -167,7 +167,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedCategory: id })
     }
@@ -185,7 +185,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedBrand: id })
     }
@@ -219,7 +219,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -239,7 +239,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                 })
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -266,7 +266,7 @@ export class CustomerAllProductScreen extends Component<CustomerAllProductScreen
                 search: ''
             })
         }, (error) => {
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 

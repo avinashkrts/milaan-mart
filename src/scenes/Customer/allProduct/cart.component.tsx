@@ -123,7 +123,7 @@ export class CartScreen extends React.Component<CartScreenProps & CustomerCartSc
                     })
                 }
             }, (error) => {
-                // Alert.alert("Server error!.")
+                // Alert.alert("Wait for a moment.")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -146,7 +146,7 @@ export class CartScreen extends React.Component<CartScreenProps & CustomerCartSc
         }).then((response) => {
             this._onRefresh();
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
     }
 
@@ -161,7 +161,7 @@ export class CartScreen extends React.Component<CartScreenProps & CustomerCartSc
             }).then((response) => {
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         }
     }
@@ -173,7 +173,7 @@ export class CartScreen extends React.Component<CartScreenProps & CustomerCartSc
         }).then((response) => {
             this._onRefresh();
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
     }
 

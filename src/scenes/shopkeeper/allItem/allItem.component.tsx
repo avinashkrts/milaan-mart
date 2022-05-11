@@ -105,7 +105,7 @@ class AllItem extends React.Component<Props, any> {
                     })
                 }
             }, (error) => {
-                // Alert.alert("Server error!.")
+                // Alert.alert("Wait for a moment.")
             });
 
             axios({
@@ -119,7 +119,7 @@ class AllItem extends React.Component<Props, any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             axios({
@@ -133,7 +133,7 @@ class AllItem extends React.Component<Props, any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -152,7 +152,7 @@ class AllItem extends React.Component<Props, any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -181,7 +181,7 @@ class AllItem extends React.Component<Props, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         axios({
@@ -194,7 +194,7 @@ class AllItem extends React.Component<Props, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedCategory: id })
     }
@@ -212,7 +212,7 @@ class AllItem extends React.Component<Props, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedBrand: id })
     }
@@ -225,7 +225,7 @@ class AllItem extends React.Component<Props, any> {
         }).then((response) => {
             this.setState({ allProduct: response.data })
         }, (error) => {
-            Alert.alert("Server error.")
+            Alert.alert("Wait for a moment..")
         });
     }
 

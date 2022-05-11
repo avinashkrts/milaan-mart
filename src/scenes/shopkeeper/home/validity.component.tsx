@@ -34,7 +34,7 @@ export class ValidityScreen extends Component<ValidityScreenProps, ThemedCompone
                 })
             }
         }, (error) => {
-            // Alert.alert("Server error!.")
+            // Alert.alert("Wait for a moment.")
         });
     }
     onRefresh() {

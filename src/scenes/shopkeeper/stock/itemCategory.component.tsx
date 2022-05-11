@@ -105,7 +105,7 @@ export class ItemCategoryScreen extends React.Component<ItemCategoryScreenProps 
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }
@@ -140,7 +140,7 @@ export class ItemCategoryScreen extends React.Component<ItemCategoryScreenProps 
                 this._onRefresh();
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 

@@ -53,7 +53,7 @@ export class AdminBillBookScreen extends Component<AdminBillBookScreenProps, The
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             axios(AppConstants.API_BASE_URL + "/api/lookup/getalllookup")

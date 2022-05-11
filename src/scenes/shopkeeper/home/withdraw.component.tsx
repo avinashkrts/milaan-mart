@@ -60,7 +60,7 @@ export class WithdrawScreen extends Component<WithdrawScreenProps, ThemedCompone
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         Axios({
@@ -98,11 +98,11 @@ export class WithdrawScreen extends Component<WithdrawScreenProps, ThemedCompone
                         })
                     }
                 }, (error) => {
-                    Alert.alert("Server error!.")
+                    Alert.alert("Wait for a moment.")
                 });
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
 
@@ -233,7 +233,7 @@ export class WithdrawScreen extends Component<WithdrawScreenProps, ThemedCompone
                     Alert.alert('Account details added successfully please request again to withdraw.')
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }
@@ -259,7 +259,7 @@ export class WithdrawScreen extends Component<WithdrawScreenProps, ThemedCompone
                 Alert.alert('Withdraw request sent successfully.')
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 

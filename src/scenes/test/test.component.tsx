@@ -78,7 +78,7 @@ export const TestComponent = (props) => {
     //                 wishList: response.data.wishList
     //             })
     //         }, (error) => {
-    //             Alert.alert("Server error.")
+    //             Alert.alert("Wait for a moment..")
     //         });
     //     }
     //     if (null != shopIdAsync && shopIdAsync !== '') {
@@ -93,7 +93,7 @@ export const TestComponent = (props) => {
     //                 })
     //             }
     //         }, (error) => {
-    //             Alert.alert("Server error!.")
+    //             Alert.alert("Wait for a moment.")
     //         });
     //         axios({
     //             method: 'GET',
@@ -106,7 +106,7 @@ export const TestComponent = (props) => {
     //                 })
     //             }
     //         }, (error) => {
-    //             Alert.alert("Server error!.")
+    //             Alert.alert("Wait for a moment.")
     //         });
     //         axios({
     //             method: 'GET',
@@ -119,7 +119,7 @@ export const TestComponent = (props) => {
     //                 })
     //             }
     //         }, (error) => {
-    //             Alert.alert("Server error!.")
+    //             Alert.alert("Wait for a moment.")
     //         });
     //     } else {
     //         try {
@@ -139,7 +139,7 @@ export const TestComponent = (props) => {
     //                     single: false
     //                 })
     //             }, (error) => {
-    //                 Alert.alert("Server error.")
+    //                 Alert.alert("Wait for a moment..")
     //             });
     //         } catch (err) {
     //             console.warn(err);
@@ -156,7 +156,7 @@ export const TestComponent = (props) => {
     //                 })
     //             }
     //         }, (error) => {
-    //             Alert.alert("Server error!.")
+    //             Alert.alert("Wait for a moment.")
     //         });
     //         axios({
     //             method: 'GET',
@@ -169,7 +169,7 @@ export const TestComponent = (props) => {
     //                 })
     //             }
     //         }, (error) => {
-    //             Alert.alert("Server error!.")
+    //             Alert.alert("Wait for a moment.")
     //         });
     //     }
 
@@ -192,7 +192,7 @@ export const TestComponent = (props) => {
     //                 })
     //             }
     //         }, (error) => {
-    //             Alert.alert("Server error.")
+    //             Alert.alert("Wait for a moment..")
     //         });
     //     })
     // }
@@ -219,7 +219,7 @@ export const TestComponent = (props) => {
     //             })
     //         }
     //     }, (error) => {
-    //         Alert.alert("Server error!.")
+    //         Alert.alert("Wait for a moment.")
     //     });
 
     //     axios({
@@ -232,7 +232,7 @@ export const TestComponent = (props) => {
     //             })
     //         }
     //     }, (error) => {
-    //         Alert.alert("Server error!.")
+    //         Alert.alert("Wait for a moment.")
     //     });
     //     // this.setState({ selectedCategory: id })
     // }
@@ -250,7 +250,7 @@ export const TestComponent = (props) => {
     //             })
     //         }
     //     }, (error) => {
-    //         Alert.alert("Server error!.")
+    //         Alert.alert("Wait for a moment.")
     //     });
     //     // this.setState({ selectedBrand: id })
     // }
@@ -284,7 +284,7 @@ export const TestComponent = (props) => {
     //                 }
     //             }
     //         }, (error) => {
-    //             // Alert.alert("Server error.")
+    //             // Alert.alert("Wait for a moment..")
     //         });
     //     } else {
     //         this.props.navigation.navigate(AppRoute.AUTH);
@@ -304,7 +304,7 @@ export const TestComponent = (props) => {
     //             })
     //             this._onRefresh();
     //         }, (error) => {
-    //             Alert.alert("Server error.")
+    //             Alert.alert("Wait for a moment..")
     //         });
     //     } else {
     //         this.props.navigation.navigate(AppRoute.AUTH);
@@ -332,7 +332,7 @@ export const TestComponent = (props) => {
     //                 search: ''
     //             })
     //         }, (error) => {
-    //             // Alert.alert("Server error.")
+    //             // Alert.alert("Wait for a moment..")
     //         })
     //         : axios({
     //             method: 'GET',
@@ -343,7 +343,7 @@ export const TestComponent = (props) => {
     //                 search: ''
     //             })
     //         }, (error) => {
-    //             // Alert.alert("Server error.")
+    //             // Alert.alert("Wait for a moment..")
     //         });
     // }
 
@@ -378,7 +378,7 @@ export const TestComponent = (props) => {
     //                 location: data.structured_formatting.main_text
     //             })
     //         }, (error) => {
-    //             Alert.alert("Server error.")
+    //             Alert.alert("Wait for a moment..")
     //         });
 
     //     }, (error) => {
@@ -410,7 +410,7 @@ export const TestComponent = (props) => {
     //                 location: 'Current Location'
     //             })
     //         }, (error) => {
-    //             Alert.alert("Server error.")
+    //             Alert.alert("Wait for a moment..")
     //         });
     //     }, (erroe) => {
 

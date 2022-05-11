@@ -147,7 +147,7 @@ export class EditEmployeeScreen extends React.Component<EditEmployeeScreenProps 
             (error) => {
                 console.log(error);
                 if (error) {
-                    Alert.alert("Server error.");
+                    Alert.alert("Wait for a moment..");
                 }
             }
         );
@@ -166,7 +166,7 @@ export class EditEmployeeScreen extends React.Component<EditEmployeeScreenProps 
             (error) => {
                 console.log(error);
                 if (error) {
-                    Alert.alert("Server error.");
+                    Alert.alert("Wait for a moment..");
                 }
             }
         );
@@ -233,7 +233,7 @@ export class EditEmployeeScreen extends React.Component<EditEmployeeScreenProps 
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }

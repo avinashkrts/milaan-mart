@@ -212,11 +212,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     } else {
       this.getAllSubCategory();
@@ -256,11 +256,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     }
   }
@@ -297,11 +297,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
             }
           }
         }, (error) => {
-          Alert.alert("Server error!.")
+          Alert.alert("Wait for a moment.")
         });
       }
     }, (error) => {
-      Alert.alert("Server error!.")
+      Alert.alert("Wait for a moment.")
     });
   }
 
@@ -398,7 +398,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         })
       }
     }, (error) => {
-      Alert.alert("Server error!.")
+      Alert.alert("Wait for a moment.")
     });
   }
 
@@ -537,7 +537,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 }
               }, (error) => {
                 this.setState({ check: true })
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
               });
             } else {
               Alert.alert("Product allready exists in your cart.")
@@ -590,7 +590,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       //     })
       //   }
       // }, (error) => {
-      //   Alert.alert("Server error!.")
+      //   Alert.alert("Wait for a moment.")
       // });
 
       axios({
@@ -624,11 +624,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     }
   }
@@ -669,11 +669,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     }
   }
@@ -719,11 +719,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     } else {
       this.getProductByCategory(id)
@@ -760,7 +760,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           isSelectedWish: !isSelectedWish
         })
       }, (error) => {
-        Alert.alert("Server error.")
+        Alert.alert("Wait for a moment..")
       });
     } else {
       this.props.navigation.navigate(AppRoute.AUTH);
@@ -842,11 +842,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
 
       axios({
@@ -886,11 +886,11 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
             }
           }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
           });
         }
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     }
     // console.log("data", tempProd)
@@ -952,7 +952,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           location: data.structured_formatting.main_text
         })
       }, (error) => {
-        Alert.alert("Server error.")
+        Alert.alert("Wait for a moment..")
       });
     }, (error) => {
       console.log(error);
@@ -980,7 +980,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           location: 'Current Location'
         })
       }, (error) => {
-        Alert.alert("Server error.")
+        Alert.alert("Wait for a moment..")
       });
     }, (erroe) => {
 
@@ -1023,7 +1023,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         }
       }
     }, (error) => {
-      Alert.alert("Server error!.")
+      Alert.alert("Wait for a moment.")
     });
   }
 
@@ -1042,7 +1042,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           this.getCart(user.userId)
         }, (error) => {
           this.setState({ check: true })
-          Alert.alert("Server problem")
+          Alert.alert("Wait for a moment.")
         })
       }
     }
@@ -1063,7 +1063,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           this.getCart(user.userId)
         }, (error) => {
           this.setState({ check: true })
-          Alert.alert("Server problem")
+          Alert.alert("Wait for a moment.")
         })
       }
     }
@@ -1120,9 +1120,10 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                     <Text style={Styles.old_price_text}>MRP {item.itemList[0].mrp.toFixed(2)}</Text>
                     <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{item.itemList[0].unitSellingPrice}/pc</Text>
-                    <Text style={[Styles.offer_price_text]}>
-                      {Math.round(item.itemList[0].customerBundleOffer)}% off
-                    </Text>
+                    {item.itemList[0].customerBundleOffer > 0 || item.itemList[0].customerSingleOffer > 0 ?
+                      <Text style={[Styles.offer_price_text]}>
+                        {Math.round(item.itemList[0].customerBundleOffer > 0 ? item.itemList[0].customerBundleOffer : item.itemList[0].customerSingleOffer > 0 ? item.itemList[0].customerSingleOffer : null)}% off
+                      </Text> : null}
                     {/* {item.offerActiveInd ?
                       <Text style={{ color: Color.COLOR, fontSize: 20, textDecorationLine: 'line-through' }}>{item.oldPrice}</Text>
                       : null
@@ -1200,9 +1201,10 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                     <Text style={Styles.price_text}><RupeeIcon fontSize={scale(14)} />{item.unitSellingPrice.toFixed(2)}</Text>
                   </View>
                   <View>
+                    {item.customerBundleOffer > 0 || item.customerSingleOffer ?
                     <Text style={[Styles.offer_price_text]}>
-                      {Math.round(item.customerBundleOffer)}% off
-                    </Text>
+                      {Math.round(item.customerBundleOffer > 0 ? item.customerBundleOffer : item.customerSingleOffer> 0 ? item.customerSingleOffer : null)}% off
+                    </Text>: null}
                     {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)}/pc (Buy {item.bundleQuantity} or more)</Text> : null}
                   </View>
                 </View>

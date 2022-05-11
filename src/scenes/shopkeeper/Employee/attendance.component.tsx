@@ -291,7 +291,7 @@ export class AttendanceScreen extends React.Component<AttendanceScreenProps & Th
             (error) => {
                 console.log(error);
                 if (error) {
-                    Alert.alert("Server error.");
+                    Alert.alert("Wait for a moment..");
                 }
             }
         );
@@ -310,7 +310,7 @@ export class AttendanceScreen extends React.Component<AttendanceScreenProps & Th
             (error) => {
                 console.log(error);
                 if (error) {
-                    Alert.alert("Server error.");
+                    Alert.alert("Wait for a moment..");
                 }
             }
         );

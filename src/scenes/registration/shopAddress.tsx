@@ -148,7 +148,7 @@ export class ShopAddressScreen extends Component<ShopAddressScreenProps & SignRe
                             location: response.data.results[0].formatted_address
                         })
                         // }, (error) => {
-                        //     Alert.alert("Server error.")
+                        //     Alert.alert("Wait for a moment..")
                         // });
             
                     }, (error) => {
@@ -272,7 +272,7 @@ export class ShopAddressScreen extends Component<ShopAddressScreenProps & SignRe
                 location: data.structured_formatting.main_text
             })
             // }, (error) => {
-            //     Alert.alert("Server error.")
+            //     Alert.alert("Wait for a moment..")
             // });
 
         }, (error) => {

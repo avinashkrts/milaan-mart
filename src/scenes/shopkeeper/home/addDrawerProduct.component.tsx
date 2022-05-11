@@ -111,7 +111,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
 
             Axios({
@@ -126,7 +126,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
 
@@ -256,7 +256,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }
@@ -280,7 +280,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }
@@ -307,7 +307,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
             //         })
             //     }
             // }, (error) => {
-            //     Alert.alert("Server error!.")
+            //     Alert.alert("Wait for a moment.")
             // });
         }
     }
@@ -490,7 +490,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }
@@ -527,7 +527,7 @@ export class AddDrawerProductScreen extends Component<AddDrawerProductScreenProp
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
     }

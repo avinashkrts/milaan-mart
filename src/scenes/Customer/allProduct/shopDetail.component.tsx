@@ -343,7 +343,7 @@ export class ShopDetailScreen extends React.Component<ShopDetailScreenProps & Of
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
 
@@ -425,7 +425,7 @@ export class ShopDetailScreen extends React.Component<ShopDetailScreenProps & Of
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -449,7 +449,7 @@ export class ShopDetailScreen extends React.Component<ShopDetailScreenProps & Of
                 })
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);

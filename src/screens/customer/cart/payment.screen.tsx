@@ -89,7 +89,9 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             adminData: [],
             insideShop: false,
             selectedDelivery: '',
-            orderPlacing: false
+            orderPlacing: false,
+            shopLatLng: '',
+            userLatLng: ''
         }
         this.backFunction = this.backFunction.bind(this)
         this.getAddress = this.getAddress.bind(this)
@@ -98,6 +100,29 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
     async componentDidMount() {
         this.props.navigation.addListener('focus', () => {
             this.getAddress();
+        })
+        // const lat1 = 25.577647957975636, lng1 = 85.0558914550103, lat2 = 25.612677, lng2 = 85.158875
+        // axios({
+        //     method: 'GET',
+        //     url: 'https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=' + lat1 + ',' + lng1 + '&destinations=' + lat2 + '%2C' + lng2 + '&key=' + AppConstants.GOOGLE_MAP_KEY
+        // }).then((res) => {
+        //     console.log("map", res.data.rows[0].elements[0].distance.value)
+        // }, (err) => {
+        //     console.log({ err })
+        // })
+
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/admin/get/3'
+        }).then((res) => {
+            // console.log("map", res.data.latitude + ',' + res.data.longitude)
+            if (res.data) {
+                this.setState({
+                    shopLatLng: res.data.latitude + ',' + res.data.longitude
+                })
+            }
+        }, (err) => {
+            console.log({ err })
         })
 
         SCREEN_WIDTH = Dimensions.get('window').width;
@@ -120,7 +145,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         })
         if (null != logedIn && logedIn === 'true') {
             // Alert.alert("" + userData.userId, cartId) 
-              
+
 
             axios({
                 method: 'GET',
@@ -144,12 +169,12 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                             })
                         }
                     }, (error) => {
-                        Alert.alert("Server problem")
+                        Alert.alert("Wait for a moment.")
                     })
                 }
 
             }, (error) => {
-                // Alert.alert("Server problem")
+                // Alert.alert("Wait for a moment.")
             })
 
             axios({
@@ -210,7 +235,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                     })
                 }
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
             this.getAddress();
         } else {
@@ -231,7 +256,8 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                 if (response.data) {
                     this.setState({
                         addressData: response.data,
-                        addressId: response.data.id
+                        addressId: response.data.id,
+                        userLatLng: response.data.latitude + ',' + response.data.longitude
                     })
                 } else {
                     this.props.navigation.navigate(AppRoute.CART_ADDRESS)
@@ -288,82 +314,98 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
 
     handlePlaceOrder() {
-        const { orderType, insideShop, selectedSlot, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
-        console.log('data', selectedSlot, orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId, addressId);
-        this.setState({
-            orderPlacing: true
-        })
-        if (addressData != null) {
-            if (payOnline) {
-                // Alert.alert('online')
+        const { orderType, userLatLng, shopLatLng, insideShop, selectedSlot, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
+        // console.log('data', selectedSlot, orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId, addressId);
 
-                axios({
-                    method: 'PUT',
-                    url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
-                    data: {
-                        transactionType: paymentType,
-                        cartId: cartId,
-                        orderType: orderType,
-                        addressId: addressId,
-                        slotDate: slotDate,
-                        insideShop: insideShop,
-                        slotTime: selectedSlot
-                    }
-                }).then((response) => {
-                    if (response.data) {
-                        if (response.data.status) {
-                            // Alert.alert(response.data.transactionId)
-                            console.log(response.data)
-
-                            this.startPayment(response.data.transactionId, response.data.orderId);
-                        } else {
-                            Alert.alert("Got error while placing Order.")
-                        }
-                    }
-                }, (error) => {
-                    console.log(error)
-                    Alert.alert("Please select your address.")
+        axios({
+            method: 'GET',
+            url: 'https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=' + shopLatLng + '&destinations=' + userLatLng + '&key=' + AppConstants.GOOGLE_MAP_KEY
+        }).then((res) => {
+            // console.log("map", res.data.rows[0].elements[0].distance, selectedSlot)
+            const { text, value } = res.data.rows[0].elements[0].distance;
+            if (value > 2000 && value < 5000 && selectedSlot === '2_HRS') {
+                Alert.alert("Message", "Sorry! You are not in our quick delivery range, Please select another delivery slot.")
+            } else if (value > 5000) {
+                Alert.alert("Message", "Sorry! You are not in our delivery range, It is available for only 5 KMs.")
+            } else {
+                this.setState({
+                    orderPlacing: true
                 })
-            } else if (cashDelivery) {
-                // Alert.alert('offline')
+                if (addressData != null) {
+                    if (payOnline) {
+                        // Alert.alert('online')
 
-                axios({
-                    method: 'PUT',
-                    url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
-                    data: {
-                        transactionType: paymentType,
-                        cartId: cartId,
-                        orderType: orderType,
-                        addressId: addressId,
-                        slotDate: slotDate,
-                        insideShop: insideShop,
-                        slotTime: selectedSlot
+                        axios({
+                            method: 'PUT',
+                            url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
+                            data: {
+                                transactionType: paymentType,
+                                cartId: cartId,
+                                orderType: orderType,
+                                addressId: addressId,
+                                slotDate: slotDate,
+                                insideShop: insideShop,
+                                slotTime: selectedSlot
+                            }
+                        }).then((response) => {
+                            if (response.data) {
+                                if (response.data.status) {
+                                    // Alert.alert(response.data.transactionId)
+                                    console.log(response.data)
+
+                                    this.startPayment(response.data.transactionId, response.data.orderId);
+                                } else {
+                                    Alert.alert("Got error while placing Order.")
+                                }
+                            }
+                        }, (error) => {
+                            console.log(error)
+                            Alert.alert("Please select your address.")
+                        })
+                    } else if (cashDelivery) {
+                        // Alert.alert('offline')
+
+                        axios({
+                            method: 'PUT',
+                            url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
+                            data: {
+                                transactionType: paymentType,
+                                cartId: cartId,
+                                orderType: orderType,
+                                addressId: addressId,
+                                slotDate: slotDate,
+                                insideShop: insideShop,
+                                slotTime: selectedSlot
+                            }
+                        }).then((response) => {
+                            if (response.data) {
+                                if (response.data.status) {
+                                    this.notification()
+                                    console.log(response.data)
+                                    this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_NAV)
+                                    // const resetAction = CommonActions.reset({
+                                    //     index: 0,
+                                    //     routes: [
+                                    //         { name: AppRoute.CUSTOMER_ORDER_NAV }
+                                    //     ],
+                                    // });
+                                    // this.props.navigation.dispatch(resetAction)
+                                } else {
+                                    Alert.alert("Got error while placing Order.")
+                                }
+                            }
+                        }, (error) => {
+                            console.log(error)
+                            Alert.alert("Please select your address.")
+                        })
                     }
-                }).then((response) => {
-                    if (response.data) {
-                        if (response.data.status) {
-                            this.notification()
-                            console.log(response.data)
-                            this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_NAV)
-                            // const resetAction = CommonActions.reset({
-                            //     index: 0,
-                            //     routes: [
-                            //         { name: AppRoute.CUSTOMER_ORDER_NAV }
-                            //     ],
-                            // });
-                            // this.props.navigation.dispatch(resetAction)
-                        } else {
-                            Alert.alert("Got error while placing Order.")
-                        }
-                    }
-                }, (error) => {
-                    console.log(error)
-                    Alert.alert("Please select your address.")
-                })
+                } else {
+                    Alert.alert("Please add your address.")
+                }
             }
-        } else {
-            Alert.alert("Please add your address.")
-        }
+        }, (err) => {
+            console.log({ err })
+        })
     }
 
     backFunction() {
@@ -447,7 +489,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             this.props.navigation.dispatch(pushAction);
             // this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_PRODUCT, { id: this.backFunction.bind(this) })
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
     }
 
@@ -709,7 +751,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         <Picker.Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
                                         <Picker.Item key="DELI3" label="5PM to 7PM" value="5_7_PM" />
                                         {moment(slotDate).diff(minDate, 'days') == 0 ?
-                                            <Picker.Item key="DELI5" label="Within two hour" value="2_HRS" /> : null
+                                            <Picker.Item key="DELI5" label="Within 30 minutes" value="2_HRS" /> : null
                                         }
                                     </Picker>
 

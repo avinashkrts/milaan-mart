@@ -150,7 +150,7 @@ export class EditCustomerScreen extends React.Component<EditCustomerScreenProps 
             (error) => {
                 console.log(error);
                 if (error) {
-                    Alert.alert("Server error.");
+                    Alert.alert("Wait for a moment..");
                 }
             }
         );
@@ -252,7 +252,7 @@ export class EditCustomerScreen extends React.Component<EditCustomerScreenProps 
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         }
 

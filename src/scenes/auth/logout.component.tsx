@@ -70,7 +70,7 @@ export class LogoutScreen extends Component<LogoutScreenProps & SafeAreaLayoutEl
           this.props.navigation.dispatch(pushAction)
         });
       }, (error) => {
-        Alert.alert("Server error!.")
+        Alert.alert("Wait for a moment.")
       });
     } else {
       AsyncStorage.setItem('logedIn', JSON.stringify(''))

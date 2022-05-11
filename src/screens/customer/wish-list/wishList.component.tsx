@@ -118,7 +118,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
                 this.setState({ allProduct: response.data })
             }, (error) => {
                 this.setState({ allProduct: null })
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
 
             this.getAllBrand()
@@ -142,7 +142,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -163,7 +163,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
@@ -179,7 +179,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -195,7 +195,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
             }
         }, (error: any) => {
             console.log(error)
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 
@@ -223,14 +223,14 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
                             this._onRefresh();
                             Alert.alert("Product added to cart.")
                         }, (error) => {
-                            Alert.alert("Server error.")
+                            Alert.alert("Wait for a moment..")
                         });
                     } else {
                         Alert.alert("Product allready exists in your cart.")
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -262,7 +262,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
             }).then((response) => {
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -281,7 +281,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
             }).then((response) => {
                 this.getCart(user.userId)
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         }
     }
@@ -297,7 +297,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
             }).then((response) => {
                 this.getCart(user.userId)
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         }
     }
@@ -327,7 +327,7 @@ export class WishListScreen extends React.Component<Props, MyState & any> {
                 }
             }, (error) => {
                 // console.log(error)
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
         } else {
             const pushAction = StackActions.push(AppRoute.AUTH)

@@ -89,7 +89,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                             })
                         }
                     }, (error) => {
-                        Alert.alert("Server error!.")
+                        Alert.alert("Wait for a moment.")
                     });
                 }, (erroe) => {
 
@@ -121,7 +121,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
 
@@ -137,7 +137,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         axios({
@@ -151,7 +151,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         allData.map((data, index) => {
@@ -167,7 +167,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         })
     }
@@ -223,7 +223,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -243,7 +243,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                 })
                 this.onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -259,7 +259,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
             }).then((response) => {
                 this.setState({ allProduct: response.data })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
     }
@@ -285,7 +285,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                     location: data.structured_formatting.main_text
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
 
         }, (error) => {
@@ -320,7 +320,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                     location: LableText.USE_CURRENT_LOCATION
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }, (erroe) => {
 
@@ -341,7 +341,7 @@ export class CombinedOffersScreen extends Component<CombinedOfferScreenProps, Th
                 search: ''
             })
         }, (error) => {
-            // Alert.alert("Server error.")
+            // Alert.alert("Wait for a moment..")
         });
     }
 

@@ -285,7 +285,7 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                     wishList: response.data.wishList
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }
     }
@@ -313,7 +313,7 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                 allImages: image1
             })
         }, (error) => {
-            Alert.alert("Server error.")
+            Alert.alert("Wait for a moment..")
         });
     }
 
@@ -370,7 +370,7 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                     }
                 }
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -394,7 +394,7 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                 })
                 this._onRefresh();
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -435,10 +435,10 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                             <View style={[Styles.product_view, Styles.center]}>
                                 <View style={[Styles.product_image]}>
                                     {allImages != null && allImages != [] ?
-                                       <SliderBox
-                                       autoplay
-                                       circleLoop
-                                       images={allImages} />
+                                        <SliderBox
+                                            autoplay
+                                            circleLoop
+                                            images={allImages} />
                                         : null
                                     }
                                 </View>
@@ -504,9 +504,13 @@ export class ProductDetailScreen extends React.Component<Props, any> {
                                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                                                         <Text style={Styles.old_price_text}>MRP {data.mrp.toFixed(2)}</Text>
                                                         <Text style={{ color: '#000', fontWeight: '600', fontSize: scale(14) }}><RupeeIcon fontSize={scale(14)} />{data.unitSellingPrice}/pc</Text>
-                                                        <Text style={[{ fontFamily: 'notoserif', color: Color.OFFER, fontWeight: 'bold' }, Styles.offer_price_text]}>
+                                                        {data.customerBundleOffer > 0 || data.customerSingleOffer ?
+                                                            <Text style={[Styles.offer_price_text]}>
+                                                                {Math.round(data.customerBundleOffer > 0 ? data.customerBundleOffer : data.customerSingleOffer > 0 ? data.customerSingleOffer : null)}% off
+                                                            </Text> : null}
+                                                        {/* <Text style={[{ fontFamily: 'notoserif', color: Color.OFFER, fontWeight: 'bold' }, Styles.offer_price_text]}>
                                                             {Math.round(data.customerBundleOffer)}% off
-                                                        </Text>
+                                                        </Text> */}
                                                     </View>
                                                     {data.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(data.bundlePrice / data.bundleQuantity).toFixed(2)}/pc (Buy {data.bundleQuantity} or more)</Text> : null}
 

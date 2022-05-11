@@ -101,7 +101,7 @@ export class CustomerCartScreen extends React.Component<CustomerCartScreenProps 
                 cartData: response.data[0],
             })
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
 
         axios({
@@ -112,7 +112,7 @@ export class CustomerCartScreen extends React.Component<CustomerCartScreenProps 
                 productList: response.data
             })
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
     } else {
         this.props.navigation.navigate(AppRoute.AUTH)

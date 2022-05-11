@@ -178,7 +178,7 @@ class CombinedProduct extends Component<Props, any> {
         //         })
         //     }
         // }, (error) => {
-        //     Alert.alert("Server error!.")
+        //     Alert.alert("Wait for a moment.")
         // });
         // axios({
         //     method: 'GET',
@@ -191,7 +191,7 @@ class CombinedProduct extends Component<Props, any> {
         //         })
         //     }
         // }, (error) => {
-        //     Alert.alert("Server error!.")
+        //     Alert.alert("Wait for a moment.")
         // });
         // axios({
         //     method: 'GET',
@@ -204,7 +204,7 @@ class CombinedProduct extends Component<Props, any> {
         //         })
         //     }
         // }, (error) => {
-        //     Alert.alert("Server error!.")
+        //     Alert.alert("Wait for a moment.")
         // });
 
         // axios({
@@ -216,7 +216,7 @@ class CombinedProduct extends Component<Props, any> {
         //         allMeasurement: response.data,
         //     })
         // }, (error) => {
-        //     Alert.alert("Server error.")
+        //     Alert.alert("Wait for a moment..")
         // });
     }
 
@@ -244,7 +244,7 @@ class CombinedProduct extends Component<Props, any> {
                     }
                 }
             }, (error) => {
-                // Alert.alert("Server error.")
+                // Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -269,7 +269,7 @@ class CombinedProduct extends Component<Props, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
 
         axios({
@@ -283,7 +283,7 @@ class CombinedProduct extends Component<Props, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedCategory: id })
     }
@@ -302,7 +302,7 @@ class CombinedProduct extends Component<Props, any> {
                 })
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
         // this.setState({ selectedBrand: id })
     }
@@ -345,7 +345,7 @@ class CombinedProduct extends Component<Props, any> {
                     isSelectedWish: !isSelectedWish
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH);
@@ -422,7 +422,7 @@ class CombinedProduct extends Component<Props, any> {
                     location: data.structured_formatting.main_text
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }, (error) => {
             console.log(error);
@@ -454,7 +454,7 @@ class CombinedProduct extends Component<Props, any> {
                     location: 'Current Location'
                 })
             }, (error) => {
-                Alert.alert("Server error.")
+                Alert.alert("Wait for a moment..")
             });
         }, (erroe) => {
 
@@ -587,7 +587,7 @@ class CombinedProduct extends Component<Props, any> {
             const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
             this.props.fetchCartByShopIdUserId(data)
         }, (error) => {
-            Alert.alert("Server problem")
+            Alert.alert("Wait for a moment.")
         })
     }
 
@@ -603,7 +603,7 @@ class CombinedProduct extends Component<Props, any> {
                 const data = { shopId: AppConstants.SHOP_ID, userId: userData.userId }
                 this.props.fetchCartByShopIdUserId(data)
             }, (error) => {
-                Alert.alert("Server problem")
+                Alert.alert("Wait for a moment.")
             })
         }
     }

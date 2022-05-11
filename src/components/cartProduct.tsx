@@ -37,7 +37,7 @@ export const CartProduct: FC<Props> = (props: Props) => {
             <Text style={Styles.old_price_text}>MRP {item.mrp.toFixed(2)}</Text>
             <Text style={Styles.price_text}><RupeeIcon fontSize={scale(14)} />{item.unitSellingPrice.toFixed(2)}</Text>
             <Text style={Styles.offer_price_text}>
-              {Math.round(item.customerBundleOffer)}% off
+              {Math.round(item.customerBundleOffer > 0 ? item.customerBundleOffer : item.customerSingleOffer > 0 ? item.customerSingleOffer : null)}% off
             </Text>
           </View>
 

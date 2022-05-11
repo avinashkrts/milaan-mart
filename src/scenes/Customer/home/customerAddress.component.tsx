@@ -71,7 +71,7 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                     })
                 }
             }, (error) => {
-                Alert.alert("Server error!.")
+                Alert.alert("Wait for a moment.")
             });
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
@@ -128,7 +128,7 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                 this.toggleModal();
                 this.onRefresh()
             }, (error) => {
-                Alert.alert("Server error!");
+                Alert.alert("Wait for a moment.");
             })
         }
     }
@@ -215,7 +215,7 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                 this.toggleModal();
                 this.onRefresh()
             }, (error) => {
-                Alert.alert("Server error!");
+                Alert.alert("Wait for a moment.");
             })
         }
     }
@@ -231,7 +231,7 @@ export class CustomerAddressScreen extends Component<CustomerAddressScreenProps,
                 this.onRefresh();
             }
         }, (error) => {
-            Alert.alert("Server error!.")
+            Alert.alert("Wait for a moment.")
         });
     }
 
