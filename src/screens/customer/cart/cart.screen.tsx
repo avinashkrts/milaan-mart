@@ -205,14 +205,14 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
     renderCart = ({ item }: any): ListItemElement => (
         <ListItem style={{ borderBottomColor: Color.BORDER, borderBottomWidth: 1 }}>
             {item != null ?
-            <View style={{ paddingBottom: scale(20)}}>
-                <CartProduct
-                    handleDelete={(id) => { this.handleDelete(id) }}
-                    measurement={this.state.allMeasurement.length > 0 ? this.state.allMeasurement.find((data, index) => data.id == item.measurement).name : null}
-                    handleIncrease={(productId, cartId, productQuantity) => { this.handleIncrease(productId, cartId, productQuantity, item.currentStock) }}
-                    handleDecrease={(productId, cartId, productQuantity) => { this.handleDecrease(productId, cartId, productQuantity) }}
-                    item={item}
-                />
+                <View style={{ paddingBottom: scale(20) }}>
+                    <CartProduct
+                        handleDelete={(id) => { this.handleDelete(id) }}
+                        measurement={this.state.allMeasurement.length > 0 ? this.state.allMeasurement.find((data, index) => data.id == item.measurement).name : null}
+                        handleIncrease={(productId, cartId, productQuantity) => { this.handleIncrease(productId, cartId, productQuantity, item.currentStock) }}
+                        handleDecrease={(productId, cartId, productQuantity) => { this.handleDecrease(productId, cartId, productQuantity) }}
+                        item={item}
+                    />
                 </View>
                 :
                 <ActivityIndicator size='large' color='green' />}
@@ -253,7 +253,7 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
 
                                     {/* <View style={Styles.price_detail_2_1}>
                                         <Text style={Styles.cart_price_text_head}>Delevery Charges</Text>
-                                        <Text style={Styles.cart_price_text_data}>FREE</Text>
+                                        <Text style={Styles.cart_price_text_head}><RupeeIcon fontSize={18} />{item.deliveryCharge ? item.deliveryCharge.toFixed(2) : null}</Text>
                                     </View> */}
                                 </View>
 
@@ -420,10 +420,10 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                                     <Text style={Styles.cart_price_text_head}><RupeeIcon fontSize={18} />{null != cartData.gstAmount ? (cartData.gstAmount).toFixed(2) : null}</Text>
                                 </View>
 
-                                {/* <View style={Styles.price_detail_2_1}>
-                                        <Text style={Styles.cart_price_text_head}>Delevery Charges</Text>
-                                        <Text style={Styles.cart_price_text_data}>FREE</Text>
-                                    </View> */}
+                                <View style={Styles.price_detail_2_1}>
+                                    <Text style={Styles.cart_price_text_head}>Delevery Charge</Text>
+                                    <Text style={Styles.cart_price_text_head}><RupeeIcon fontSize={18} />{cartData.deliveryCharge ? cartData.deliveryCharge.toFixed(2) : 0}</Text>
+                                </View>
                             </View>
 
                             <View style={Styles.cart_total_view}>
@@ -432,6 +432,7 @@ export class CartScreen extends React.Component<Props, CartPageState & any> {
                             </View>
                             <View style={Styles.price_detail_2}>
                                 <Text style={Styles.cart_price_text_data}>You will save <RupeeIcon fontSize={18} />{null != cartData.discount ? cartData.discount.toFixed(2) : null} on this order.</Text>
+                                <Text style={Styles.cart_price_text_data}>Purchase above <RupeeIcon fontSize={18} />499 and get free delivery on every order.</Text>
                             </View>
                         </View>
                     </>

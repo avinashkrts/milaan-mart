@@ -135,8 +135,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 12
-        versionName "12.0"
+        versionCode 14
+        versionName "14.0"
     }
 
     dexOptions {

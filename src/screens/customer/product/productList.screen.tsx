@@ -94,6 +94,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       ],
       single: false,
       shopName: '',
+      indicator: false
     };
 
     this._onRefresh = this._onRefresh.bind(this);
@@ -138,7 +139,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       userData: userData,
       selectedSubCategory: '',
       selectedBrand: '',
-      check: true
+      check: true,
+      indicator: true
     })
 
     this.getMeasurement();
@@ -207,7 +209,10 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 }
                 this.setState({
                   productWithVariant: data,
-                  allProductWithVariant: data
+                  allProductWithVariant: data,
+                  categoryId: 0,
+                  selectedCategory: 0,
+                  indicator: false
                 })
               }
             }
@@ -251,7 +256,9 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 }
                 this.setState({
                   productWithVariant: data,
-                  allProductWithVariant: data
+                  allProductWithVariant: data,
+                  categoryId: 0,
+                  indicator: false
                 })
               }
             }
@@ -263,6 +270,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         Alert.alert("Wait for a moment.")
       });
     }
+    // this.setState({
+    //   indicator: false})
   }
 
   getProductByCategory(categoryId) {
@@ -292,7 +301,9 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               }
               this.setState({
                 productWithVariant: data,
-                allProductWithVariant: data
+                allProductWithVariant: data,
+                selectedCategory: categoryId,
+                indicator: false
               })
             }
           }
@@ -368,7 +379,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           online: true
         })
         this.setState({
-          subCategory: subCat
+          subCategory: subCat,
+          indicator: false
         })
       }
     }, (error: any) => {
@@ -562,6 +574,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
 
   selectSubCategory(id: any, brandName: any) {
     const { shopId } = this.state
+   
     if (id == 0) {
       this._onRefresh()
     } else {
@@ -592,7 +605,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       // }, (error) => {
       //   Alert.alert("Wait for a moment.")
       // });
-
+      this.setState({ indicator: true})
       axios({
         method: 'GET',
         url: AppConstants.API_BASE_URL + '/api/item/getitem/online/' + id + '/true',
@@ -619,7 +632,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 }
                 this.setState({
                   productWithVariant: data,
-                  selectedSubCategory: id
+                  selectedSubCategory: id, 
+                  indicator: false
                 })
               }
             }
@@ -714,7 +728,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                 }
                 this.setState({
                   productWithVariant: data,
-                  allProductWithVariant: data
+                  allProductWithVariant: data,
+                  indicator: false
                 })
               }
             }
@@ -726,6 +741,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         Alert.alert("Wait for a moment.")
       });
     } else {
+      this.setState({indicator: true})
       this.getProductByCategory(id)
       this.getSubCategory(id)
     }
@@ -782,7 +798,8 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
       if (filteredProduct1.length > 0) {
         if (searchTerm != '' && searchTerm != null) {
           this.setState({
-            productWithVariant: []
+            productWithVariant: [],
+            indicator: true
           })
           this.getAllFilteredProduct(filteredProduct1)
           Keyboard.dismiss();
@@ -882,6 +899,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   searchVisible1: false,
                   isProduct: true,
                   searched: true,
+                  indicator: false
                 })
               }
             }
@@ -1202,9 +1220,9 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
                   </View>
                   <View>
                     {item.customerBundleOffer > 0 || item.customerSingleOffer ?
-                    <Text style={[Styles.offer_price_text]}>
-                      {Math.round(item.customerBundleOffer > 0 ? item.customerBundleOffer : item.customerSingleOffer> 0 ? item.customerSingleOffer : null)}% off
-                    </Text>: null}
+                      <Text style={[Styles.offer_price_text]}>
+                        {Math.round(item.customerBundleOffer > 0 ? item.customerBundleOffer : item.customerSingleOffer > 0 ? item.customerSingleOffer : null)}% off
+                      </Text> : null}
                     {item.bundleQuantity > 1 ? <Text style={{ fontSize: scale(12), color: Color.OFFER }} ><RupeeIcon fontSize={scale(14)} />{(item.bundlePrice / item.bundleQuantity).toFixed(2)}/pc (Buy {item.bundleQuantity} or more)</Text> : null}
                   </View>
                 </View>
@@ -1294,7 +1312,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
 
   render() {
     const productList = null
-    const { allBrand, selectedCategory, temp_variant, productName, searchVisible1, variantVisible,
+    const { allBrand, indicator, selectedCategory, temp_variant, productName, searchVisible1, variantVisible,
       searchTerm, isCart, searchVisible, lat, long, refreshing,
       selectedBrand, selectedSubCategory, allCart, allCategory,
       subCategory, productWithVariant } = this.state;
@@ -1390,7 +1408,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
               </> : null}
           </View>
         </Modal>
-
+       
         <Toolbar
           title='Product List'
           backIcon={MenuIcon}
@@ -1403,6 +1421,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
         <Divider />
         <Divider />
         <Divider />
+       
         {/* {!single ?
               <View style={{ padding: 5 }}>
                   <Text onPress={() => { this.setState({ searchVisible: true }) }} style={{ fontWeight: 'bold', fontSize: 18, color: Color.COLOR }}>Location: <Text style={{ fontSize: 16, fontWeight: '100' }}>{location}</Text></Text>
@@ -1427,6 +1446,7 @@ export class ProductListScreen extends PureComponent<Props, ProductPageState & a
           </View>
         </View>
         <Divider />
+        {indicator && <ActivityIndicator size={'large'} />}
         {/* </Header> */}
         <>
           <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>

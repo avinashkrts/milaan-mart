@@ -43,6 +43,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
         super(props);
         this.state = {
             name: '',
+            indicator: false,
             allBrand: [],
             refreshing: false,
             productWithVariant: [],
@@ -253,7 +254,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
         this.setState({
             userData: userData,
             searched: false,
-            searchTerm: ''
+            searchTerm: '',
+            indicator: true
         })
 
         this.getProduct();
@@ -268,6 +270,9 @@ export class CategoryListScreen extends Component<Props & any, any> {
 
         this.getAllSubCategory();
         this.getAllBrand();
+        this.setState({
+            indicator: false
+        })
     }
 
     loadData() {
@@ -880,7 +885,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
             if (filteredProduct1.length > 0) {
                 if (searchTerm != '' && searchTerm != null) {
                     this.setState({
-                        productWithVariant: []
+                        productWithVariant: [],
+                        indicator: true
                     })
                     this.getAllFilteredProduct(filteredProduct1)
                     Keyboard.dismiss();
@@ -980,6 +986,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                     searchVisible1: false,
                                     isProduct: true,
                                     searched: true,
+                                    indicator: false
                                 })
                             }
                         }
@@ -1176,7 +1183,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
     }
 
     render() {
-        const { isEnd, searched, searchData, slectedFilter, banners, productWithVariant, isProduct, offers, allImages, temp_variant, productName, variantVisible,
+        const { isEnd, searched, indicator, searchData, slectedFilter, banners, productWithVariant, isProduct, offers, allImages, temp_variant, productName, variantVisible,
             isCart, refreshing, searchVisible1, searchTerm, allCategory, allCart } = this.state;
         var filteredProduct = searchData ? searchData.length > 0 ? searchData.filter(createFilter(searchTerm, KEYS_TO_FILTERS)) : null : null
         return (
@@ -1213,7 +1220,8 @@ export class CategoryListScreen extends Component<Props & any, any> {
                         </ScrollView>
                     </View>
                 </Modal>
-
+                {indicator &&
+                    <ActivityIndicator size={'large'} />}
                 <Toolbar
                     title='All Category'
                     backIcon={MenuIcon}

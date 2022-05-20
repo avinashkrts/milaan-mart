@@ -386,10 +386,10 @@ export class CustomerOrderDetailScreen extends Component<Props, any> {
                                 <Text style={Styles.cart_price_text_data}><RupeeIcon fontSize={18} />{null != cartData.gstAmount ? cartData.gstAmount.toFixed(2) : null}</Text>
                             </View>
 
-                            {/* <View style={Styles.price_detail_2_1}>
+                            <View style={Styles.price_detail_2_1}>
                                 <Text style={Styles.cart_price_text_head}>Delevery Charges</Text>
-                                <Text style={Styles.cart_price_text_data}>FREE</Text>
-                            </View> */}
+                                <Text style={Styles.cart_price_text_data}><RupeeIcon fontSize={18} />{null != cartData.deliveryCharge ? cartData.deliveryCharge.toFixed(2) : 0}</Text>
+                            </View>
                         </View>
 
                         <View style={Styles.cart_total_view}>

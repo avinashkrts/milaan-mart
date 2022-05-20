@@ -20,6 +20,7 @@ import DatePicker from 'react-native-datepicker';
 import RazorpayCheckout from 'react-native-razorpay';
 import SelectDropdown from 'react-native-select-dropdown';
 import { scale } from 'react-native-size-matters';
+import { date } from 'yup/lib/locale';
 
 import { AddIcon, BackIcon, CancelIcon, MinusIcon, RightArrowIcon, RupeeIcon } from '../../../assets/icons';
 import { Styles } from '../../../assets/styles';
@@ -91,25 +92,23 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             selectedDelivery: '',
             orderPlacing: false,
             shopLatLng: '',
-            userLatLng: ''
+            userLatLng: '',
+            quickSlotId: '',
+            allSlotList: []
         }
         this.backFunction = this.backFunction.bind(this)
         this.getAddress = this.getAddress.bind(this)
+        this.getAllSlotList = this.getAllSlotList.bind(this)
+        this.getTodaySlotList = this.getTodaySlotList.bind(this)
     }
 
     async componentDidMount() {
         this.props.navigation.addListener('focus', () => {
             this.getAddress();
+            this.getTodaySlotList();
         })
-        // const lat1 = 25.577647957975636, lng1 = 85.0558914550103, lat2 = 25.612677, lng2 = 85.158875
-        // axios({
-        //     method: 'GET',
-        //     url: 'https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=' + lat1 + ',' + lng1 + '&destinations=' + lat2 + '%2C' + lng2 + '&key=' + AppConstants.GOOGLE_MAP_KEY
-        // }).then((res) => {
-        //     console.log("map", res.data.rows[0].elements[0].distance.value)
-        // }, (err) => {
-        //     console.log({ err })
-        // })
+
+        this.getTodaySlotList();
 
         axios({
             method: 'GET',
@@ -243,6 +242,86 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         }
     }
 
+    getTodaySlotList() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/discount/get/byoffertype/SLOT'
+        }).then((res) => {
+            if (!!res.data) {
+                // console.log(res.data);
+                var data: any = []
+                var duration = new Date().getHours();
+                // if (duration > 12) { duration = duration - 12; }
+                console.log(duration, "time")
+                res.data.map((slot) => {
+                    if (duration < 18 && duration >= 9) {
+                        if (slot.lable > duration) {
+                            data.push(slot);
+                        }
+                    } else if(duration < 9){
+                        if (slot.lable != 24) {
+                            data.push(slot);
+                        }
+                    }else {
+                        this.changeSlotDate(moment(new Date).add(1, 'day').format('YYYY-MM-DD'))
+                    }
+                    if (slot.lable == 24) {
+                        this.setState({
+                            quickSlotId: slot.discountId
+                        })
+                    }
+                })
+                if (data != []) {
+                    this.setState({
+                        selectedSlot: data[0].discountId,
+                        allSlotList: data
+                    })
+                }
+            }
+        }, (err) => {
+            console.log({ err })
+        })
+    }
+
+    changeSlotDate(date) {
+        this.setState({ slotDate: date })
+
+        let today = moment(moment(new Date()).format('YYYY-MM-DD'), 'YYYY-MM-DD')
+        var orderDate = moment(date, 'YYYY-MM-DD')
+        var difference = today.diff(orderDate, 'day')
+        if (difference == 0) {
+            this.getTodaySlotList();
+        } else {
+            this.getAllSlotList();
+        }
+        // console.log(difference, today, orderDate)
+    }
+
+    getAllSlotList() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/discount/getall'
+        }).then((res) => {
+            if (!!res.data) {
+                var data: any = []
+                // if (duration > 12) { duration = duration - 12; }
+                // console.log(duration, "time")
+                res.data.map((slot) => {
+                    if (slot.offerType === "SLOT" && slot.lable !== "24") {
+                        data.push(slot);
+                    }
+                })
+
+                this.setState({
+                    selectedSlot: data[0].discountId,
+                    allSlotList: data
+                })
+            }
+        }, (err) => {
+            console.log({ err })
+        })
+    }
+
     async getAddress() {
         let userDetail = await AsyncStorage.getItem('userDetail');
         let logedIn = await AsyncStorage.getItem('logedIn');
@@ -314,7 +393,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
 
     handlePlaceOrder() {
-        const { orderType, userLatLng, shopLatLng, insideShop, selectedSlot, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
+        const { orderType, userLatLng, quickSlotId, shopLatLng, insideShop, selectedSlot, addressId, addressData, slotDate, homeDelivery, selfPick, cashDelivery, payOnline, homeId, cashId, onlineId, selfId, paymentType, cartId, } = this.state;
         // console.log('data', selectedSlot, orderType, paymentType, homeDelivery, selfPick, cashDelivery, payOnline, cashId, onlineId, homeId, selfId, cartId, addressId);
 
         axios({
@@ -323,7 +402,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         }).then((res) => {
             // console.log("map", res.data.rows[0].elements[0].distance, selectedSlot)
             const { text, value } = res.data.rows[0].elements[0].distance;
-            if (value > 2000 && value < 5000 && selectedSlot === '2_HRS') {
+            if (value > 2000 && value < 5000 && selectedSlot === quickSlotId) {
                 Alert.alert("Message", "Sorry! You are not in our quick delivery range, Please select another delivery slot.")
             } else if (value > 5000) {
                 Alert.alert("Message", "Sorry! You are not in our delivery range, It is available for only 5 KMs.")
@@ -333,8 +412,6 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                 })
                 if (addressData != null) {
                     if (payOnline) {
-                        // Alert.alert('online')
-
                         axios({
                             method: 'PUT',
                             url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
@@ -351,8 +428,6 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                             if (response.data) {
                                 if (response.data.status) {
                                     // Alert.alert(response.data.transactionId)
-                                    console.log(response.data)
-
                                     this.startPayment(response.data.transactionId, response.data.orderId);
                                 } else {
                                     Alert.alert("Got error while placing Order.")
@@ -552,11 +627,12 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
     )
 
     render() {
-        const { cartData, paymentType, selectedSlot, selectedDelivery, selectedPayment, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
+        const { cartData, allSlotList, paymentType, selectedSlot, selectedDelivery, selectedPayment, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP}>
+
                 <Toolbar
                     title='Payment'
                     backIcon={BackIcon}
@@ -701,7 +777,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                                 borderColor: '#fff'
                                             }
                                         }}
-                                        onDateChange={(date) => { this.setState({ slotDate: date }) }}
+                                        onDateChange={(date) => { this.changeSlotDate(date) }}
                                     />
                                 </View>
 
@@ -747,12 +823,15 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         itemStyle={{}}
                                         onValueChange={(value) => { this.setState({ selectedSlot: value }) }}
                                     >
-                                        <Picker.Item style={{ backgroundColor: 'red' }} key="DELI1" label="8AM to 10AM" value="8_10_AM" />
-                                        <Picker.Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
+                                        {!!allSlotList && allSlotList.map((slot) => (
+                                            <Picker.Item style={{ backgroundColor: 'red' }} key="DELI1" label={slot.name} value={slot.discountId} />
+                                        ))
+                                        }
+                                        {/* <Picker.Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
                                         <Picker.Item key="DELI3" label="5PM to 7PM" value="5_7_PM" />
                                         {moment(slotDate).diff(minDate, 'days') == 0 ?
                                             <Picker.Item key="DELI5" label="Within 30 minutes" value="2_HRS" /> : null
-                                        }
+                                        } */}
                                     </Picker>
 
                                     {/* <DropDown

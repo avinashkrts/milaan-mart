@@ -1,5 +1,6 @@
 import { StackActions } from '@react-navigation/core';
 import { Avatar, Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
+import axios from 'axios';
 import Axios from 'axios';
 import moment from 'moment';
 import React, { Component } from 'react';
@@ -35,11 +36,13 @@ export class CustomerOrderScreen extends Component<Props, any> {
             receivedCartId: '',
             adminData: [],
             isDetail: false,
-            paymentMode: []
+            paymentMode: [],
+            allSlotList: []
         }
 
         this.onRefresh = this.onRefresh.bind(this);
         this.NavigateToHome = this.NavigateToHome.bind(this);
+        this.getAllSlotList = this.getAllSlotList.bind(this);
     }
 
     backAction = () => {
@@ -70,7 +73,7 @@ export class CustomerOrderScreen extends Component<Props, any> {
         let userDetail = await AsyncStorage.getItem('userDetail');
         let userData = JSON.parse(userDetail);
         this.setState({ userData: userData })
-        console.log("asasass" + this.props)
+        // console.log("asasass" + this.props)
 
         if (null != userData) {
             Axios({
@@ -91,7 +94,7 @@ export class CustomerOrderScreen extends Component<Props, any> {
                 url: AppConstants.API_BASE_URL + '/api/lookup/getalllookup',
             }).then((response) => {
                 if (null != response.data) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         deliveryTypeData: response.data.DELIVERY_TYPE,
                         paymentMode: response.data.PAYMENT_MODE,
@@ -101,9 +104,32 @@ export class CustomerOrderScreen extends Component<Props, any> {
             }, (error) => {
                 Alert.alert("Wait for a moment.")
             });
+            this.getAllSlotList();
         } else {
             this.props.navigation.navigate(AppRoute.AUTH)
         }
+    }
+
+    getAllSlotList() {
+        axios({
+            method: 'GET',
+            url: AppConstants.API_BASE_URL + '/api/discount/getall'
+        }).then((res) => {
+            if (!!res.data) {
+                var data: any = []
+                res.data.map((slot) => {
+                    if (slot.offerType === "SLOT") {
+                        data.push(slot);
+                    }
+                })
+
+                this.setState({
+                    allSlotList: data
+                })
+            }
+        }, (err) => {
+            console.log({ err })
+        })
     }
 
     onRefresh() {
@@ -568,8 +594,14 @@ export class CustomerOrderScreen extends Component<Props, any> {
                                                                 <Text style={{ marginVertical: 5, fontWeight: 'bold', fontSize: 16 }}>Rs. {item.deliveryCharge}</Text>
                                                                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Delivery boy detail</Text>
                                                                 <Text style={{ marginVertical: 5 }}>{item.dBoyName}, {item.dBoyNumber}</Text>
-                                                                <Text style={{ marginVertical: 5 }}>Expected Time for delivery: <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{moment(item.deliveryDate).format('DD-MM-YYYY')}</Text> up to
-                                                                    <Text style={{ fontWeight: 'bold', fontSize: 16 }}> {item.deliveryTime === "8_10_AM" ? "8AM to 10AM" : item.deliveryTime === "1_3_PM" ? "1PM to 3PM" : item.deliveryTime === "5_7_PM" ? "5PM to 7PM" : "Within two hour"}</Text>
+                                                                <Text style={{ marginVertical: 5 }}>Expected Time for delivery: <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{moment(item.deliveryDate).format('DD-MM-YYYY')},</Text>
+                                                                    {!!this.state.allSlotList && this.state.allSlotList.map((slot) => {
+                                                                        if (slot.discountId == item.slotTime) {
+                                                                            return (
+                                                                                <Text style={{ fontWeight: 'bold', fontSize: 16 }}> {slot.name}</Text>
+                                                                            )
+                                                                        }
+                                                                    })}
                                                                 </Text>
                                                             </View>
                                                         </>
