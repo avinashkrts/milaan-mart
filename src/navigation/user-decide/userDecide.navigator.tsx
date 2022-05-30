@@ -9,18 +9,18 @@ import { AppRoute } from '../app-routes';
 import { UserDecide } from '../../screens/auth';
 
 type UserDecideNavigatorParams = RootNavigatorParams & {
-  [AppRoute.USER_DECIDE]: undefined;
+  [AppRoute.USER_DECIDE_PAGE]: undefined;
 }
 
 export interface UserDecideProps {
-  navigation: StackNavigationProp<UserDecideNavigatorParams, AppRoute.USER_DECIDE>;
-  route: RouteProp<UserDecideNavigatorParams, AppRoute.USER_DECIDE>;
+  navigation: StackNavigationProp<UserDecideNavigatorParams, AppRoute.USER_DECIDE_PAGE>;
+  route: RouteProp<UserDecideNavigatorParams, AppRoute.USER_DECIDE_PAGE>;
 }
 
 const Stack = createStackNavigator<UserDecideNavigatorParams>();
 
 export const UserDecideNavigator = (): React.ReactElement => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name={AppRoute.USER_DECIDE} component={UserDecide}/>
+    <Stack.Screen name={AppRoute.USER_DECIDE_PAGE} component={UserDecide}/>
   </Stack.Navigator>
 );

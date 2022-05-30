@@ -1,5 +1,5 @@
 export class AppConstants {
-    public static readonly API_BASE_URL = 'http://api.milaansearch.com:8072';
+    public static readonly API_BASE_URL = 'http://api.milaansearch.com:8092';
     public static readonly IMAGE_BASE_URL = 'http://api.milaansearch.com/test';
     public static readonly USER = 'USER';
     public static readonly CONSULTANT = 'CONSULTANT';

@@ -32,6 +32,7 @@ export enum AppRoute {
     /*----------------------------- Auth Navigator Constants -----------------------------*/
     AUTH = "Auth",
     USER_DECIDE = "USER_DECIDE",
+    USER_DECIDE_PAGE = "USER_DECIDE_PAGE",
     SIGN_IN = "Sign_In",
     SIGN_UP = "SIGN_UP",
     FORGET_PWD = "FORGET_PWD",

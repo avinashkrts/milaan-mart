@@ -51,12 +51,12 @@ export class UserDecide extends Component<Props, State & any> {
         VersionCheck.getLatestVersion({
             provider: 'playStore'
         }).then(latestVersion => {
-            console.log('Latest Version', latestVersion);
+            // console.log('Latest Version', latestVersion);
         });
 
         VersionCheck.needUpdate()
             .then(async res => {
-                console.log('data', res.isNeeded);    // true
+                // console.log('data', res.isNeeded);    // true
                 if (res.isNeeded) {
                     Linking.openURL(res.storeUrl);  // open store if update is needed.
                 } else {
@@ -87,7 +87,7 @@ export class UserDecide extends Component<Props, State & any> {
 
                             }, { enableHighAccuracy: true })
                         } else {
-                            console.log("Location permission denied");
+                            // console.log("Location permission denied");
                             Alert.alert("Please give location permition to use this application.")
                         }
                     } catch (err) {
@@ -105,7 +105,7 @@ export class UserDecide extends Component<Props, State & any> {
         // const playerId = '8a6d8667-7422-4bad-b9e6-5d5625f73a96';
         // OneSignal.postNotification(contents, data, playerId);
         const deviceState = await OneSignal.getDeviceState();
-        console.log('one signal', deviceState)
+        // console.log('one signal', deviceState)
 
         AsyncStorage.setItem('productCount', '0');
         AsyncStorage.setItem('wishCount', '0');
@@ -120,7 +120,7 @@ export class UserDecide extends Component<Props, State & any> {
             const user = JSON.parse(value);
             const admin = Number(JSON.parse(value1));
             const customer = Number(JSON.parse(value2));
-            console.log('UserType' + 'admin: ', admin + "customer", customer, logedIn)
+            // console.log('UserType' + 'admin: ', admin + "customer", customer, logedIn)
             if (logedIn === 'true') {
                 const userType = Number(user.userType);
                 const token = user.token;
@@ -146,7 +146,6 @@ export class UserDecide extends Component<Props, State & any> {
         } else {
             this.props.navigation.navigate(AppRoute.CUSTOMER)
         }
-
         SplashScreen.hide();
     }
 

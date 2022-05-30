@@ -39,7 +39,7 @@ export const CustomerDrawer = (props: DrawerCustomerScreenProps): DrawerElement 
           url: AppConstants.API_BASE_URL + '/api/user/get/' + user.userId
       }).then((response) => {
         setData(response.data);
-        console.log('data from async', user)
+        // console.log('data from async', user)
       }, (error) => {
 
       });

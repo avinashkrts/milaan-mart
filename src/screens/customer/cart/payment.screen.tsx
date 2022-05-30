@@ -243,44 +243,40 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
     }
 
     getTodaySlotList() {
-        axios({
-            method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/discount/get/byoffertype/SLOT'
-        }).then((res) => {
-            if (!!res.data) {
-                // console.log(res.data);
-                var data: any = []
-                var duration = new Date().getHours();
-                // if (duration > 12) { duration = duration - 12; }
-                console.log(duration, "time")
-                res.data.map((slot) => {
-                    if (duration < 18 && duration >= 9) {
-                        if (slot.lable > duration) {
-                            data.push(slot);
-                        }
-                    } else if(duration < 9){
-                        if (slot.lable != 24) {
-                            data.push(slot);
-                        }
-                    }else {
-                        this.changeSlotDate(moment(new Date).add(1, 'day').format('YYYY-MM-DD'))
-                    }
-                    if (slot.lable == 24) {
+        // console.log(this.state.slotDate)
+        var duration = new Date().getHours();
+        // var date = this.state.slotDate
+        if (duration >= 18) {
+            this.changeSlotDate(moment(new Date).add(1, 'day').format('YYYY-MM-DD'))
+        } else {
+            axios({
+                method: 'GET',
+                url: AppConstants.API_BASE_URL + '/api/slottime/allslot/' + this.state.slotDate
+            }).then((res) => {
+                if (!!res.data) {
+                    // console.log('active', !!res.data[1].active);
+                    // console.log('active', res.data);
+                    var data = []
+                    data = res.data.find(slot => !!slot.active)
+                    //    console.log("qwq", !!data)
+                    if (!!data) {
+                        // Alert.alert("data", "data")
                         this.setState({
-                            quickSlotId: slot.discountId
+                            selectedSlot: data.lookUpId,
+                        })
+                    } else {
+                        this.setState({
+                            selectedSlot: "",
                         })
                     }
-                })
-                if (data != []) {
                     this.setState({
-                        selectedSlot: data[0].discountId,
-                        allSlotList: data
+                        allSlotList: res.data
                     })
                 }
-            }
-        }, (err) => {
-            console.log({ err })
-        })
+            }, (err) => {
+                console.log({ err })
+            })
+        }
     }
 
     changeSlotDate(date) {
@@ -292,29 +288,31 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
         if (difference == 0) {
             this.getTodaySlotList();
         } else {
-            this.getAllSlotList();
+            this.getAllSlotList(date);
         }
-        // console.log(difference, today, orderDate)
     }
 
-    getAllSlotList() {
+    getAllSlotList(date) {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/discount/getall'
+            url: AppConstants.API_BASE_URL + '/api/slottime/allslot/' + date
         }).then((res) => {
             if (!!res.data) {
-                var data: any = []
-                // if (duration > 12) { duration = duration - 12; }
-                // console.log(duration, "time")
-                res.data.map((slot) => {
-                    if (slot.offerType === "SLOT" && slot.lable !== "24") {
-                        data.push(slot);
-                    }
-                })
-
+                var data = []
+                data = res.data.find(slot => !!slot.active)
+                //    console.log("qwq", data)
+                if (!!data) {
+                    // Alert.alert("data", "data")
+                    this.setState({
+                        selectedSlot: data.lookUpId,
+                    })
+                } else {
+                    this.setState({
+                        selectedSlot: "",
+                    })
+                }
                 this.setState({
-                    selectedSlot: data[0].discountId,
-                    allSlotList: data
+                    allSlotList: res.data
                 })
             }
         }, (err) => {
@@ -407,72 +405,75 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
             } else if (value > 5000) {
                 Alert.alert("Message", "Sorry! You are not in our delivery range, It is available for only 5 KMs.")
             } else {
-                this.setState({
-                    orderPlacing: true
-                })
                 if (addressData != null) {
                     if (payOnline) {
-                        axios({
-                            method: 'PUT',
-                            url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
-                            data: {
-                                transactionType: paymentType,
-                                cartId: cartId,
-                                orderType: orderType,
-                                addressId: addressId,
-                                slotDate: slotDate,
-                                insideShop: insideShop,
-                                slotTime: selectedSlot
-                            }
-                        }).then((response) => {
-                            if (response.data) {
-                                if (response.data.status) {
-                                    // Alert.alert(response.data.transactionId)
-                                    this.startPayment(response.data.transactionId, response.data.orderId);
-                                } else {
-                                    Alert.alert("Got error while placing Order.")
+                        if (selectedSlot === '' || selectedSlot == null) {
+                            Alert.alert('Message', "Please select slot")
+                        } else {
+                            this.setState({
+                                orderPlacing: true
+                            })
+                            axios({
+                                method: 'PUT',
+                                url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
+                                data: {
+                                    transactionType: paymentType,
+                                    cartId: cartId,
+                                    orderType: orderType,
+                                    addressId: addressId,
+                                    slotDate: slotDate,
+                                    insideShop: insideShop,
+                                    slotTime: selectedSlot
                                 }
-                            }
-                        }, (error) => {
-                            console.log(error)
-                            Alert.alert("Please select your address.")
-                        })
+                            }).then((response) => {
+                                if (response.data) {
+                                    if (response.data.status) {
+                                        this.startPayment(response.data.transactionId, response.data.orderId);
+                                    } else {
+                                        Alert.alert("Got error while placing Order.")
+                                    }
+                                }
+                            }, (error) => {
+                                console.log(error)
+                                Alert.alert("Please select your address.")
+                            })
+                        }
                     } else if (cashDelivery) {
                         // Alert.alert('offline')
-
-                        axios({
-                            method: 'PUT',
-                            url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
-                            data: {
-                                transactionType: paymentType,
-                                cartId: cartId,
-                                orderType: orderType,
-                                addressId: addressId,
-                                slotDate: slotDate,
-                                insideShop: insideShop,
-                                slotTime: selectedSlot
-                            }
-                        }).then((response) => {
-                            if (response.data) {
-                                if (response.data.status) {
-                                    this.notification()
-                                    console.log(response.data)
-                                    this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_NAV)
-                                    // const resetAction = CommonActions.reset({
-                                    //     index: 0,
-                                    //     routes: [
-                                    //         { name: AppRoute.CUSTOMER_ORDER_NAV }
-                                    //     ],
-                                    // });
-                                    // this.props.navigation.dispatch(resetAction)
-                                } else {
-                                    Alert.alert("Got error while placing Order.")
+                        if (selectedSlot === '' || selectedSlot == null) {
+                            Alert.alert('Message', "Please select slot")
+                        } else {
+                            this.setState({
+                                orderPlacing: true
+                            })
+                            // console.log("" + selectedSlot)
+                            axios({
+                                method: 'PUT',
+                                url: AppConstants.API_BASE_URL + '/api/cart/placeorder',
+                                data: {
+                                    transactionType: paymentType,
+                                    cartId: cartId,
+                                    orderType: orderType,
+                                    addressId: addressId,
+                                    slotDate: slotDate,
+                                    insideShop: insideShop,
+                                    slotTime: selectedSlot
                                 }
-                            }
-                        }, (error) => {
-                            console.log(error)
-                            Alert.alert("Please select your address.")
-                        })
+                            }).then((response) => {
+                                if (response.data) {
+                                    if (response.data.status) {
+                                        this.notification()
+                                        console.log(response.data)
+                                        this.props.navigation.navigate(AppRoute.CUSTOMER_ORDER_NAV)
+                                    } else {
+                                        Alert.alert("Got error while placing Order.")
+                                    }
+                                }
+                            }, (error) => {
+                                console.log(error)
+                                Alert.alert("Please select your address.")
+                            })
+                        }
                     }
                 } else {
                     Alert.alert("Please add your address.")
@@ -628,6 +629,11 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
     render() {
         const { cartData, allSlotList, paymentType, selectedSlot, selectedDelivery, selectedPayment, orderPlacing, insideShop, minDate, addressData, homeDelivery, payOnline, cashDelivery, selfPick, totalAmt, productList, slotDate } = this.state
+        // {
+        //     !!allSlotList && allSlotList.map((slot, i) => {
+        //         console.log("121212", slot.lookUpId)
+        //     })
+        // }
         return (
             <SafeAreaLayout
                 style={Styles.safeArea}
@@ -648,35 +654,6 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                         />
                     }
                 >
-                    {/* <GooglePlacesAutocomplete
-                        placeholder='Search'
-                        // minLength={2}
-                        autoFillOnNotFound
-                        onPress={(data, details = null) => {
-                            // 'details' is provided when fetchDetails = true
-                            console.log('google data', data, details);
-                        }}
-                        query={{
-                            key: AppConstants.GOOGLE_MAP_KEY,
-                            language: 'en',
-                        }}
-                    /> */}
-
-                    {/* <View style={{ width: '100%', height: 200 }}>
-                        <MapView
-                            provider={PROVIDER_GOOGLE}
-
-                            initialRegion={{
-                                latitude: 37.78825,
-                                longitude: -122.4324,
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
-                            }}
-                        />
-                    </View> */}
-
-
-
                     <View>
 
                     </View>
@@ -692,16 +669,6 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                             </TouchableOpacity>
                         </View>
                     </View>
-
-
-                    {/* <Header style={styles.header}> */}
-                    {/* <View style={Styles.searchBox}>
-                        <Text style={Styles.searchIcon}><SearchIcon /></Text>
-                        <TextInput
-                            placeholder="Search"
-                            style={Styles.searchInput}
-                        />
-                    </View> */}
                     {!insideShop ?
                         <View style={[Styles.center]}>
                             <View style={[Styles.payment_box_view]}>
@@ -718,18 +685,6 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         <Picker.Item key="PICK2" label="Self Pickup" value="SELF" />
                                     </Picker>
                                 </View>
-
-                                {/* <View style={Styles.payment_selection_view}>
-                                    <View style={{ flexDirection: 'row', marginRight: scale(20) }}>
-                                        <Radio selected={homeDelivery} selectedColor='#501B1D' onPress={() => { this.handleOrderType('HOME') }} />
-                                        <Text style={Styles.payment_selection_text}>Home Delivery</Text>
-                                    </View>
-
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Radio selected={selfPick} selectedColor='#501B1D' onPress={() => { this.handleOrderType('SELF') }} />
-                                        <Text style={Styles.payment_selection_text}>Self Pickup</Text>
-                                    </View>
-                                </View> */}
                             </View>
                         </View> :
                         null}
@@ -755,7 +710,7 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                             <View style={[Styles.payment_box_view]}>
                                 <Text style={Styles.payment_selection_header}>Delivery Slot</Text>
 
-                                <View style={Styles.payment_selection_view}>
+                                <View style={[Styles.payment_selection_view, {borderColor: Color.COLOR, borderWidth: 1}]}>
                                     <DatePicker
                                         style={{ width: '100%' }}
                                         date={slotDate}
@@ -783,39 +738,6 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
 
                                 <View style={{ marginTop: scale(20), borderColor: Color.COLOR, borderWidth: 1, borderStyle: 'solid', }}>
 
-                                    {/* <SelectDropdown
-                                        data={["Egypt", "Canada", "Australia", "Ireland"]}
-                                        onSelect={(selectedItem, index) => {
-                                            console.log(selectedItem, index)
-                                        }}
-                                        buttonStyle={{ width: '100%' }}
-                                    /> */}
-
-                                    {/* <SelectDropdown
-                                        data={["Egypt", "Canada", "Australia", "Ireland"]}
-                                        // defaultValueByIndex={1}
-                                        // defaultValue={'Egypt'}
-                                        onSelect={(selectedItem, index) => {
-                                            console.log(selectedItem, index);
-                                        }}
-                                        defaultButtonText={'Select country'}
-                                        buttonTextAfterSelection={(selectedItem, index) => {
-                                            return selectedItem;
-                                        }}
-                                        rowTextForSelection={(item, index) => {
-                                            return item;
-                                        }}
-                                        buttonStyle={styles.dropdown1BtnStyle}
-                                        buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                                        renderDropdownIcon={isOpened => {
-                                            return <Text style={styles.icon} ><RightArrowIcon fontSize={scale(18)} /></Text>;
-                                        }}
-                                        dropdownIconPosition={'right'}
-                                        dropdownStyle={styles.dropdown1DropdownStyle}
-                                        rowStyle={styles.dropdown1RowStyle}
-                                        rowTextStyle={styles.dropdown1RowTxtStyle}
-                                    /> */}
-
                                     <Picker
                                         mode="dropdown"
                                         style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
@@ -823,38 +745,14 @@ export class PaymentScreen extends React.Component<Props, MyState & any> {
                                         itemStyle={{}}
                                         onValueChange={(value) => { this.setState({ selectedSlot: value }) }}
                                     >
-                                        {!!allSlotList && allSlotList.map((slot) => (
-                                            <Picker.Item style={{ backgroundColor: 'red' }} key="DELI1" label={slot.name} value={slot.discountId} />
-                                        ))
-                                        }
-                                        {/* <Picker.Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
-                                        <Picker.Item key="DELI3" label="5PM to 7PM" value="5_7_PM" />
-                                        {moment(slotDate).diff(minDate, 'days') == 0 ?
-                                            <Picker.Item key="DELI5" label="Within 30 minutes" value="2_HRS" /> : null
-                                        } */}
+                                        <Picker.Item enabled={true} style={{ backgroundColor: 'red' }} key={"DELI1"} label={"Select slot"} value={""} />
+                                        {!!allSlotList && allSlotList.map((slot, i) => (
+                                            <Picker.Item enabled={Boolean(slot.active)} style={{ backgroundColor: 'red' }} key={"DELI1" + i} label={!slot.active ? slot.lookUpLabel + " (Slot full)": slot.lookUpLabel} value={slot.lookUpId} />
+                                        ))}
                                     </Picker>
-
-                                    {/* <DropDown
-                                        // mode="dropdown"
-                                        // style={[Styles.center, { marginVertical: 0, color: Color.COLOR, width: '100%' }]}
-                                        selectedValue={selectedSlot}
-                                        // itemStyle={{}}
-                                        onChange={(value) => { this.setState({ selectedSlot: value }) }}
-                                    >
-                                        <Item style={{ backgroundColor: 'red' }} key="DELI1" label="8AM to 10AM" value="8_10_AM" />
-                                        <Item key="DELI2" label="1PM to 3PM" value="1_3_PM" />
-                                        <Item key="DELI3" label="5PM to 7PM" value="5_7_PM" />
-                                        {moment(slotDate).diff(minDate, 'days') == 0 ?
-                                            <Item key="DELI5" label="Within two hour" value="2_HRS" /> : null
-                                        }
-                                    </DropDown> */}
                                 </View>
                             </View>
                         </View> : null}
-
-                    {/* <List data={productList}
-                        renderItem={this.renderCart}
-                    /> */}
                 </ScrollView>
                 {orderPlacing ?
                     <View>

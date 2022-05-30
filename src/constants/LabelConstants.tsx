@@ -1,4 +1,5 @@
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 /*------------------------------------------------------------COLOR CODE------------------------------------------------------------*/
 export class Color {
@@ -35,7 +36,6 @@ var logIn;
 const logedIn = async () => {
     const value = await AsyncStorage.getItem('logedIn')
     logIn = value
-    console.log('data login', logIn)
 }
 
 export class LableText {

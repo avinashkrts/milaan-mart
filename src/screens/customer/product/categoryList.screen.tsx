@@ -378,7 +378,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                 }
             }).then((response) => {
                 if (null != response.data) {
-                    console.log("Data", response.data)
+                    // console.log("Data", response.data)
                     if (response.data.status === 'true') {
                         Alert.alert("Product added to cart.")
                         this.getCart(userData.userId)
@@ -1298,6 +1298,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                 <View style={{ height: scale(130) }}>
                                     <View style={[Styles.product_image]}>
                                         <SliderBox
+                                        key={index=> index+"slider"}
                                             ImageComponentStyle={{ height: '100%', width: '97%', borderRadius: 10, borderWidth: 1, borderColor: 'silver' }}
                                             autoplay
                                             circleLoop
@@ -1324,6 +1325,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                                             allCategory.map((item, index) => {
                                                 return (
                                                     <CategoryCard
+                                                    key={index+"cat"}
                                                         categoryClick={(id, shopId) => this.navigateProductDetail(id, shopId)}
                                                         index={index}
                                                         data={item}
@@ -1350,7 +1352,7 @@ export class CategoryListScreen extends Component<Props & any, any> {
                             {!searched && banners ?
                                 <>
                                     {banners.map((data, i) => (
-                                        <View style={{ marginTop: scale(10), paddingHorizontal: scale(5) }}>
+                                        <View key={i+"banner"} style={{ marginTop: scale(10), paddingHorizontal: scale(5) }}>
                                             <View style={Styles.category_card}>
                                                 {/* <Pressable onPress={() => { this.navigateProductOffer(item.id) }}> */}
                                                 <View style={[Styles.cat_card_img, Styles.center]}>

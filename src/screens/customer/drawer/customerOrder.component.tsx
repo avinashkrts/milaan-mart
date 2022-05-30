@@ -113,18 +113,11 @@ export class CustomerOrderScreen extends Component<Props, any> {
     getAllSlotList() {
         axios({
             method: 'GET',
-            url: AppConstants.API_BASE_URL + '/api/discount/getall'
+            url: AppConstants.API_BASE_URL + '/api/lookup/getallslottype'
         }).then((res) => {
             if (!!res.data) {
-                var data: any = []
-                res.data.map((slot) => {
-                    if (slot.offerType === "SLOT") {
-                        data.push(slot);
-                    }
-                })
-
                 this.setState({
-                    allSlotList: data
+                    allSlotList: res.data
                 })
             }
         }, (err) => {
@@ -596,9 +589,9 @@ export class CustomerOrderScreen extends Component<Props, any> {
                                                                 <Text style={{ marginVertical: 5 }}>{item.dBoyName}, {item.dBoyNumber}</Text>
                                                                 <Text style={{ marginVertical: 5 }}>Expected Time for delivery: <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{moment(item.deliveryDate).format('DD-MM-YYYY')},</Text>
                                                                     {!!this.state.allSlotList && this.state.allSlotList.map((slot) => {
-                                                                        if (slot.discountId == item.slotTime) {
+                                                                        if (slot.lookUpId == item.slotTime) {
                                                                             return (
-                                                                                <Text style={{ fontWeight: 'bold', fontSize: 16 }}> {slot.name}</Text>
+                                                                                <Text style={{ fontWeight: 'bold', fontSize: 16 }}> {slot.lookUpLabel}</Text>
                                                                             )
                                                                         }
                                                                     })}
