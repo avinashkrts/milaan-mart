@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import { View, Alert, Image, Text, ActivityIndicator, PermissionsAndroid, Platform, BackHandler, Linking, } from 'react-native';
+import { View, Alert, PermissionsAndroid } from 'react-native';
 import { AppRoute } from '../../navigation/app-routes';
-import { Placeholder, LableText, AppConstants } from '../../constants';
-import axios from 'axios';
-import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { AppConstants } from '../../constants';
+// import axios from 'axios';
+// import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
+// import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { Styles } from '../../assets/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
-import RazorpayCheckout from 'react-native-razorpay';
+// import RazorpayCheckout from 'react-native-razorpay';
 import OneSignal from 'react-native-onesignal';
 import Geolocation from 'react-native-geolocation-service';
-import { checkForVersion } from 'react-native-app-version-force-update';
-import moment from 'moment';
-import VersionCheck from 'react-native-version-check';
+// import { checkForVersion } from 'react-native-app-version-force-update';
+// import moment from 'moment';
+// import VersionCheck from 'react-native-version-check';
 import { UserDecideProps } from '../../navigation/user-decide/userDecide.navigator';
 import { ThemedComponentProps } from '@ui-kitten/components';
 import Geocoder from 'react-native-geocoding';
@@ -48,18 +48,18 @@ export class UserDecide extends Component<Props, State & any> {
         Geocoder.init(AppConstants.GOOGLE_MAP_KEY);
         AsyncStorage.setItem('categoryId', '')
 
-        VersionCheck.getLatestVersion({
-            provider: 'playStore'
-        }).then(latestVersion => {
-            // console.log('Latest Version', latestVersion);
-        });
+        // VersionCheck.getLatestVersion({
+        //     provider: 'playStore'
+        // }).then(latestVersion => {
+        //     // console.log('Latest Version', latestVersion);
+        // });
 
-        VersionCheck.needUpdate()
-            .then(async res => {
-                // console.log('data', res.isNeeded);    // true
-                if (res.isNeeded) {
-                    Linking.openURL(res.storeUrl);  // open store if update is needed.
-                } else {
+        // VersionCheck.needUpdate()
+        //     .then(async res => {
+        //         // console.log('data', res.isNeeded);    // true
+        //         if (res.isNeeded) {
+        //             Linking.openURL(res.storeUrl);  // open store if update is needed.
+        //         } else {
                     try {
                         const granted = await PermissionsAndroid.request(
                             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -93,8 +93,8 @@ export class UserDecide extends Component<Props, State & any> {
                     } catch (err) {
                         console.warn(err);
                     }
-                }
-            });
+            //     }
+            // });
 
 
     }
