@@ -1,22 +1,17 @@
 import React, { Component } from 'react';
-import { View, Alert, PermissionsAndroid } from 'react-native';
+import { View, Alert, PermissionsAndroid, Linking, Platform } from 'react-native';
 import { AppRoute } from '../../navigation/app-routes';
 import { AppConstants } from '../../constants';
-// import axios from 'axios';
-// import { SafeAreaLayout, SaveAreaInset, } from '../../components/safe-area-layout.component';
-// import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { Styles } from '../../assets/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
-// import RazorpayCheckout from 'react-native-razorpay';
 import OneSignal from 'react-native-onesignal';
 import Geolocation from 'react-native-geolocation-service';
-// import { checkForVersion } from 'react-native-app-version-force-update';
-// import moment from 'moment';
-// import VersionCheck from 'react-native-version-check';
+import VersionCheck from 'react-native-version-check';
 import { UserDecideProps } from '../../navigation/user-decide/userDecide.navigator';
 import { ThemedComponentProps } from '@ui-kitten/components';
 import Geocoder from 'react-native-geocoding';
+
 
 interface State {
     email: string | undefined;
@@ -48,11 +43,55 @@ export class UserDecide extends Component<Props, State & any> {
         Geocoder.init(AppConstants.GOOGLE_MAP_KEY);
         AsyncStorage.setItem('categoryId', '')
 
+        // inAppUpdates.checkNeedsUpdate({ curVersion: '15' }).then((result) => {
+        //     console.log('qwer', result)
+        //     if (result.shouldUpdate) {
+        //         let updateOptions: StartUpdateOptions = {};
+        //         if (Platform.OS === 'android') {
+        //             // android only, on iOS the user will be promped to go to your app store page
+        //             updateOptions = {
+        //                 updateType: IAUUpdateKind.FLEXIBLE,
+        //             };
+        //         }
+        //         inAppUpdates.startUpdate(updateOptions); // https://github.com/SudoPlz/sp-react-native-in-app-updates/blob/master/src/types.ts#L78
+        //     }
+        // });
+        // console.log(VersionCheck.getCurrentVersion())
+
+        fetch(
+            `https://play.google.com/store/apps/details?id=com.milaan.mart&hl=en`,
+        ).then(res => res.text())
+            .then((text) => {
+                const match = text.match(/Current Version.+>([\d.]{4,10})<\/span>/);
+                if (match) {
+                    const latestVersion = match[1].trim();
+                    return Promise.resolve(latestVersion);
+                }
+                return Promise.reject();
+            });
+
+        // VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
+        //     .then(latestVersion => {
+        //         console.log(latestVersion);    // 0.1.2
+        //     });
+
+        // VersionCheck.getPlayStoreUrl()
+        // .then(country => console.log(country)); 
+
+        // VersionCheck.getLatestVersion({packageName: "com.milaan.mart"}).then(latestVersion => {
+        //         console.log('latest version',latestVersion);    // 0.1.2
+        //     });
+
         // VersionCheck.getLatestVersion({
         //     provider: 'playStore'
         // }).then(latestVersion => {
-        //     // console.log('Latest Version', latestVersion);
+        //     console.log('Latest Version', latestVersion);
         // });
+
+        //   VersionCheck.needUpdate()
+        //     .then(async res => {
+        //         console.log(res)
+        //     })
 
         // VersionCheck.needUpdate()
         //     .then(async res => {
@@ -60,41 +99,41 @@ export class UserDecide extends Component<Props, State & any> {
         //         if (res.isNeeded) {
         //             Linking.openURL(res.storeUrl);  // open store if update is needed.
         //         } else {
-                    try {
-                        const granted = await PermissionsAndroid.request(
-                            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                            {
-                                title: "Milaan Mart Location Permission",
-                                message:
-                                    "Milaan Mart needs access to your Location " +
-                                    "so you can get your nearest shop.",
-                                buttonNeutral: "Ask Me Later",
-                                buttonNegative: "Cancel",
-                                buttonPositive: "OK"
-                            }
-                        );
-                      
-                        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                            Geolocation.getCurrentPosition((position) => {
-                                var lat = position.coords.latitude
-                                var long = position.coords.longitude
-                                AsyncStorage.setItem('latitude', String(lat))
-                                AsyncStorage.setItem('longitude', String(long))
-                                AsyncStorage.setItem('location', 'Current Location')
-                                // console.log('location', lat, position.coords.accuracy)
-                                this.navigate()
-                            }, (err) => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    title: "Milaan Mart Location Permission",
+                    message:
+                        "Milaan Mart needs access to your Location " +
+                        "so you can get your nearest shop.",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK"
+                }
+            );
 
-                            }, { enableHighAccuracy: true })
-                        } else {
-                            // console.log("Location permission denied");
-                            Alert.alert("Please give location permition to use this application.")
-                        }
-                    } catch (err) {
-                        console.warn(err);
-                    }
-            //     }
-            // });
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                Geolocation.getCurrentPosition((position) => {
+                    var lat = position.coords.latitude
+                    var long = position.coords.longitude
+                    AsyncStorage.setItem('latitude', String(lat))
+                    AsyncStorage.setItem('longitude', String(long))
+                    AsyncStorage.setItem('location', 'Current Location')
+                    // console.log('location', lat, position.coords.accuracy)
+                    this.navigate()
+                }, (err) => {
+
+                }, { enableHighAccuracy: true })
+            } else {
+                // console.log("Location permission denied");
+                Alert.alert("Please give location permition to use this application.")
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+        //     }
+        // });
 
 
     }

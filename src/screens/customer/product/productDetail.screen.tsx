@@ -1,8 +1,7 @@
-import { Picker } from '@react-native-picker/picker';
 import { Divider, ListItem, Text, ThemedComponentProps } from '@ui-kitten/components';
 import axios from 'axios';
 import Axios from 'axios';
-import React from 'react';
+import React, {PureComponent} from 'react';
 import { Alert, AsyncStorage, Pressable, RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SliderBox } from "react-native-image-slider-box";
 import { scale } from 'react-native-size-matters';
@@ -38,7 +37,7 @@ const PROFILE_IMAGE_MIN_HEIGHT = 40;
 
 type Props = ProductDetailScreenProps & CategoryProductDetailScreenProps & ThemedComponentProps & any & WishProductDetailScreenProps
 
-export class ProductDetailScreen extends React.Component<Props, any> {
+export class ProductDetailScreen extends PureComponent<Props, any> {
     constructor(props: Props) {
         super(props)
         this.state = {

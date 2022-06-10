@@ -1,9 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import { CommonActions } from '@react-navigation/core';
 import { Divider, List, ListItem, ListItemElement, ThemedComponentProps } from '@ui-kitten/components';
 import Axios from 'axios';
-import React, { Component } from 'react';
-import { ActivityIndicator, Alert, AsyncStorage, Pressable, RefreshControl, Text, View } from 'react-native';
+import React, { PureComponent } from 'react';
+import { ActivityIndicator, Alert, Pressable, RefreshControl, Text, View } from 'react-native';
 import Geocoder from 'react-native-geocoding';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -22,7 +23,7 @@ import { CustomerAddressScreenProps } from '../../../navigation/customer-navigat
 
 type Props = CartAddressScreenProps & CustomerAddressScreenProps & ThemedComponentProps
 
-export class CustomerAddressScreen extends Component<Props, any> {
+export class CustomerAddressScreen extends PureComponent<Props, any> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -62,6 +63,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
         let userData = JSON.parse(userDetail);
 
         const logedIn = await AsyncStorage.getItem('logedIn');
+
         if (null != logedIn && logedIn === 'true') {
             Axios({
                 method: 'GET',
@@ -96,6 +98,10 @@ export class CustomerAddressScreen extends Component<Props, any> {
             Alert.alert("Please enter pincode.");
         } else if (city == null || city === '') {
             Alert.alert("Please enter address.");
+        } else if (lat == null || lat === '') {
+            Alert.alert("Please select your desired location.");
+        } else if (lat == null || lat === '') {
+            Alert.alert("Please select your desired location.");
         } else {
             Axios({
                 method: 'POST',
@@ -300,7 +306,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
         })
     }
 
-    async onCurrentLocation() {
+    onCurrentLocation = async () => {
         Geolocation.getCurrentPosition((position) => {
             var lat = position.coords.latitude
             var long = position.coords.longitude
@@ -358,7 +364,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
 
     render() {
         const { allAddress, name, searchVisible, lat, long, mobileNo, street, edit, modalVisible, isEditable, city, postOffice, policeStation, district, landMark, pinCode, state, latitude, longitude, country } = this.state
-        return (
+             return (
             <SafeAreaLayout
                 style={Styles.safeArea}
                 insets={SaveAreaInset.TOP}>
@@ -379,7 +385,7 @@ export class CustomerAddressScreen extends Component<Props, any> {
                             styles={{}}
                             onPress={(data, details = null) => {
                                 this.handleSearchLatLong(data, details)
-                                console.log('New Location', data);
+                                console.log('New Location', data, lat, long);
                             }}
                             query={{
                                 key: AppConstants.GOOGLE_MAP_KEY,
